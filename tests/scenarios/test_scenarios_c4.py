@@ -7,8 +7,9 @@ record what C4 does not do yet:
   meaning where gold expects two (the seed would need a second reviewed "auth" name).
 - FX-19 case 1: context resolution and the alias cap work, but half the obligations are missed.
 - FX-21: needs the admin script (descriptor refresh, then unshare mid-run) and a SkillHub read.
-FX-18, FX-22, FX-23 have no cases (script-only): FX-18 and FX-23 are covered by unit tests
-(tests/test_sanctum_ref_memory.py); FX-22 (probe coverage) is not built.
+FX-18 and FX-22 have no cases (script-only): FX-18 is covered by unit tests
+(tests/test_sanctum_ref_memory.py); FX-22 (probe coverage) is not built. FX-23's case passes
+here without its mid-request swap script; pinning, swap and rollback are unit-tested.
 EX-15 and FX-17 pass on the seed as authored; their governance scripts (proposal review) are not
 run because the write and proposal path is post-pilot.
 """
@@ -18,7 +19,7 @@ import pytest
 
 from .conftest import scenario_cases
 
-M4_SCENARIOS = {"EX-05", "EX-09b", "EX-15", "FX-16", "FX-17", "FX-19", "FX-20", "FX-21", "EX-04", "EX-06"}
+M4_SCENARIOS = {"EX-05", "EX-09b", "EX-15", "FX-16", "FX-17", "FX-19", "FX-20", "FX-21", "FX-23", "EX-04", "EX-06"}
 EXPECTED_C4_FAIL = {
     "sc-ex-04-1": "no scope and no service named",
     "sc-ex-06-1": "r1 reviews 'auth' for identity-auth only",

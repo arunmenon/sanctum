@@ -163,8 +163,9 @@ Uncertain answers keep the source; an unavailable layer keeps every candidate an
 
 IncidentHub joins with no `sanctum_ref` code change: an owner manifest
 (`owners/manifests/incidenthub.yaml`) and memory release `r2` (queue places, pinned descriptor),
-activated through `owners/memory_seed/ACTIVE`. It stays held back in `configs/hubs.yaml`; release it
-per run with `tools/run_lab.py --release-hub incidenthub` (the proxy exposes only released hubs).
+selected per run with `--memory-release r2` (ACTIVE stays `r1` so M0-M6 results reproduce). It stays
+held back in `configs/hubs.yaml`; release it per run with `tools/run_lab.py --release-hub incidenthub
+--memory-release r2` (the proxy exposes only released hubs).
 
 | Arm | Dev held back | Dev released |
 |---|---|---|

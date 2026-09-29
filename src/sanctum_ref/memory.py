@@ -163,8 +163,9 @@ class MemoryStore(Protocol):
     def context_entity(self, scope: str) -> Optional[tuple[str, str]]: ...
 
 
-def _term_ref(term: TermRecord) -> str:
-    return f"DENOTES:{term.source}:{term.namespace}:{term.native_id}@v{term.version}"
+def _term_ref(term: TermRecord, release_id: str) -> str:
+    """Assertion refs carry the release they were read from, so a receipt shows no mixing."""
+    return f"DENOTES:{term.source}:{term.namespace}:{term.native_id}@v{term.version}@{release_id}"
 
 
 class RelationStore:
@@ -200,7 +201,7 @@ class RelationStore:
         return sorted({qualifier for qualifier, _ in self._edges.get(("label", "DENOTES"), [])})
 
     def denotes(self, label):
-        return [Denotation(term.denotes, term.source, term.namespace, term.label, _term_ref(term))
+        return [Denotation(term.denotes, term.source, term.namespace, term.label, _term_ref(term, self.release_id))
                 for qualifier, term in self._edges.get(("label", "DENOTES"), []) if qualifier == label]
 
     def places_for(self, entity_id):
@@ -217,7 +218,7 @@ class RelationStore:
                      if term.denotes == entity_id and term.source == source), None)
 
     def context_entity(self, scope):
-        return next(((c.selects_for, f"CONTEXT:{c.scope}@v{c.version}")
+        return next(((c.selects_for, f"CONTEXT:{c.scope}@v{c.version}@{self.release_id}")
                      for qualifier, c in self._edges.get(("scope", "SELECTS_FOR"), []) if qualifier == scope), None)
 
 
@@ -240,7 +241,7 @@ class TableStore:
         return sorted({label for label, _ in self._name_table})
 
     def denotes(self, label):
-        return [Denotation(t.denotes, t.source, t.namespace, t.label, _term_ref(t)) for key, t in self._name_table if key == label]
+        return [Denotation(t.denotes, t.source, t.namespace, t.label, _term_ref(t, self.release_id)) for key, t in self._name_table if key == label]
 
     def places_for(self, entity_id):
         return [place for place in self._place_table if place.selects_for == entity_id]
@@ -255,7 +256,7 @@ class TableStore:
         return next((t.label for _, t in self._name_table if t.denotes == entity_id and t.source == source), None)
 
     def context_entity(self, scope):
-        return next(((c.selects_for, f"CONTEXT:{c.scope}@v{c.version}") for c in self._context_table if c.scope == scope), None)
+        return next(((c.selects_for, f"CONTEXT:{c.scope}@v{c.version}@{self.release_id}") for c in self._context_table if c.scope == scope), None)
 
 
 class LabelTable:

@@ -17,7 +17,7 @@ def test_ex12_answers_only_when_released(scenario_world, tmp_path, config_id):
         cases.mkdir()
         shutil.copy(SCENARIO_GOLD / f"{case_id}.yaml", cases)
         result = run_ref(scenario_world, tmp_path / f"run-{case_id}", config_id=config_id, cases_dir=cases,
-                         include_held_back=released)
+                         include_held_back=released, extra_arguments=("--memory-release", "r2") if config_id == "C4" else ())
         assert result.integrity_ok and ("incidenthub" in result.manifest["hubs"]) == released
         outcomes[case_id] = result.scores[0]
     assert outcomes[released_case].safe_grounded_success, outcomes[released_case]

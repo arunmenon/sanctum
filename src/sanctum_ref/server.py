@@ -68,9 +68,9 @@ class ProxyPort:
 
 
 def build_server(arm: ArmConfig, registry_dir: Path, proxy: ClientSession,
-                 memory_seed: Optional[Path] = None, provider=None) -> Server:
+                 memory_seed: Optional[Path] = None, provider=None, memory_release: Optional[str] = None) -> Server:
     server: Server = Server("sanctum-ref")
-    memory = MemoryState(memory_seed)            # one per process: release cache, change cursor
+    memory = MemoryState(memory_seed, memory_release)            # one per process: release cache, change cursor
     schema = RetrieveRequest.model_json_schema()
 
     @server.list_tools()
@@ -111,8 +111,8 @@ async def proxy_session(read_descriptor: int, write_descriptor: int):
 
 
 async def serve(arm: ArmConfig, registry_dir: Path, proxy_read_fd: int, proxy_write_fd: int,
-                memory_seed: Optional[Path] = None, provider=None) -> None:
+                memory_seed: Optional[Path] = None, provider=None, memory_release: Optional[str] = None) -> None:
     async with proxy_session(proxy_read_fd, proxy_write_fd) as proxy:
-        server = build_server(arm, registry_dir, proxy, memory_seed, provider)
+        server = build_server(arm, registry_dir, proxy, memory_seed, provider, memory_release)
         async with stdio_server() as (read_stream, write_stream):
             await server.run(read_stream, write_stream, server.create_initialization_options())

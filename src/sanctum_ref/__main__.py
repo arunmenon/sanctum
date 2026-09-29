@@ -23,6 +23,8 @@ def main(argv=None) -> int:
     parser.add_argument("--registry", type=Path, default=ROOT / "owners" / "manifests")
     parser.add_argument("--memory-seed", type=Path, default=ROOT / "owners" / "memory_seed",
                         help="memory releases (used by memory arms only)")
+    parser.add_argument("--memory-release", default=None,
+                        help="pin this release for the whole process instead of reading ACTIVE per request")
     parser.add_argument("--decision-provider", default="standin", choices=["rules", "standin", "jev"],
                         help="D2 provider for arms with decision_provider: named")
     parser.add_argument("--decision-params", type=Path, default=ROOT / "configs" / "d2_standin.yaml")
@@ -42,7 +44,7 @@ def main(argv=None) -> int:
             print(f"sanctum_ref: {error}", file=sys.stderr)
             return 2
     anyio.run(serve, arm, arguments.registry, arguments.proxy_read_fd, arguments.proxy_write_fd,
-              arguments.memory_seed if arm.uses_memory else None, provider)
+              arguments.memory_seed if arm.uses_memory else None, provider, arguments.memory_release)
     return 0
 
 

@@ -79,8 +79,9 @@ class MemoryState:
     an unshared or renamed place stops being used as a selector (HLD §9.5 "stale": uncertain,
     no exclusive filter) until a new release re-binds it."""
 
-    def __init__(self, seed_dir: Optional[Path]):
+    def __init__(self, seed_dir: Optional[Path], release_id: Optional[str] = None):
         self.seed_dir = seed_dir
+        self.release_id = release_id           # explicit release for this process; else ACTIVE
         self.cursor = 0
         self.invalidated_places: set[str] = set()
         self._stores: dict[tuple[str, str], Any] = {}
@@ -89,7 +90,7 @@ class MemoryState:
         """(release, store) for the release active now; raises MemoryUnavailable."""
         if self.seed_dir is None:
             raise MemoryUnavailable("no memory seed configured")
-        release = load_release(self.seed_dir)
+        release = load_release(self.seed_dir, self.release_id)
         key = (release.release_id, backend)
         if key not in self._stores:
             self._stores[key] = (release, build_store(release, backend))
@@ -128,11 +129,13 @@ class Retriever:
 
         # memory: pin one release for the whole request (HLD §9.6); failure degrades, never widens
         release_id, degraded, resolution, activations, memory_reasons = MEMORY_RELEASE, [], None, [], []
+        pinned_at_ms = None
         if self.arm.uses_memory:
             try:
                 await self.memory.consume_changes(port)
                 release, store = self.memory.pin(self.arm.memory_store)
                 release_id = release.release_id
+                pinned_at_ms = int((time.monotonic() - clock.started) * 1000)
                 if self.arm.resolution == "label_only":
                     resolution = resolve_label_only(request, LabelTable(release), store, releases)
                 else:
@@ -184,7 +187,9 @@ class Retriever:
                                    aliases=list(plan.aliases), as_of=plan.as_of)
                          for plan in plans if plan.call],
             calls=clock.calls, complete=True,
-            timings_ms={"total": int((time.monotonic() - clock.started) * 1000)})
+            timings_ms={"total": int((time.monotonic() - clock.started) * 1000),
+                        # when the release was pinned (FX-23): everything after used this release
+                        **({"memory_pinned": pinned_at_ms} if pinned_at_ms is not None else {})})
         response = EvidenceResponse(
             request_id=request.request_id, receipt_id=receipt_id, memory_release_id=release_id,
             effective_scope_ref=self._scope_ref(request, groups),

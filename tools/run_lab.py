@@ -16,7 +16,7 @@ MEMORY_CONFIGS = ("C4", "C4a-equivalent", "C4a-label-only", "C5")
 REF_CONFIGS = ("C1-naive", "C1-fair", "C2", "C3", "C4", "C4a-equivalent", "C4a-label-only", "C5")
 
 
-def make_sut(name: str, config_id: str = "stub", registry=None, decision_provider=None):
+def make_sut(name: str, config_id: str = "stub", registry=None, decision_provider=None, memory_release=None):
     """`stub` runs in process (trusted, canned); `ref` runs out of process behind the gateway proxy."""
     if name == "stub":
         return StubSUTAdapter(load_call_plan(M0_TRACES))
@@ -28,6 +28,8 @@ def make_sut(name: str, config_id: str = "stub", registry=None, decision_provide
             arguments += ["--registry", str(Path(registry).resolve())]
         if decision_provider is not None:
             arguments += ["--decision-provider", decision_provider]
+        if memory_release is not None:
+            arguments += ["--memory-release", memory_release]
         return ProcessSUT(arguments)
     raise SystemExit(f"unknown SUT {name!r}")
 
@@ -55,18 +57,21 @@ if __name__ == "__main__":
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--principal-aliases", type=Path, default=None,
                         help="alias YAML (default: configs/m0_principal_aliases.yaml for gold/m0 only)")
+    parser.add_argument("--memory-release", default=None,
+                        help="memory release for memory arms (default: owners/memory_seed/ACTIVE, r1); r2 adds IncidentHub")
     parser.add_argument("--release-hub", action="append", default=[], choices=["incidenthub"],
                         help="release a held-back hub for this run (default: configs/hubs.yaml held_back)")
     parser.add_argument("--out", type=Path, required=True)
     arguments = parser.parse_args()
     arguments.config_id = arguments.config_id or ("C2" if arguments.sut == "ref" else "stub")
-    sut = make_sut(arguments.sut, arguments.config_id, arguments.registry, arguments.decision_provider)
+    sut = make_sut(arguments.sut, arguments.config_id, arguments.registry, arguments.decision_provider,
+                   arguments.memory_release)
     alignment = None
     if arguments.sut == "ref" and arguments.config_id in MEMORY_CONFIGS:
         # evaluator side: map the SUT's memory entity refs to world refs before scoring
         from sanctum_eval.alignment import load_alignment
         from sanctum_world.schema import load_world
-        active = (ROOT / "owners" / "memory_seed" / "ACTIVE").read_text().strip()
+        active = arguments.memory_release or (ROOT / "owners" / "memory_seed" / "ACTIVE").read_text().strip()
         alignment, _unaligned = load_alignment(ROOT / "owners" / "memory_seed" / active / "entities.yaml",
                                                load_world(ROOT / "world" / "world.yaml"), arguments.world_build)
     try:

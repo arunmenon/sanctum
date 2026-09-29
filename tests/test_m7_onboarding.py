@@ -21,12 +21,13 @@ from tests.scenarios.conftest import scenario_world  # noqa: F401  (session worl
 
 ROOT = Path(__file__).resolve().parents[1]
 M6_COMMIT = "92b4d62"
+M7_COMMIT = "59f85ec"   # onboarding commit; later sanctum_ref changes (FX-23 hooks) are not onboarding
 
 
 def test_sanctum_ref_core_unchanged_since_m6():
-    if shutil.which("git") is None or subprocess.run(["git", "cat-file", "-e", M6_COMMIT], cwd=ROOT).returncode:
+    if shutil.which("git") is None or subprocess.run(["git", "cat-file", "-e", M7_COMMIT], cwd=ROOT).returncode:
         pytest.skip("git history not available")
-    changed = subprocess.run(["git", "diff", "--name-only", M6_COMMIT, "--", "src/sanctum_ref"],
+    changed = subprocess.run(["git", "diff", "--name-only", M6_COMMIT, M7_COMMIT, "--", "src/sanctum_ref"],
                              cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
     assert changed == [], f"sanctum_ref changed for onboarding: {changed}"
 

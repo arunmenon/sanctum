@@ -47,7 +47,7 @@ def plans(query, groups, arm="C4", invalidated=frozenset(), **fields):
 
 
 def test_release_validates_and_is_incomplete(release):
-    assert release.release_id == "r1" and (SEED / "ACTIVE").read_text().strip() in {"r1", "r2"}
+    assert release.release_id == "r1" and (SEED / "ACTIVE").read_text().strip() == "r1"   # r2 only by explicit --memory-release
     labels = {term.label for term in release.terms}
     assert {"Auth Service", "PA-svc"} <= labels
     namespaces = {term.namespace for term in release.terms if term.label == "Auth Service"}
@@ -195,3 +195,10 @@ def test_fx23_release_swap_and_rollback(tmp_path):
     (seed / "ACTIVE").write_text("r9\n")                                            # withdrawn / missing
     with pytest.raises(MemoryUnavailable):
         state.pin("relations")
+
+
+def test_assertion_refs_carry_their_release():
+    """FX-23 hook: every assertion ref names the release it was read from."""
+    resolution, _planned, activations, _ = plans("What are the PA-svc retry limits?", PAYMENTS)
+    refs = [ref for record in resolution.records for ref in record.assertion_refs] + [a.ref for a in activations]
+    assert refs and all(ref.endswith("@r1") for ref in refs)

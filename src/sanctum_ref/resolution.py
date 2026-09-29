@@ -181,7 +181,7 @@ def entity_plan(store: MemoryStore, registry: Registry, entity_id: str, hub_id: 
         if manifest.place_accessible(place.place, groups) is False:
             continue
         plan.selectors[place.filter] = place.value
-        plan.selector_refs.append(f"SELECTS_FOR:{place.source}:{place.value}@v{place.version}")
+        plan.selector_refs.append(f"SELECTS_FOR:{place.source}:{place.value}@v{place.version}@{store.release_id}")
         break
     query_words = set(words(request_query))
     for source in (hub_id, "catalog", "skillhub"):
@@ -200,6 +200,6 @@ def procedure_activations(store: MemoryStore, entity_id: str, entity_ref: str,
     out = []
     for procedure in store.procedures():
         if procedure.trigger.entity_member_of in domains and procedure.trigger.fact_kind_needed in fact_kinds:
-            out.append((procedure, Activation(kind="procedure", ref=f"{procedure.procedure_id}@v{procedure.version}",
+            out.append((procedure, Activation(kind="procedure", ref=f"{procedure.procedure_id}@v{procedure.version}@{store.release_id}",
                                               entity_ref=entity_ref, source_id=procedure.action.must_consult)))
     return out

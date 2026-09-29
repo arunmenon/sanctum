@@ -1,0 +1,7 @@
+id: m1-008
+family: no_source
+principal: kestrel-payments
+text: How long is an fxq quote valid before it expires?
+mode: scoped
+name: {native: fxq, hub: memoryhub}
+attributes: [quote_ttl_seconds]

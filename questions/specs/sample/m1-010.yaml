@@ -1,0 +1,8 @@
+id: m1-010
+family: restricted_content
+principal: kestrel-payments
+text: What was the root cause of the payment authorization retry incident?
+mode: scoped
+entities: [svc.payment-auth]
+attributes: [root_cause]
+fact_kinds: [incident]

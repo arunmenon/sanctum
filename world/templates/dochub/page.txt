@@ -1,0 +1,5 @@
+{{place}} / {{title}}
+
+{{body}}
+
+{{noise}}

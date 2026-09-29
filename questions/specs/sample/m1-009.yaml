@@ -1,0 +1,7 @@
+id: m1-009
+family: multi_hub
+principal: kestrel-both
+text: What is the edge gateway upstream timeout, and who has to approve changing it?
+mode: scoped
+entities: [svc.gateway-edge]
+attributes: [upstream_timeout_ms, timeout_change_approver]

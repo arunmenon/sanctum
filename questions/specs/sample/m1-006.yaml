@@ -1,0 +1,10 @@
+id: m1-006
+family: verify_claim
+principal: kestrel-payments
+text: "Verify this claim: payment authorization retries gateway timeouts up to 7 times in production."
+mode: verify
+environment: prod
+entities: [svc.payment-auth]
+attributes: [max_retries]
+fact_kinds: [implemented]
+contrast: {environment: experiment}

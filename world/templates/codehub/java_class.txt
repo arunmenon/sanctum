@@ -1,0 +1,9 @@
+// {{place}}
+// {{path}}
+package com.kestrel;
+
+{{body}}
+
+/*
+ * {{noise}}
+ */

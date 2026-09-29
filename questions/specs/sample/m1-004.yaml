@@ -1,0 +1,10 @@
+id: m1-004
+family: historical
+principal: kestrel-payments
+text: How many times did payment authorization retry a gateway timeout in release R40?
+mode: scoped
+as_of: R40
+environment: prod
+entities: [svc.payment-auth]
+attributes: [max_retries]
+contrast: {release: R42}

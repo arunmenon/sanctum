@@ -12,11 +12,14 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 
 RULES = {
-    "sanctum_contracts": {"forbid_imports": {"sanctum_eval", "sanctum_stub", "sut_ref", "gen", "world"}},
-    "sanctum_stub": {"forbid_imports": {"sanctum_eval", "gen", "world"}},
+    "sanctum_contracts": {"forbid_imports": {"sanctum_eval", "sanctum_stub", "sut_ref", "gen", "world", "sanctum_world"}},
+    "sanctum_stub": {"forbid_imports": {"sanctum_eval", "gen", "world", "sanctum_world"}},
     "sanctum_eval": {"forbid_imports": {"sanctum_stub", "sut_ref"}},
 }
-FORBIDDEN_LITERALS_RUNTIME = ("gold/", "gold\\", "world.yaml", "tests/fixtures")
+FORBIDDEN_LITERALS_RUNTIME = (
+    "gold/", "gold\\", "world.yaml", "filler.yaml", "world/templates", "build/world",
+    "build/world/private", "provenance.jsonl", "entity_refs.json", "tests/fixtures",
+)
 
 
 def _imports(path: Path) -> set[str]:
@@ -35,6 +38,14 @@ def test_import_boundaries():
         for f in (SRC / pkg).rglob("*.py"):
             bad = _imports(f) & rule["forbid_imports"]
             assert not bad, f"{f.relative_to(ROOT)} imports {bad}"
+
+
+def test_world_package_is_evaluator_side_only():
+    """Only the evaluator side and tools may import sanctum_world; the runtime packages never."""
+    assert (SRC / "sanctum_world").is_dir()
+    for pkg in ("sanctum_contracts", "sanctum_stub"):
+        for f in (SRC / pkg).rglob("*.py"):
+            assert "sanctum_world" not in _imports(f), f"{f.relative_to(ROOT)} imports sanctum_world"
 
 
 def test_runtime_packages_do_not_reference_evaluator_paths():

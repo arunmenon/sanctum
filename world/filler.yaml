@@ -1,0 +1,213 @@
+# Filler world: plausible noise services and artifact volume (lab plan §5.2).
+# Filler never asserts a core fact. Every native here must be unique and must not be a
+# substring of any other native in the world (checked at render time).
+services:
+  - {key: billing-sync, domain: payments, repo: "repo:payments/billing-sync", skill_name: "Billing Sync", doc_space: "space:BILLSYNC", memory_name: "billsync"}
+  - {key: card-vault, domain: payments, repo: "repo:payments/card-vault", skill_name: "Card Vault", doc_space: "space:CARDVAULT", memory_name: "vaultd"}
+  - {key: chargeback-desk, domain: payments, repo: "repo:payments/chargeback-desk", skill_name: "Chargeback Desk", doc_space: "space:CHARGEBACK", memory_name: "cbdesk"}
+  - {key: refund-engine, domain: payments, repo: "repo:payments/refund-engine", skill_name: "Refund Engine", doc_space: "space:REFUNDS", memory_name: "refundr"}
+  - {key: settlement-batch, domain: payments, repo: "repo:payments/settlement-batch", skill_name: "Settlement Batch", doc_space: "space:SETTLE", memory_name: "settlr"}
+  - {key: payout-router, domain: payments, repo: "repo:payments/payout-router", skill_name: "Payout Router", doc_space: "space:DISBURSE", memory_name: "payoutd"}
+  - {key: invoice-render, domain: payments, repo: "repo:payments/invoice-render", skill_name: "Invoice Render", doc_space: "space:INVOICES", memory_name: "invoicer"}
+  - {key: tax-calc, domain: payments, repo: "repo:payments/tax-calc", skill_name: "Tax Calculator", doc_space: "space:TAXCALC", memory_name: "taxcalcd"}
+  - {key: risk-score, domain: payments, repo: "repo:payments/risk-score", skill_name: "Risk Scoring", doc_space: "space:RISK", memory_name: "riskd"}
+  - {key: merchant-onboard, domain: payments, repo: "repo:payments/merchant-onboard", skill_name: "Merchant Onboarding", doc_space: "space:MERCHANTS", memory_name: "onboardr"}
+  - {key: session-store, domain: identity, repo: "repo:identity/session-store", skill_name: "Session Store", doc_space: "space:SESSIONS", memory_name: "sessd"}
+  - {key: mfa-broker, domain: identity, repo: "repo:identity/mfa-broker", skill_name: "MFA Broker", doc_space: "space:MFA", memory_name: "mfab"}
+  - {key: token-mint, domain: identity, repo: "repo:identity/token-mint", skill_name: "Token Mint", doc_space: "space:TOKENS", memory_name: "mintd"}
+  - {key: directory-sync, domain: identity, repo: "repo:identity/directory-sync", skill_name: "Directory Sync", doc_space: "space:DIRSYNC", memory_name: "dirsyncd"}
+  - {key: consent-records, domain: identity, repo: "repo:identity/consent-records", skill_name: "Consent Records", doc_space: "space:CONSENT", memory_name: "consentd"}
+  - {key: profile-api, domain: identity, repo: "repo:identity/profile-api", skill_name: "Profile API", doc_space: "space:PROFILES", memory_name: "profiled"}
+  - {key: password-reset, domain: identity, repo: "repo:identity/password-reset", skill_name: "Password Reset", doc_space: "space:PWRESET", memory_name: "pwresetd"}
+  - {key: audit-trail, domain: identity, repo: "repo:identity/audit-trail", skill_name: "Audit Trail", doc_space: "space:AUDIT", memory_name: "auditd"}
+  - {key: rate-limiter, domain: platform, repo: "repo:platform/rate-limiter", skill_name: "Rate Limiter", doc_space: "space:RATELIMIT", memory_name: "ratelimd"}
+  - {key: config-server, domain: platform, repo: "repo:platform/config-server", skill_name: "Config Server", doc_space: "space:CONFIG", memory_name: "cfgsrv"}
+  - {key: metrics-relay, domain: platform, repo: "repo:platform/metrics-relay", skill_name: "Metrics Relay", doc_space: "space:METRICS", memory_name: "metricsd"}
+  - {key: job-scheduler, domain: platform, repo: "repo:platform/job-scheduler", skill_name: "Job Scheduler", doc_space: "space:JOBS", memory_name: "schedd"}
+  - {key: feature-flags, domain: platform, repo: "repo:platform/feature-flags", skill_name: "Feature Flags", doc_space: "space:FLAGS", memory_name: "flagd"}
+  - {key: blob-archive, domain: platform, repo: "repo:platform/blob-archive", skill_name: "Blob Archive", doc_space: "space:ARCHIVE", memory_name: "archivd"}
+  - {key: dns-updater, domain: platform, repo: "repo:platform/dns-updater", skill_name: "DNS Updater", doc_space: "space:DNS", memory_name: "dnsupd"}
+  - {key: queue-bridge, domain: platform, repo: "repo:platform/queue-bridge", skill_name: "Queue Bridge", doc_space: "space:QBRIDGE", memory_name: "qbridged"}
+
+domain_places:           # shared places per domain, declared by the core world
+  skillhub: {payments: "skills/payments/", identity: "skills/identity/", platform: "skills/platform/"}
+  incidenthub: {payments: "queue:PAYOPS", identity: "queue:IDOPS", platform: "queue:PLATOPS"}
+domain_groups: {payments: payments-eng, identity: identity-eng, platform: platform-eng}
+namespaces: {payments: Payments, identity: Identity, platform: Platform}
+
+# Distinct filler artifacts per hub. Core adds 24 (plus 1 in incidenthub), so the four
+# released hubs total 3,000. The per-service split is seeded; totals are fixed.
+artifact_counts: {codehub: 1010, skillhub: 460, dochub: 790, memoryhub: 716, incidenthub: 180}
+
+kinds:
+  codehub: [java_class, yaml_config, markdown_doc]
+  skillhub: [skill]
+  dochub: [page]
+  memoryhub: [session_note]
+  incidenthub: [ticket]
+
+# Version refs a filler artifact may carry (ordered). Hubs without version reads use "current".
+version_refs:
+  codehub: [R40, R41, R42, exp-branch]
+  skillhub: [v1, v2, v3]
+  dochub: [v1, v2]
+
+class_stems: [Batch, Pool, Queue, Cache, Router, Window, Limit, Budget, Buffer, Checkpoint, Shard, Lease]
+class_suffixes: [Config, Settings, Policy, Defaults]
+words: [latency, throughput, backlog, cutover, rollback, warmup, drain, failover, rebalance,
+        compaction, rotation, reconciliation, paging, sampling, eviction, quota]
+
+# Code bodies are assembled: a header, 2-4 sampled fields (each with its own seeded value),
+# optional comment. Retry and timeout constants appear here on purpose as decoys, so a grep
+# for MAX_RETRIES returns many non-gold hits. Filler values are random and assert nothing.
+java_headers:
+  - "public final class {{class}} {"
+  - "final class {{class}} {"
+  - "public interface {{class}} {"
+  - "public class {{class}} {"
+  - "public record {{class}}() {"
+java_fields:
+  - "static final int MAX_RETRIES = {{param}};"
+  - "static final int TIMEOUT_MS = {{param}};"
+  - "static final long BACKOFF_MS = {{param}}L;"
+  - "static final int RETRY_BUDGET = {{param}};"
+  - "static final int MAX_BATCH = {{param}};"
+  - "static final int POOL_SIZE = {{param}};"
+  - "static final int QUEUE_DEPTH = {{param}};"
+  - "static final int DEFAULT_PAGE_SIZE = {{param}};"
+  - "static final Duration CONNECT_TIMEOUT = Duration.ofMillis({{param}});"
+  - "static final int MAX_ATTEMPTS = {{param}};"
+  - "private static final int WORKER_COUNT = {{param}};"
+  - "private static final double JITTER = 0.{{param}};"
+java_comments:
+  - "/** Values tuned during the {{word}} review. */"
+  - "// TODO: move to configuration once {{word}} settles."
+  - "/** Defaults only; overridden per environment. */"
+  - "// Keep in sync with the {{word}} dashboard alerts."
+yaml_keys:
+  - "max_retries: {{param}}"
+  - "timeout_ms: {{param}}"
+  - "backoff_ms: {{param}}"
+  - "pool_size: {{param}}"
+  - "interval_seconds: {{param}}"
+  - "enabled: true"
+  - "batch_size: {{param}}"
+  - "max_attempts: {{param}}"
+  - "queue_depth: {{param}}"
+bodies:
+  markdown_doc:
+    - "Build notes for {{place}}. The {{word}} stage usually takes about {{param}} seconds."
+    - "Operational notes: {{word}} is handled by the shared pipeline; expect {{param}} jobs per hour."
+    - "## Local setup\n\nRun the {{word}} target first. A clean build takes roughly {{param}} seconds."
+    - "Changelog: tightened {{word}} handling and raised the worker limit to {{param}}."
+    - "This module owns {{word}}. Known limitation: at most {{param}} concurrent requests."
+    - "## Retries\n\nClient calls retry up to {{param}} times with jittered backoff."
+    - "Migration guide: bump the {{word}} schema, then run the backfill ({{param}} rows per batch)."
+    - "Benchmarks: p99 {{word}} latency is {{param}} ms on the reference host."
+    - "Ownership moved to this team last quarter. {{Word}} alerts route here after {{param}} minutes."
+    - "Release checklist: tag, build, smoke test {{word}}, wait {{param}} minutes, promote."
+  skill:
+    - "Use this skill when {{name}} reports {{word}} problems. Check the dashboard, then drain at most {{param}} requests before escalating."
+    - "For {{name}} {{word}} work, pause deploys, confirm the queue is below {{param}} items, and hand over to the owning team."
+    - "Steps for {{name}}:\n1. Confirm the {{word}} alert is real.\n2. Retry at most {{param}} times.\n3. Escalate to the owners."
+    - "{{name}} {{word}}: restart one worker at a time and wait {{param}} seconds between restarts."
+    - "If {{name}} shows {{word}} for more than {{param}} minutes, roll back the last deploy."
+    - "Before touching {{name}}, read the {{word}} notes. Timeouts above {{param}} ms need a second reviewer."
+  page:
+    - "This page describes the {{word}} process for the team that owns {{place}}. Review cadence: every {{param}} days."
+    - "Decision record: {{word}} settings were reviewed; the agreed ceiling is {{param}} per minute."
+    - "Runbook: when {{word}} alarms fire, retry the job up to {{param}} times, then page the owner."
+    - "Meeting notes. Agreed to revisit {{word}} limits; current timeout is {{param}} ms."
+    - "FAQ\n\nQ: How long does {{word}} take?\nA: Usually about {{param}} minutes."
+    - "Onboarding: new engineers shadow {{word}} for {{param}} days before owning it."
+  session_note:
+    - "Looked into {{name}} {{word}} alerts; {{param}} occurrences in the last window. Follow up next session."
+    - "Paired on {{name}} {{word}} cleanup. Left {{param}} items for tomorrow."
+    - "{{name}}: tried bumping retries to {{param}} locally for {{word}}; reverted, not a real fix."
+    - "Reminder to self: {{name}} {{word}} timeout looked like {{param}} ms in staging. Verify before quoting it."
+    - "Asked about {{name}} {{word}}. Answer: roughly {{param}} per hour, nobody wrote it down."
+    - "Spent the session reading {{name}} {{word}} code; {{param}} call sites to update."
+  ticket:
+    - "{{word}} degraded for {{param}} minutes. Mitigated by restarting workers."
+    - "Alert fired for {{word}}; {{param}} customers saw errors before recovery."
+    - "Retries exhausted after {{param}} attempts during {{word}}; manual replay done."
+    - "Timeouts spiked to {{param}} ms during {{word}}. Root cause pending."
+extra_sentences:
+  markdown_doc:
+    - "See the wiki for deployment steps."
+    - "Tests must pass before merge."
+    - "Config defaults are safe for staging."
+    - "The {{word}} flag stays off by default."
+    - "Ask in the team channel before editing this file."
+    - "Generated sections are marked and must not be edited by hand."
+  skill:
+    - "Do not run this during a freeze."
+    - "Log what you changed in the channel."
+    - "Prefer the dashboard over raw logs."
+    - "Skip step two if {{word}} is already quiet."
+  page:
+    - "Owners review this page quarterly."
+    - "Comments are welcome in the thread."
+    - "Earlier versions of this page are out of date."
+    - "Numbers reflect the last {{word}} review."
+  session_note:
+    - "Low priority."
+    - "Need to double check with the owners."
+    - "Might be stale by next week."
+    - "Unrelated to the {{word}} work, but noted."
+  ticket:
+    - "Customer comms were sent."
+    - "No data loss."
+    - "Follow-up ticket filed."
+    - "Paging worked as expected."
+
+titles:
+  skill:
+    - "{{name}} {{word}} handling"
+    - "{{Word}} checklist for {{name}}"
+    - "{{name}}: {{word}}"
+  page:
+    - "{{Word}} process"
+    - "{{Word}} decision record"
+    - "Notes: {{word}}"
+    - "{{Word}} FAQ"
+  session_note:
+    - "Notes on {{name}} {{word}}"
+    - "{{name}} {{word}} follow-up"
+    - "Scratch: {{name}}"
+  ticket:
+    - "{{Word}} degradation"
+    - "{{Word}} alert"
+    - "Incident follow-up: {{word}}"
+
+noise_sentences:
+  - "Reviewed during the weekly operations sync."
+  - "Dashboards were refreshed after the last deploy."
+  - "No customer impact was reported for this change."
+  - "The on-call rotation was notified in advance."
+  - "Follow-up items are tracked in the team backlog."
+  - "Numbers here are approximate and may drift."
+  - "Load tests ran in the staging cluster overnight."
+  - "Owners agreed to revisit this next quarter."
+  - "Alert thresholds were tuned to reduce noise."
+  - "Logs are retained for thirty days by default."
+  - "A canary deploy preceded the full rollout."
+  - "This section was last edited by the platform rotation."
+  - "Keep this page short; link out for details."
+  - "Metrics are sampled every minute."
+  - "Rollback steps were rehearsed once."
+  - "The capacity plan assumes steady growth."
+  - "Nothing here changes public behaviour."
+  - "Questions go to the team chat channel."
+  - "Old entries are archived at the end of each month."
+  - "Retries and timeouts are configured per environment."
+  - "The runbook link is pinned in the channel topic."
+  - "Two reviewers are required for changes here."
+  - "Staging mirrors production configuration where possible."
+  - "Error budgets are reviewed monthly."
+  - "Feature work is paused during freeze weeks."
+  - "The change window is Tuesday through Thursday."
+  - "Traffic peaks around the start of each month."
+  - "Upstream dependencies are listed in the service catalog."
+  - "Clean up stale branches after merge."
+  - "Consider the migration guide before upgrading."

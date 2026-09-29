@@ -1,0 +1,11 @@
+---
+name: {{name}}
+namespace: {{namespace}}
+---
+# {{title}}
+
+{{body}}
+
+## Notes
+
+{{noise}}

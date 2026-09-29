@@ -1,0 +1,6 @@
+Session note ({{principal}})
+{{title}}
+
+{{body}}
+
+{{noise}}

@@ -1,0 +1,7 @@
+id: m1-003
+family: same_name_two_meanings
+principal: kestrel-both
+text: How many retries does Auth Service allow?
+mode: explore
+name: {native: Auth Service, hub: skillhub}
+attributes: [max_retries]

@@ -1,0 +1,8 @@
+id: m1-007
+family: vague
+principal: kestrel-both
+text: whats the auth retry limit
+mode: explore
+entities: [svc.payment-auth, svc.identity-auth]
+attributes: [max_retries]
+expected_ambiguity: clarify

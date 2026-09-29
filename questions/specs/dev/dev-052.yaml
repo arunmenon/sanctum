@@ -1,6 +1,6 @@
 id: dev-052
 family: multi_hub
-principal: kestrel-payments
+principal: kestrel-both
 text: 'edgegw: current timeout plus the approval path for a change'
 mode: scoped
 name:

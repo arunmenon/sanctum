@@ -11,12 +11,10 @@ request:
   caller_profile: agent
 principal: kestrel-payments
 answerable: true
-interpretation_policy: separate_alternatives
+interpretation_policy: unique
 interpretations:
 - interpretation_id: i1
   entity_ref: ent-ecead3bb8a
-- interpretation_id: i2
-  entity_ref: ent-5bf846464b
 obligations:
 - obligation_id: o1
   interpretation_id: i1
@@ -66,37 +64,6 @@ obligations:
       end: 181
   acceptable_gap_reasons: []
   obtainable: true
-- obligation_id: o3
-  interpretation_id: i2
-  weight: 1.0
-  bundles:
-  - spans:
-    - source_id: codehub
-      artifact_id: art-fe4b432c72
-      version: R42
-      start: 193
-      end: 194
-  - spans:
-    - source_id: memoryhub
-      artifact_id: art-246436a073
-      version: current
-      start: 84
-      end: 85
-  acceptable_gap_reasons:
-  - required_source_denied
-  obtainable: false
-- obligation_id: o4
-  interpretation_id: i2
-  weight: 1.0
-  bundles:
-  - spans:
-    - source_id: skillhub
-      artifact_id: art-b95c7dc76a
-      version: v1
-      start: 240
-      end: 241
-  acceptable_gap_reasons: []
-  obtainable: true
 source_obligations:
 - source_id: skillhub
   mandatory: true
@@ -123,11 +90,11 @@ forbidden:
   canaries:
   - CANARY-INC-4417
   - CANARY-INC-9023
-  wrong_entities: []
+  wrong_entities:
+  - ent-5bf846464b
   prohibited_activations: []
 expected:
-  evidence_status: partial
-  required_reasons:
-  - required_source_denied
+  evidence_status: sufficient
+  required_reasons: []
   source_status:
     skillhub: called

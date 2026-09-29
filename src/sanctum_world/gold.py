@@ -156,6 +156,36 @@ class _Deriver:
                     found.append(place.selects_for)
         return list(dict.fromkeys(found))
 
+    def entity_has_artifacts(self, entity_id: str) -> bool:
+        return any(entity_id in artifact.about and not self.is_restricted(artifact.id)
+                   and not self.world.hubs[artifact.hub].held_back for artifact in self.world.artifacts)
+
+    def reviewed_name_visible(self, entity_id: str) -> bool:
+        """HLD §8.5: only reviewed names establish identity. A name counts when the principal can
+        see the DENOTES name (or selecting place) itself; artifacts merely about the entity, such
+        as a shared composite skill, add no interpretation."""
+        term = self.spec.name
+        for hub_id, hub in self.world.hubs.items():
+            if (term.hub and hub_id != term.hub) or hub.held_back:
+                continue
+            for place in hub.places:
+                if place.native == term.native and place.selects_for == entity_id \
+                        and set(place.acl) & self.groups:
+                    return True
+            for name in hub.names:
+                if name.native != term.native or name.denotes != entity_id \
+                        or (term.namespace and name.namespace != term.namespace):
+                    continue
+                if name.namespace:
+                    home = hub.place(f"skills/{name.namespace.lower()}/")
+                    if home is not None and set(home.acl) & self.groups:
+                        return True
+                elif any(artifact.hub == hub_id and entity_id in artifact.about
+                         and not self.is_restricted(artifact.id) and self.can_read(artifact.id)
+                         for artifact in self.world.artifacts):
+                    return True
+        return False
+
     def homonym_siblings(self, entity_ids: list[str]) -> list[str]:
         siblings: list[str] = []
         for planted in self.world.planted:
@@ -223,9 +253,14 @@ class _Deriver:
     def derive(self) -> GoldCase:
         spec, refs = self.spec, self.index.entity_refs
         denoted = self.denoted_entities()
-        visible = [entity_id for entity_id in denoted if self.entity_visible(entity_id)]
-        if not visible:
-            raise ValueError(f"{spec.id}: no entity denoted by the term is visible to {spec.principal}")
+        if spec.name:
+            visible = [entity_id for entity_id in denoted
+                       if self.reviewed_name_visible(entity_id) and self.entity_visible(entity_id)]
+        else:
+            visible = [entity_id for entity_id in denoted if self.entity_visible(entity_id)]
+        # Invisible denoted entities that have artifacts are denied, not uncovered.
+        denied_entities = any(self.entity_has_artifacts(entity_id) for entity_id in denoted
+                              if entity_id not in visible)
         interpretation_ids = {entity_id: f"i{n}" for n, entity_id in enumerate(visible, start=1)}
 
         obligations: list[Obligation] = []
@@ -297,9 +332,9 @@ class _Deriver:
         else:
             evidence_status = EvidenceStatus.insufficient
         required_reasons: list[str] = []
-        if uncovered or not obligations:
+        if (uncovered or not obligations) and (visible or not denied_entities):
             required_reasons.append("no_coverage")
-        if denied:
+        if denied or (not visible and denied_entities):
             required_reasons.append("required_source_denied")
         if policy == InterpretationPolicy.clarify:
             required_reasons.append("ambiguous_term")

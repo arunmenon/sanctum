@@ -248,3 +248,28 @@ def test_fact_not_yet_applicable_is_skipped(world, build_dir, index):
     kinds = {_provenance(index, o.bundles[0].spans[0])["fact_kind"] for o in gold.obligations}
     assert kinds == {"implemented"}
     assert gold.expected.evidence_status.value == "sufficient"
+
+
+def test_invisible_denoted_entity_yields_denied_case_not_error(world, build_dir, index):
+    # edgegw is a memoryhub name from kestrel-both's own sessions; kestrel-payments cannot see it
+    gold = derive(world, build_dir, _spec(principal="kestrel-payments",
+                                          name={"native": "edgegw", "hub": "memoryhub"},
+                                          attributes=["upstream_timeout_ms"]), index=index)
+    assert not gold.answerable and not gold.interpretations and not gold.obligations
+    assert gold.expected.evidence_status.value == "insufficient"
+    assert gold.expected.required_reasons == ["required_source_denied"]
+    assert gold.forbidden.wrong_entities == [index.entity_refs["svc.gateway-edge"]]
+
+
+def test_composite_artifact_adds_no_interpretation(world, build_dir, index):
+    # skills/shared/ has a composite skill about both auth services; only reviewed names count
+    term = {"native": "Auth Service", "hub": "skillhub"}
+    payments = derive(world, build_dir, _spec(principal="kestrel-payments", name=term,
+                                              attributes=["max_retries"]), index=index)
+    assert payments.interpretation_policy == InterpretationPolicy.unique
+    assert [i.entity_ref for i in payments.interpretations] == [index.entity_refs["svc.payment-auth"]]
+    assert index.entity_refs["svc.identity-auth"] in payments.forbidden.wrong_entities
+    both = derive(world, build_dir, _spec(principal="kestrel-both", name=term,
+                                          attributes=["max_retries"]), index=index)
+    assert both.interpretation_policy == InterpretationPolicy.separate_alternatives
+    assert len(both.interpretations) == 2

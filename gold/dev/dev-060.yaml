@@ -12,9 +12,7 @@ request:
 principal: kestrel-both
 answerable: false
 interpretation_policy: unique
-interpretations:
-- interpretation_id: i1
-  entity_ref: ent-d8660e2a68
+interpretations: []
 obligations: []
 source_obligations: []
 relations: []
@@ -22,10 +20,11 @@ forbidden:
   canaries:
   - CANARY-INC-4417
   - CANARY-INC-9023
-  wrong_entities: []
+  wrong_entities:
+  - ent-d8660e2a68
   prohibited_activations: []
 expected:
   evidence_status: insufficient
   required_reasons:
-  - no_coverage
+  - required_source_denied
   source_status: {}

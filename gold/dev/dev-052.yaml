@@ -9,7 +9,7 @@ request:
   budget_tokens: 4000
   deadline_ms: 3000
   caller_profile: agent
-principal: kestrel-payments
+principal: kestrel-both
 answerable: true
 interpretation_policy: unique
 interpretations:
@@ -26,6 +26,12 @@ obligations:
       version: R42
       start: 98
       end: 102
+  - spans:
+    - source_id: memoryhub
+      artifact_id: art-10fe03dbd3
+      version: current
+      start: 81
+      end: 85
   - spans:
     - source_id: skillhub
       artifact_id: art-5ec7167352

@@ -31,3 +31,9 @@ src/sanctum_ref, holdout/, questions/specs/holdout.
 
 ## Result
 60 dev + 11 scenario cases derived; 282 passed; lint 0 findings.
+
+## Gold derivation fixes (A: invisible denoted entity, B: reviewed names only)
+- A: no raise; empty interpretations, insufficient, required_source_denied (or no_coverage),
+  wrong_entities = invisible denoted. B: name specs need a visible DENOTES name or place.
+- Changed gold: dev-022, dev-023 (now unique), dev-060 (now denied, 0 interpretations);
+  dev-052 principal moved to kestrel-both to keep its multi_hub intent. gold/m1, scenarios unchanged.

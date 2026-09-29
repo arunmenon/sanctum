@@ -1,0 +1,24 @@
+# Scenario id -> scenario question case ids (questions/specs/scenarios, gold/scenarios).
+# EX-09 cases are shared by EX-09a..d; the failure is injected by the scenario test, not the spec.
+scenarios:
+  EX-01:
+  - sc-ex-01-1
+  EX-02:
+  - sc-ex-02-1
+  EX-03:
+  - sc-ex-03-1
+  EX-04:
+  - sc-ex-04-1
+  EX-06:
+  - sc-ex-06-1
+  EX-07:
+  - sc-ex-07-1
+  EX-08:
+  - sc-ex-08-1
+  EX-09:
+  - sc-ex-09-1
+  EX-10:
+  - sc-ex-10-1
+  FX-24:
+  - sc-fx-24-1
+  - sc-fx-24-2

@@ -1,0 +1,13 @@
+id: sc-ex-04-1
+family: historical
+principal: kestrel-payments
+text: What was the retry limit in release R40?
+mode: scoped
+as_of: R40
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+contrast:
+  release: R42

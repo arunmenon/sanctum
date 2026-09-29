@@ -1,0 +1,53 @@
+case_id: dev-015
+bundle_id: b-dev-015
+family: hub_specific_name
+request:
+  schema_version: '1.0'
+  request_id: req-a8af1c4f71959fad
+  query: In space:LEDGER terms, what is the replay window?
+  mode: scoped
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-payments
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-d8660e2a68
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: dochub
+      artifact_id: art-7b07fe6fb9
+      version: v1
+      start: 85
+      end: 87
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-6a944fe4fd
+      version: v2
+      start: 138
+      end: 140
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations:
+- source_id: skillhub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities: []
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status:
+    skillhub: called

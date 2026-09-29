@@ -1,0 +1,11 @@
+id: dev-010
+family: named_service
+principal: admin-probe
+text: Give me the payment auth retry cap as deployed today.
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

@@ -1,0 +1,10 @@
+id: dev-055
+family: multi_hub
+principal: kestrel-payments
+text: ledger-post batch size and the replay window from the runbook
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+- replay_window_minutes

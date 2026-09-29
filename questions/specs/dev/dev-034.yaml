@@ -1,0 +1,9 @@
+id: dev-034
+family: conflicting_sources
+principal: kestrel-identity
+text: Is identity-auth's documented retry count consistent with what ships?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- max_retries

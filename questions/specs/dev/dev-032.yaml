@@ -1,0 +1,9 @@
+id: dev-032
+family: conflicting_sources
+principal: kestrel-both
+text: 'payment-auth: the skill says one retry count, the code another. Which is it?'
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

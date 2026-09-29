@@ -1,0 +1,97 @@
+case_id: dev-033
+bundle_id: b-dev-033
+family: conflicting_sources
+request:
+  schema_version: '1.0'
+  request_id: req-d39a2f75c59232c4
+  query: Do docs and code agree on payment-auth max retries at R42?
+  mode: scoped
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: admin-probe
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-ecead3bb8a
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: codehub
+      artifact_id: art-7623f130c9
+      version: R42
+      start: 261
+      end: 262
+  - spans:
+    - source_id: codehub
+      artifact_id: art-8522875cbb
+      version: R42
+      start: 105
+      end: 106
+  acceptable_gap_reasons: []
+  obtainable: true
+- obligation_id: o2
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: dochub
+      artifact_id: art-bd52a9e934
+      version: current
+      start: 114
+      end: 115
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-5b6058d059
+      version: v3
+      start: 139
+      end: 140
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-b95c7dc76a
+      version: v1
+      start: 180
+      end: 181
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations:
+- source_id: codehub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+- source_id: skillhub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+relations:
+- relation_id: r1
+  relation_type: policy_implementation_divergence
+  witness_a:
+    spans:
+    - source_id: codehub
+      artifact_id: art-7623f130c9
+      version: R42
+      start: 261
+      end: 262
+  witness_b:
+    spans:
+    - source_id: skillhub
+      artifact_id: art-5b6058d059
+      version: v3
+      start: 139
+      end: 140
+forbidden:
+  canaries: []
+  wrong_entities:
+  - ent-5bf846464b
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status:
+    codehub: called
+    skillhub: called

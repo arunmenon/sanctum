@@ -1,0 +1,10 @@
+id: dev-023
+family: same_name_two_meanings
+principal: kestrel-identity
+text: What retry limit does Auth Service document?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries

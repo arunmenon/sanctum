@@ -1,0 +1,10 @@
+id: sc-ex-10-1
+family: named_service
+principal: kestrel-payments
+text: What is the payment-auth retry limit? Include what the PA space says.
+mode: scoped
+name:
+  native: space:PA
+  hub: dochub
+attributes:
+- max_retries

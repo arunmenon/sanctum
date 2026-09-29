@@ -1,0 +1,12 @@
+id: dev-060
+family: restricted_content
+principal: kestrel-both
+text: 'ledgerd replay incident: how many dupes?'
+mode: scoped
+name:
+  native: ledgerd
+  hub: memoryhub
+attributes:
+- duplicate_postings
+fact_kinds:
+- incident

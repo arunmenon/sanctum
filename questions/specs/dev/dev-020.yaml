@@ -1,0 +1,10 @@
+id: dev-020
+family: same_name_two_meanings
+principal: kestrel-both
+text: auth service retry count??
+mode: explore
+name:
+  native: Auth Service
+attributes:
+- max_retries
+expected_ambiguity: clarify

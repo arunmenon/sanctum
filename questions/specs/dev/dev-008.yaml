@@ -1,0 +1,9 @@
+id: dev-008
+family: named_service
+principal: kestrel-codeonly
+text: How many retries does payment-auth do, and what does the retry runbook say?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

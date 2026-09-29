@@ -1,0 +1,10 @@
+id: dev-013
+family: hub_specific_name
+principal: kestrel-identity
+text: 'idauth: after how many failed attempts does lockout kick in?'
+mode: scoped
+name:
+  native: idauth
+  hub: memoryhub
+attributes:
+- lockout_threshold

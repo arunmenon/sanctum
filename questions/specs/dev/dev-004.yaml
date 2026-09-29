@@ -1,0 +1,9 @@
+id: dev-004
+family: named_service
+principal: kestrel-identity
+text: identiy-auth max retires on upstream failure?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- max_retries

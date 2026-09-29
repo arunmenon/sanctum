@@ -1,0 +1,11 @@
+id: dev-057
+family: restricted_content
+principal: kestrel-payments
+text: What was the root cause of the payment-auth incident?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- root_cause
+fact_kinds:
+- incident

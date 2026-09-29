@@ -1,0 +1,10 @@
+id: dev-012
+family: hub_specific_name
+principal: kestrel-payments
+text: ledgerd batch size?
+mode: scoped
+name:
+  native: ledgerd
+  hub: memoryhub
+attributes:
+- batch_size

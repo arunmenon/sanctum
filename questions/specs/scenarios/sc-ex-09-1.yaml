@@ -1,0 +1,12 @@
+id: sc-ex-09-1
+family: named_service
+principal: kestrel-payments
+text: What does authorize() in payment-auth do on a gateway timeout, and how many
+  retries are allowed? (failure variant)
+mode: scoped
+scope: project:payments-auth-retry-fix
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+- backoff_schedule_ms

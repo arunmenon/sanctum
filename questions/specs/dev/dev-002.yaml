@@ -1,0 +1,10 @@
+id: dev-002
+family: named_service
+principal: kestrel-payments
+text: how many retries does payment-auth allow after a gateway timeout
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+scope: project:payments-auth-retry-fix

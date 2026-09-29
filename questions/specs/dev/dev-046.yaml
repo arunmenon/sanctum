@@ -1,0 +1,11 @@
+id: dev-046
+family: no_source
+principal: kestrel-payments
+text: What should FX Quote do with a stale quote?
+mode: scoped
+name:
+  native: FX Quote
+  hub: skillhub
+  namespace: Payments
+attributes:
+- stale_quote_action

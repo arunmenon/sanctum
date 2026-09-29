@@ -1,0 +1,11 @@
+id: dev-040
+family: verify_claim
+principal: kestrel-codeonly
+text: 'Check this: ledger-post posts in batches of 250.'
+mode: verify
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+fact_kinds:
+- implemented

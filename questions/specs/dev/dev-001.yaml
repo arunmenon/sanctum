@@ -1,0 +1,9 @@
+id: dev-001
+family: named_service
+principal: kestrel-payments
+text: What batch size does ledger-post use when posting in prod?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- batch_size

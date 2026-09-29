@@ -1,0 +1,10 @@
+id: dev-014
+family: hub_specific_name
+principal: kestrel-both
+text: What timeout does edgegw use for upstream calls?
+mode: scoped
+name:
+  native: edgegw
+  hub: memoryhub
+attributes:
+- upstream_timeout_ms

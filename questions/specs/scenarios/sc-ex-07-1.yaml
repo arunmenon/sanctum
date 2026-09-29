@@ -1,0 +1,12 @@
+id: sc-ex-07-1
+family: verify_claim
+principal: kestrel-payments
+text: Is it true that payment-auth retries 5 times in production?
+mode: verify
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+contrast:
+  environment: experiment

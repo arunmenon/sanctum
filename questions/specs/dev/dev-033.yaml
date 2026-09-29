@@ -1,0 +1,9 @@
+id: dev-033
+family: conflicting_sources
+principal: admin-probe
+text: Do docs and code agree on payment-auth max retries at R42?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

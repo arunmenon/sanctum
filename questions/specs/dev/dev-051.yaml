@@ -1,0 +1,10 @@
+id: dev-051
+family: multi_hub
+principal: kestrel-both
+text: gateway-edge upstream timeout, and who approves changing it?
+mode: scoped
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms
+- timeout_change_approver

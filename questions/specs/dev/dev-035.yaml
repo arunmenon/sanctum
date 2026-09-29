@@ -1,0 +1,9 @@
+id: dev-035
+family: conflicting_sources
+principal: kestrel-codeonly
+text: Compare payment-auth's coded retry limit with its procedure.
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

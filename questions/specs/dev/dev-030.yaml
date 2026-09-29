@@ -1,0 +1,10 @@
+id: dev-030
+family: historical
+principal: kestrel-codeonly
+text: What was payment-auth's max retries in R40, and the runbook value then?
+mode: scoped
+as_of: R40
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

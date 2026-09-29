@@ -1,0 +1,9 @@
+id: dev-005
+family: named_service
+principal: kestrel-payments
+text: What backoff schedule does payment-auth follow between retry attempts?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- backoff_schedule_ms

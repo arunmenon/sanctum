@@ -1,0 +1,9 @@
+id: dev-049
+family: no_source
+principal: kestrel-codeonly
+text: fx quote expiry seconds?
+mode: scoped
+entities:
+- svc.fx-quote
+attributes:
+- quote_ttl_seconds

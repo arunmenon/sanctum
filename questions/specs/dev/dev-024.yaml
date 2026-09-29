@@ -1,0 +1,11 @@
+id: dev-024
+family: same_name_two_meanings
+principal: kestrel-both
+text: 'Auth Service: retries and lockout, both variants'
+mode: explore
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries
+- lockout_threshold

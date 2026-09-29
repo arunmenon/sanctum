@@ -1,0 +1,11 @@
+id: dev-029
+family: historical
+principal: kestrel-payments
+text: PA-svc retry count at R41
+mode: scoped
+as_of: R41
+name:
+  native: PA-svc
+  hub: memoryhub
+attributes:
+- max_retries

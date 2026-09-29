@@ -1,0 +1,71 @@
+case_id: dev-051
+bundle_id: b-dev-051
+family: multi_hub
+request:
+  schema_version: '1.0'
+  request_id: req-df401102e34a2dee
+  query: gateway-edge upstream timeout, and who approves changing it?
+  mode: scoped
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-both
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-db04e1595f
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: codehub
+      artifact_id: art-c26321f78b
+      version: R42
+      start: 98
+      end: 102
+  - spans:
+    - source_id: memoryhub
+      artifact_id: art-10fe03dbd3
+      version: current
+      start: 81
+      end: 85
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-5ec7167352
+      version: v2
+      start: 99
+      end: 103
+  acceptable_gap_reasons: []
+  obtainable: true
+- obligation_id: o2
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: dochub
+      artifact_id: art-64d294cf95
+      version: v2
+      start: 108
+      end: 129
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations:
+- source_id: dochub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities: []
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status:
+    dochub: called

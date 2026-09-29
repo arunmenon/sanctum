@@ -1,0 +1,9 @@
+id: dev-003
+family: named_service
+principal: kestrel-identity
+text: What is the lockout threshold for identity-auth sign-ins?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- lockout_threshold

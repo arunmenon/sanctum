@@ -1,0 +1,9 @@
+id: sc-ex-08-1
+family: no_source
+principal: kestrel-payments
+text: What's the quote TTL for the new FX-quote service?
+mode: scoped
+entities:
+- svc.fx-quote
+attributes:
+- quote_ttl_seconds

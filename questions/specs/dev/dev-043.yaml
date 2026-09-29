@@ -1,0 +1,12 @@
+id: dev-043
+family: vague
+principal: kestrel-payments
+text: what changed in payments recently
+mode: explore
+entities:
+- svc.payment-auth
+- svc.ledger-post
+attributes:
+- max_retries
+- batch_size
+expected_ambiguity: clarify

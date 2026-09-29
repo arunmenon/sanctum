@@ -1,0 +1,11 @@
+id: dev-058
+family: restricted_content
+principal: admin-probe
+text: payment-auth incident root cause
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- root_cause
+fact_kinds:
+- incident

@@ -1,0 +1,9 @@
+id: dev-006
+family: named_service
+principal: kestrel-both
+text: Upstream timeout configured on gateway-edge in production?
+mode: scoped
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms

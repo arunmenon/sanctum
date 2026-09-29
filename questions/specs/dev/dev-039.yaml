@@ -1,0 +1,9 @@
+id: dev-039
+family: verify_claim
+principal: kestrel-identity
+text: 'Verify: identity-auth locks accounts after 6 failures.'
+mode: verify
+entities:
+- svc.identity-auth
+attributes:
+- lockout_threshold

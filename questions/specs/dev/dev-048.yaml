@@ -1,0 +1,10 @@
+id: dev-048
+family: no_source
+principal: admin-probe
+text: What is the SLA-relevant quote ttl for the new FX quote service?
+mode: scoped
+entities:
+- svc.fx-quote
+attributes:
+- quote_ttl_seconds
+- stale_quote_action

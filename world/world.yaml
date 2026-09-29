@@ -10,6 +10,8 @@ principals:
   - {id: kestrel-identity, groups: [identity-eng, platform-eng]}
   - {id: kestrel-both, groups: [payments-eng, identity-eng, platform-eng]}
   - {id: admin-probe, groups: [payments-eng, identity-eng, platform-eng, restricted-incidents]}
+  # Code-only reader: payments repos on codehub, but no payments skills, docs or memory.
+  - {id: kestrel-codeonly, groups: [payments-code]}
 
 entities:
   - {id: domain.payments, type: domain}
@@ -130,10 +132,10 @@ hubs:
   codehub:
     names: []                                   # code uses repo paths, not names
     places:
-      - {native: "repo:payments/payment-auth", selects_for: svc.payment-auth, acl: [payments-eng]}
+      - {native: "repo:payments/payment-auth", selects_for: svc.payment-auth, acl: [payments-eng, payments-code]}
       - {native: "repo:identity/auth", selects_for: svc.identity-auth, acl: [identity-eng]}
-      - {native: "repo:payments/fx-quote", selects_for: svc.fx-quote, acl: [payments-eng]}
-      - {native: "repo:payments/ledger-post", selects_for: svc.ledger-post, acl: [payments-eng]}
+      - {native: "repo:payments/fx-quote", selects_for: svc.fx-quote, acl: [payments-eng, payments-code]}
+      - {native: "repo:payments/ledger-post", selects_for: svc.ledger-post, acl: [payments-eng, payments-code]}
       - {native: "repo:platform/gateway-edge", selects_for: svc.gateway-edge, acl: [platform-eng]}
     capabilities: {version_reads: true, filters: [repo, ref]}
   skillhub:

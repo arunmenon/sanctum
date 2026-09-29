@@ -1,0 +1,14 @@
+id: dev-037
+family: verify_claim
+principal: kestrel-payments
+text: Is it true payment-auth retries at most 3 times in prod?
+mode: verify
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented
+contrast:
+  environment: experiment

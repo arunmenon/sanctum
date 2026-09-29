@@ -5,15 +5,12 @@
 #
 # p-payments (m0-001: codehub and skillhub payments evidence) -> kestrel-payments.
 # p-both     (m0-002)                                        -> kestrel-both.
-# p-code-only (m0-003): NO WORLD PRINCIPAL FITS. m0-003 needs payments code readable on
-#   codehub (o-impl) while payments skills on skillhub are denied (o-proc unobtainable,
-#   skillhub expected denied_gap). In the world, codehub and skillhub payments artifacts carry
-#   the same ACL (payments-eng), so every principal either reads both (kestrel-payments,
-#   kestrel-both, admin-probe) or neither (kestrel-identity). kestrel-identity is a transport
-#   stand-in only: it keeps the skillhub denial but also loses the codehub evidence (reads
-#   come back empty, not denied). The stub's canned responses do not depend on hub content, so
-#   stub scores are unaffected; do not use this alias to evaluate a real SUT on m0-003.
+# p-code-only (m0-003)                                        -> kestrel-codeonly.
+#   m0-003 needs payments code readable on codehub (o-impl) while payments skills on skillhub
+#   are denied (o-proc unobtainable, skillhub expected denied_gap). kestrel-codeonly (added at
+#   M3) holds only payments-code, which is on the payments repo ACLs and on no skillhub,
+#   dochub or memoryhub place, so it reads the codehub evidence and is denied the skills.
 aliases:
   p-payments: kestrel-payments
   p-both: kestrel-both
-  p-code-only: kestrel-identity
+  p-code-only: kestrel-codeonly

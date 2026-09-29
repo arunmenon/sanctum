@@ -1,0 +1,10 @@
+id: dev-056
+family: multi_hub
+principal: admin-probe
+text: identity-auth retries plus lockout threshold
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+- lockout_threshold

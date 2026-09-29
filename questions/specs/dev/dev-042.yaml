@@ -1,0 +1,12 @@
+id: dev-042
+family: vague
+principal: kestrel-both
+text: anything I should know about timeouts?
+mode: explore
+entities:
+- svc.gateway-edge
+- svc.payment-auth
+attributes:
+- upstream_timeout_ms
+- backoff_schedule_ms
+expected_ambiguity: clarify

@@ -1,0 +1,50 @@
+case_id: sc-fx-24-2
+bundle_id: b-sc-fx-24-2
+family: historical
+request:
+  schema_version: '1.0'
+  request_id: req-b15d425366f04c53
+  query: Retry limit for payment-auth in the experiment environment?
+  mode: scoped
+  environment: experiment
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-payments
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-ecead3bb8a
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: codehub
+      artifact_id: art-7623f130c9
+      version: exp-branch
+      start: 261
+      end: 262
+  - spans:
+    - source_id: memoryhub
+      artifact_id: art-3bdbdf189b
+      version: current
+      start: 104
+      end: 105
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities:
+  - ent-5bf846464b
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status: {}

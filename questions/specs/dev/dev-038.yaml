@@ -1,0 +1,9 @@
+id: dev-038
+family: verify_claim
+principal: kestrel-both
+text: 'Claim: gateway-edge upstream timeout is 2000 ms. Correct?'
+mode: verify
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms

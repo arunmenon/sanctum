@@ -1,0 +1,31 @@
+case_id: dev-060
+bundle_id: b-dev-060
+family: restricted_content
+request:
+  schema_version: '1.0'
+  request_id: req-eecea9a5dab9dab1
+  query: 'ledgerd replay incident: how many dupes?'
+  mode: scoped
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-both
+answerable: false
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-d8660e2a68
+obligations: []
+source_obligations: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities: []
+  prohibited_activations: []
+expected:
+  evidence_status: insufficient
+  required_reasons:
+  - no_coverage
+  source_status: {}

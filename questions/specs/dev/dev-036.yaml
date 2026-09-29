@@ -1,0 +1,10 @@
+id: dev-036
+family: conflicting_sources
+principal: kestrel-payments
+text: 'PA-svc retrys: code vs runbook'
+mode: scoped
+name:
+  native: PA-svc
+  hub: memoryhub
+attributes:
+- max_retries

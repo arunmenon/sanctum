@@ -1,0 +1,12 @@
+id: dev-028
+family: historical
+principal: kestrel-both
+text: gateway-edge upstream timeout in R41 (before the bump)
+mode: scoped
+as_of: R41
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms
+contrast:
+  release: R42

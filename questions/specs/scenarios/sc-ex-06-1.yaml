@@ -1,0 +1,13 @@
+id: sc-ex-06-1
+family: vague
+principal: kestrel-both
+text: Why did auth get slower last week?
+mode: explore
+entities:
+- svc.payment-auth
+- svc.identity-auth
+- svc.gateway-edge
+attributes:
+- max_retries
+- upstream_timeout_ms
+expected_ambiguity: clarify

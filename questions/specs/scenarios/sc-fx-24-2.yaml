@@ -1,0 +1,12 @@
+id: sc-fx-24-2
+family: historical
+principal: kestrel-payments
+text: Retry limit for payment-auth in the experiment environment?
+mode: scoped
+environment: experiment
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

@@ -1,0 +1,11 @@
+id: dev-031
+family: conflicting_sources
+principal: kestrel-payments
+text: Does the Payments Auth Service retry procedure match the code?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+  namespace: Payments
+attributes:
+- max_retries

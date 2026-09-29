@@ -1,0 +1,11 @@
+id: dev-017
+family: hub_specific_name
+principal: kestrel-codeonly
+text: repo:payments/payment-auth - retry limit and the documented backoff?
+mode: scoped
+name:
+  native: repo:payments/payment-auth
+  hub: codehub
+attributes:
+- max_retries
+- backoff_schedule_ms

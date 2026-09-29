@@ -1,0 +1,12 @@
+id: dev-016
+family: hub_specific_name
+principal: kestrel-payments
+text: What does the Ledger Posting skill say about batch size and replays?
+mode: scoped
+name:
+  native: Ledger Posting
+  hub: skillhub
+  namespace: Payments
+attributes:
+- batch_size
+- replay_window_minutes

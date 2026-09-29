@@ -1,0 +1,12 @@
+id: dev-027
+family: historical
+principal: kestrel-identity
+text: At R40, how many retries did identity-auth make?
+mode: scoped
+as_of: R40
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+contrast:
+  release: R42

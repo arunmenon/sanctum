@@ -1,0 +1,16 @@
+id: sc-fx-24-1
+family: historical
+principal: kestrel-payments
+text: What retry limit applies to payment-auth in prod at R42, given the experiment
+  branch?
+mode: scoped
+as_of: R42
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented
+contrast:
+  environment: experiment

@@ -1,0 +1,10 @@
+id: dev-050
+family: no_source
+principal: kestrel-payments
+text: repo:payments/fx-quote stale quote handling
+mode: scoped
+name:
+  native: repo:payments/fx-quote
+  hub: codehub
+attributes:
+- stale_quote_action

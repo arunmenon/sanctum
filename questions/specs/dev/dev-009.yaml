@@ -1,0 +1,10 @@
+id: dev-009
+family: named_service
+principal: kestrel-codeonly
+text: ledger post batch size and replay window please
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+- replay_window_minutes

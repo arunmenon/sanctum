@@ -1,0 +1,10 @@
+id: dev-053
+family: multi_hub
+principal: kestrel-identity
+text: If I bump the edge timeout, what is it now and who signs off?
+mode: scoped
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms
+- timeout_change_approver

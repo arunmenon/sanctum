@@ -1,0 +1,10 @@
+id: dev-015
+family: hub_specific_name
+principal: kestrel-payments
+text: In space:LEDGER terms, what is the replay window?
+mode: scoped
+name:
+  native: space:LEDGER
+  hub: dochub
+attributes:
+- replay_window_minutes

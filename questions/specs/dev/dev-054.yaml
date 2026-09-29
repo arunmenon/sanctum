@@ -1,0 +1,10 @@
+id: dev-054
+family: multi_hub
+principal: kestrel-payments
+text: payment-auth retries and backoff between attempts
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+- backoff_schedule_ms

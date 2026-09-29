@@ -1,0 +1,9 @@
+id: sc-ex-02-1
+family: named_service
+principal: kestrel-payments
+text: What is the payment retry policy backoff schedule?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- backoff_schedule_ms

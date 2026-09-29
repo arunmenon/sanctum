@@ -1,0 +1,10 @@
+id: dev-044
+family: vague
+principal: kestrel-identity
+text: retry settings?
+mode: explore
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+expected_ambiguity: clarify

@@ -1,0 +1,10 @@
+id: dev-011
+family: hub_specific_name
+principal: kestrel-payments
+text: What are the PA-svc retry limits when the gateway times out?
+mode: scoped
+name:
+  native: PA-svc
+  hub: memoryhub
+attributes:
+- max_retries

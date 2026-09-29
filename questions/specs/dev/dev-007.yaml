@@ -1,0 +1,9 @@
+id: dev-007
+family: named_service
+principal: kestrel-payments
+text: For ledger-post, how far back can a replay go (minutes)?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- replay_window_minutes

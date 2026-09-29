@@ -1,0 +1,11 @@
+id: sc-ex-03-1
+family: conflicting_sources
+principal: kestrel-payments
+text: How many retries does payment-auth allow at R42? The skill and the code may
+  disagree.
+mode: scoped
+scope: project:payments-auth-retry-fix
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

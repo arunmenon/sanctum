@@ -1,0 +1,10 @@
+id: dev-022
+family: same_name_two_meanings
+principal: kestrel-payments
+text: Auth Service max retries, whichever one that is
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries

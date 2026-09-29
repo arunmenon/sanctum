@@ -1,0 +1,11 @@
+id: dev-052
+family: multi_hub
+principal: kestrel-payments
+text: 'edgegw: current timeout plus the approval path for a change'
+mode: scoped
+name:
+  native: edgegw
+  hub: memoryhub
+attributes:
+- upstream_timeout_ms
+- timeout_change_approver

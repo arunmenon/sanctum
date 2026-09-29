@@ -19,6 +19,7 @@ import yaml
 
 from sanctum_contracts import RetrieveRequest
 from sanctum_eval import METRICS_REVISION
+from sanctum_eval.alignment import apply_alignment
 from sanctum_eval.gold import GoldCase
 from sanctum_eval.load import load_gold
 from sanctum_eval.metrics import CaseScore, score_case
@@ -60,6 +61,8 @@ class RunConfig:
     token_mode: TokenMode = TokenMode.EXCHANGE
     # gold principal -> world principal, for gold sets written before the world's identities
     principal_aliases: Optional[dict[str, str]] = None
+    # SUT memory entity id -> world entity ref (`alignment.load_alignment`); scoring only
+    entity_alignment: Optional[dict[str, str]] = None
 
 
 @dataclass
@@ -122,6 +125,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     hub_ids = released_hub_ids(config.hubs_config_path, config.include_held_back)
     token_service = TokenService(config.world_build_dir / "identity" / "principals.json", config.token_secret)
     responses, receipts, traces, scores = [], [], [], []
+    aligned_responses, aligned_receipts = [], []
     async with HubGateway(config.world_build_dir, hub_ids, token_service, _failure_injector(config),
                           config.token_mode) as gateway, AsyncExitStack() as sut_stack:
         # An out-of-process SUT (`process_sut.ProcessSUT`) starts its process and gateway proxy here.
@@ -142,6 +146,10 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
             responses.append(response.model_dump(mode="json"))
             receipts.append(receipt.model_dump(mode="json"))
             traces.append(trace.model_dump(mode="json"))
+            if config.entity_alignment is not None:
+                response, receipt = apply_alignment(response, receipt, config.entity_alignment)
+                aligned_responses.append(response.model_dump(mode="json"))
+                aligned_receipts.append(receipt.model_dump(mode="json"))
             scores.append(score_case(gold, response, receipt, trace))
         anomalies = gateway.anomalies() + list(getattr(sut, "anomalies", lambda: [])())
 
@@ -158,6 +166,8 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
         "metrics_revision": METRICS_REVISION,
         "hubs": hub_ids,
         "cases": [gold.case_id for gold in cases],
+        "entity_alignment": None if config.entity_alignment is None else {
+            "table": "entity_alignment.json", "aligned": len(config.entity_alignment)},
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=1, sort_keys=True) + "\n",
                                            encoding="utf-8")
@@ -166,6 +176,12 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     _write_jsonl(out_dir / "traces.jsonl", traces)
     _write_jsonl(out_dir / "scores.jsonl", [asdict(score) for score in scores])
     _write_jsonl(out_dir / "anomalies.jsonl", anomalies)
+    if config.entity_alignment is not None:
+        # raw SUT outputs above stay as emitted; scoring used these aligned copies
+        (out_dir / "entity_alignment.json").write_text(
+            json.dumps(config.entity_alignment, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        _write_jsonl(out_dir / "responses.aligned.jsonl", aligned_responses)
+        _write_jsonl(out_dir / "receipts.aligned.jsonl", aligned_receipts)
     return RunResult(out_dir=out_dir, manifest=manifest, scores=scores, anomalies=anomalies)
 
 

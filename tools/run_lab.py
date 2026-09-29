@@ -12,11 +12,11 @@ ROOT = Path(__file__).resolve().parents[1]
 M0_TRACES = ROOT / "tests" / "fixtures" / "m0" / "traces"
 
 
-MEMORY_CONFIGS = ("C4", "C4a-equivalent", "C4a-label-only")
-REF_CONFIGS = ("C1-naive", "C1-fair", "C2", "C4", "C4a-equivalent", "C4a-label-only")
+MEMORY_CONFIGS = ("C4", "C4a-equivalent", "C4a-label-only", "C5")
+REF_CONFIGS = ("C1-naive", "C1-fair", "C2", "C3", "C4", "C4a-equivalent", "C4a-label-only", "C5")
 
 
-def make_sut(name: str, config_id: str = "stub", registry=None):
+def make_sut(name: str, config_id: str = "stub", registry=None, decision_provider=None):
     """`stub` runs in process (trusted, canned); `ref` runs out of process behind the gateway proxy."""
     if name == "stub":
         return StubSUTAdapter(load_call_plan(M0_TRACES))
@@ -26,6 +26,8 @@ def make_sut(name: str, config_id: str = "stub", registry=None):
         arguments = ["--config", config_id]
         if registry is not None:
             arguments += ["--registry", str(Path(registry).resolve())]
+        if decision_provider is not None:
+            arguments += ["--decision-provider", decision_provider]
         return ProcessSUT(arguments)
     raise SystemExit(f"unknown SUT {name!r}")
 
@@ -48,13 +50,15 @@ if __name__ == "__main__":
     parser.add_argument("--config", "--config-id", dest="config_id", default=None,
                         help="arm id (ref: C1-naive, C1-fair, C2); defaults to 'stub' for the stub")
     parser.add_argument("--registry", type=Path, default=None, help="owner manifests (ref only)")
+    parser.add_argument("--decision-provider", default=None, choices=["rules", "standin", "jev"],
+                        help="D2 provider for C3/C5 (default standin)")
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--principal-aliases", type=Path, default=None,
                         help="alias YAML (default: configs/m0_principal_aliases.yaml for gold/m0 only)")
     parser.add_argument("--out", type=Path, required=True)
     arguments = parser.parse_args()
     arguments.config_id = arguments.config_id or ("C2" if arguments.sut == "ref" else "stub")
-    sut = make_sut(arguments.sut, arguments.config_id, arguments.registry)
+    sut = make_sut(arguments.sut, arguments.config_id, arguments.registry, arguments.decision_provider)
     alignment = None
     if arguments.sut == "ref" and arguments.config_id in MEMORY_CONFIGS:
         # evaluator side: map the SUT's memory entity refs to world refs before scoring

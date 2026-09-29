@@ -139,6 +139,26 @@ named by `owners/memory_seed/ACTIVE`; place unshares and renames arrive through 
 | C4a-equivalent | 18 | 38 |
 | C4a-label-only | 15 | 33 |
 
+### M6: decision provider (SUT side)
+
+```bash
+PYTHONPATH=src:. <u> python tools/fit_d2_standin.py            # refit D2 calibration on dev runs only
+PYTHONPATH=src:. <u> python tools/run_lab.py --sut ref --config C3 --decision-provider standin --cases gold/dev --out runs/m6-c3
+```
+
+`DecisionProvider.decide(DecisionRequest) -> DecisionResult` for D2 (source usefulness) over
+optional sources only: `rules`, `standin` (local TF-IDF over pinned descriptors plus logistic
+calibration, `configs/d2_standin.yaml` with provenance), `jev` (refuses: not approved).
+Uncertain answers keep the source; an unavailable layer keeps every candidate and reports
+`decision_layer_unavailable`. Receipts carry the decisions.
+
+| Arm | Scenarios (22) | Dev (60) | Sources per dev case |
+|---|---|---|---|
+| C2 | 15 | 26 | 2.57 |
+| C3 (standin) | 15 | 26 | 2.57 |
+| C4 | 18 | 38 | 2.57 |
+| C5 (standin) | 18 | 38 | 2.57 |
+
 ## M0 exit criteria (lab plan revised §10)
 
 | Criterion | Where | Status |

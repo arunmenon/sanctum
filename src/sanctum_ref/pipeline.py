@@ -32,6 +32,7 @@ from .assembly import assemble
 from .config import ArmConfig
 from .intent import analyze
 from .registry import Registry, RegistryUnavailable
+from .decision import d2_request
 from .memory import LabelTable, MemoryUnavailable, build_store, load_release
 from .resolution import resolve, resolve_label_only
 from .routing import SourcePlan, apply_memory, plan_sources
@@ -103,8 +104,10 @@ class MemoryState:
 
 class Retriever:
     def __init__(self, arm: ArmConfig, registry: Optional[Registry],
-                 registry_error: Optional[str] = None, memory: Optional[MemoryState] = None):
+                 registry_error: Optional[str] = None, memory: Optional[MemoryState] = None,
+                 provider=None):
         self.arm = arm
+        self.provider = provider
         self.registry = registry
         self.registry_error = registry_error
         self.memory = memory
@@ -141,6 +144,10 @@ class Retriever:
                 degraded = ["memory_unavailable"]
                 resolution = None
 
+        decisions = []
+        if self.arm.decision_provider == "named":
+            decisions, decision_degraded = self._judge_usefulness(request, plans)
+            degraded += decision_degraded
         deadline = time.monotonic() + min(request.deadline_ms, self.arm.deadline_ms) / 1000.0
         outcomes: dict[str, str] = {}
         candidates = await self._ask(request, plans, port, clock, deadline, intent.fact_kinds, outcomes,
@@ -171,7 +178,7 @@ class Retriever:
         receipt = Receipt(
             receipt_id=receipt_id, request_id=request.request_id, config_id=self.arm.config_id,
             contract_revision=CONTRACT_REVISION, memory_release_id=release_id,
-            resolutions=resolution.records if resolution else [], activations=activations,
+            resolutions=resolution.records if resolution else [], activations=activations, decisions=decisions,
             query_plans=[QueryPlan(source_id=plan.hub_id, original_query=request.query,
                                    selectors=[f"{key}={value}" for key, value in sorted(plan.selectors.items())],
                                    aliases=list(plan.aliases), as_of=plan.as_of)
@@ -190,6 +197,27 @@ class Retriever:
                           tokenizer_id=self.arm.tokenizer),
             truncation=assembled.truncated_relevant, degraded_reasons=degraded)
         return response, receipt
+
+    def _judge_usefulness(self, request: RetrieveRequest, plans: list[SourcePlan]):
+        """Round 2, D2 (HLD §6.3): one question per optional called source. A confident "not
+        useful" skips it; uncertain keeps it; an unavailable layer keeps everything."""
+        optional = sorted({plan.hub_id for plan in plans if plan.call and not plan.required}
+                          - {plan.hub_id for plan in plans if plan.required})
+        if self.provider is None:
+            return [], ["decision_layer_unavailable"]
+        results = {hub_id: self.provider.decide(d2_request(hub_id, request.query, self.arm.deadline_ms))
+                   for hub_id in optional}
+        if any(result.status.value != "answered" for result in results.values()):
+            return list(results.values()), ["decision_layer_unavailable"]
+        skip = {hub_id for hub_id, result in results.items() if not result.value["call"]}
+        if skip and not [p for p in plans if p.call and p.hub_id not in skip]:
+            # never leave the request with no source: keep the two most likely (HLD §10 Ex8)
+            keep = sorted(skip, key=lambda hub_id: -results[hub_id].value["p"])[:2]
+            skip -= set(keep)
+        for plan in plans:
+            if plan.hub_id in skip:
+                plan.call, plan.status, plan.reasons = False, "skipped", ["not_selected"]
+        return list(results.values()), []
 
     def _interpretations(self, resolution, candidates, assembled, status, required_gap,
                          reasons: list[str], request: RetrieveRequest):

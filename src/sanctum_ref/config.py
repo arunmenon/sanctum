@@ -1,8 +1,8 @@
 """Arm configuration from `configs/matrix.yaml` switches only (lab plan §7.2).
 
 An arm is the shared switches plus its own. `sanctum_ref` implements the modules that C1-naive,
-C1-fair, C2, C4, C4a-equivalent and C4a-label-only enable; any arm that switches on a module not
-built yet (a decision provider: C3, C5) is refused rather than silently run as something else.
+C1-fair, C2, C3, C4, C4a-equivalent, C4a-label-only and C5 enable. `decision_provider: named`
+means the provider is named at launch (`--decision-provider rules|standin`; jev is not approved).
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ IMPLEMENTED = {
     "translation": {False, True},
     "procedures": {False, "registry_only", "memory"},
     "memory_store": {"none", "relations", "tables"},
-    "decision_provider": {"none"},
+    "decision_provider": {"none", "named"},
 }
 
 
@@ -36,6 +36,7 @@ class ArmConfig:
     resolution: str
     translation: bool
     memory_store: str
+    decision_provider: str
     response_tokens: int
     candidates: int
     calls: int
@@ -77,7 +78,8 @@ def load_arm(matrix_path: Path, config_id: str) -> ArmConfig:
     return ArmConfig(
         config_id=config_id, routing=switches["routing"], assembly=switches["assembly"],
         procedures=switches["procedures"], resolution=switches["resolution"],
-        translation=bool(switches["translation"]), memory_store=switches["memory_store"], response_tokens=int(budgets["response_tokens"]),
+        translation=bool(switches["translation"]), memory_store=switches["memory_store"],
+        decision_provider=switches["decision_provider"], response_tokens=int(budgets["response_tokens"]),
         candidates=int(budgets["candidates"]), calls=int(budgets["calls"]),
         deadline_ms=int(budgets["deadline_ms"]), tokenizer=str(shared["tokenizer"]),
         exact_dedup=bool(shared["exact_dedup"]),

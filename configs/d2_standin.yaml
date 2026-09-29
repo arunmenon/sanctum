@@ -1,0 +1,26 @@
+# D2 stand-in provider (lab plan §7.3). Descriptors are pinned (HLD §9.7) and written from
+# hub-visible structure; calibration is fitted by tools/fit_d2_standin.py on dev runs only.
+descriptors:
+  codehub: 'Source code and configuration per service repository: java classes, yaml config, constants such as max retries,
+    batch size, timeout, pool size, worker count, page size; releases R40 R41 R42 and an experiment branch; implemented behavior'
+  skillhub: 'Skills and runbooks per domain namespace: procedures, checklists, how to retry, cutover, rollback, drain, failover,
+    paging; what should happen and how many times; intended procedure'
+  dochub: 'Team reference pages per space: service overview, policies, backoff schedule, SLA, retry procedure pages, design
+    notes, documentation'
+  memoryhub: 'The caller''s own agent session notes: follow-ups, what I looked into last session, alerts and occurrences,
+    scratch notes, earlier discussions'
+bands:
+  use: 0.7
+  skip: 0.1
+calibration:
+  a: 4.6021
+  b: -1.7617
+provenance:
+  fitted_on: dev
+  cases: gold/dev
+  points: 204
+  positives: 35
+  label: recall drop when the hub is removed (C1-fair runs)
+  fitted_at: '2026-09-29'
+  git_commit: 1b720dfffeb9ecdc69ba606defc7b54a6a032bc7
+bands_note: skip only well below the dev base rate of useful sources (35/204); HLD Ex1 skips at p=0.08

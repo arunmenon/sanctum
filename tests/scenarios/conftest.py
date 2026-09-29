@@ -30,7 +30,7 @@ def scenario_world(tmp_path_factory) -> Path:
 
 def alignment_for(world: Path, config_id: str):
     """Evaluator side: memory entity refs -> world refs (src/sanctum_eval/alignment.py)."""
-    if config_id not in ("C4", "C4a-equivalent", "C4a-label-only"):
+    if config_id not in ("C4", "C4a-equivalent", "C4a-label-only", "C5"):
         return None
     from sanctum_eval.alignment import load_alignment
     from sanctum_world.schema import load_world
@@ -41,8 +41,8 @@ def alignment_for(world: Path, config_id: str):
 
 def run_ref(world: Path, out_dir: Path, config_id: str = "C2", failure_profile: str = "none",
             registry: Path | None = None, time_scale: float | None = None, cases_dir: Path = SCENARIO_GOLD,
-            memory_seed: Path | None = None):
-    arguments = ["--config", config_id]
+            memory_seed: Path | None = None, extra_arguments: tuple[str, ...] = ()):
+    arguments = ["--config", config_id, *extra_arguments]
     if memory_seed is not None:
         arguments += ["--memory-seed", str(memory_seed)]
     if registry is not None:

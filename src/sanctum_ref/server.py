@@ -38,6 +38,7 @@ class ProxyPort:
     def __init__(self, session: ClientSession, request_id: str, caller_token: Optional[str]):
         self._session = session
         self._meta = {META_REQUEST_ID: request_id, META_CALLER_TOKEN: caller_token}
+        self.reader: Optional[str] = None
 
     async def _call(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         params = types.CallToolRequestParams.model_validate(
@@ -53,6 +54,8 @@ class ProxyPort:
 
     async def caller_groups(self) -> Optional[list[str]]:
         body = await self._call(CALLER_TOOL, {})
+        reader = body.get("reader")
+        self.reader = reader if isinstance(reader, str) else None     # opaque, per verified caller
         groups = body.get("groups")
         return list(groups) if isinstance(groups, list) and "error" not in body else None
 

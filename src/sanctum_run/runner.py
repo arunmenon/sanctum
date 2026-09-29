@@ -145,6 +145,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
             with gateway.sut_call(request.request_id):
                 response, receipt = await sut.retrieve(request, context)
             elapsed_ms = round((time.perf_counter() - started) * 1000.0, 3)
+            gateway.release(context.gateway)       # the invocation ends with the case
             trace = gateway.trace(request.request_id).model_copy(update={"elapsed_ms": elapsed_ms})
             responses.append(response.model_dump(mode="json"))
             receipts.append(receipt.model_dump(mode="json"))

@@ -209,6 +209,16 @@ def unit_cost(unit: EvidenceUnit, tokenizer_id: str) -> int:
     return token_count(json.dumps(unit.model_dump(mode="json"), sort_keys=True), tokenizer_id)
 
 
+def list_cost(items: list["Ranked"], tokenizer_id: str) -> int:
+    """Tokens of the evidence list exactly as it goes on the wire: every unit with its duplicate
+    references, plus list framing. The larger of two JSON spellings, so a re-count by a reader
+    who serializes differently (key order) still fits."""
+    payload = [item.unit.model_copy(update={"duplicates": list(item.duplicates)}).model_dump(mode="json")
+               for item in items]
+    return max(token_count(json.dumps(payload, sort_keys=True), tokenizer_id),
+               token_count(json.dumps(payload), tokenizer_id))
+
+
 def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, RelationType]],
          budget_tokens: int, tokenizer_id: str, reserve_witnesses: bool) -> Assembled:
     chosen: list[Ranked] = []
@@ -218,11 +228,14 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
         nonlocal used
         if any(item is other for other in chosen):
             return True
-        cost = unit_cost(item.unit, tokenizer_id)
-        if used + cost > budget_tokens:
+        # cheap lower bound first, then the exact cost of the whole list with this unit in it
+        if used + unit_cost(item.unit, tokenizer_id) > budget_tokens:
+            return False
+        total = list_cost(chosen + [item], tokenizer_id)
+        if total > budget_tokens:
             return False
         chosen.append(item)
-        used += cost
+        used = total
         return True
 
     flagged: list[tuple[Ranked, Ranked, RelationType]] = []
@@ -245,6 +258,12 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
                    if any(a is c for c in chosen) and any(b is c for c in chosen)]
     chosen_order = {id(item): index for index, item in enumerate(ranked)}
     chosen.sort(key=lambda item: chosen_order[id(item)])
+    used = list_cost(chosen, tokenizer_id)            # the final order is what goes on the wire
+    while chosen and used > budget_tokens:
+        dropped = chosen.pop()                         # lowest ranked first
+        flagged = [(a, b, r) for a, b, r in flagged if a is not dropped and b is not dropped]
+        truncated_relevant = truncated_relevant or dropped.relevant
+        used = list_cost(chosen, tokenizer_id)
     evidence = [item.unit.model_copy(update={"duplicates": list(item.duplicates)}) for item in chosen]
     conflicts = [Conflict(conflict_id=f"cf-{index + 1}", a=a.unit.evidence_id, b=b.unit.evidence_id,
                           relation_type=relation, status=ConflictStatus.possible_conflict)

@@ -48,7 +48,8 @@ def test_proxy_serves_only_the_bound_request(scenario_world):  # noqa: F811
     assert out["ok"].get("items")
     for key in ("unbound", "stale", "forged"):
         assert out[key]["error"]["code"] == "denied_or_not_found", key
-    assert set(out["groups"]) == {"groups"} and "payments-eng" in out["groups"]["groups"]
+    assert set(out["groups"]) == {"groups", "reader"} and "payments-eng" in out["groups"]["groups"]
+    assert out["groups"]["reader"].startswith("reader-")                   # opaque per-caller id
     assert PRINCIPAL not in str(out["groups"])                               # groups only, never the principal
     assert "error" in out["groups_forged"]
     assert set(out["capabilities"]["hubs"]) == set(released_hub_ids(DEFAULT_HUBS_CONFIG))
@@ -56,3 +57,49 @@ def test_proxy_serves_only_the_bound_request(scenario_world):  # noqa: F811
     assert outcomes == [("codehub", "ok", True), ("codehub", "denied", False), ("codehub", "denied", False)]
     kinds = [entry["kind"] for entry in out["anomalies"]]
     assert kinds.count("proxy_call_outside_binding") == 3
+
+
+async def _request_id_reuse(world):
+    """Codex M3-M8 #1: bind caller A, then try to create an admin context with the same request id
+    and dispatch with A's token. Credentials must stay A's, and every attempt is an anomaly."""
+    from sanctum_run.gateway import DuplicateRequestBinding
+    token_service = TokenService(world / "identity" / "principals.json", "reuse-secret")
+    token_a = token_service.issue_caller_token(PRINCIPAL)
+    admin = token_service.issue_caller_token("admin-probe")
+    out = {}
+    async with HubGateway(world, released_hub_ids(DEFAULT_HUBS_CONFIG), token_service) as gateway:
+        proxy = await GatewayProxy.create(gateway, world)
+        handle_a = gateway.handle("req-x", token_a)
+        proxy.bind("req-x", token_a, handle_a)
+        try:
+            gateway.handle("req-x", admin)
+            out["gateway_duplicate"] = "accepted"
+        except DuplicateRequestBinding:
+            out["gateway_duplicate"] = "refused"
+        other = gateway.handle("req-y", admin)
+        try:
+            proxy.bind("req-x", admin, other)
+            out["proxy_duplicate"] = "accepted"
+        except DuplicateRequestBinding:
+            out["proxy_duplicate"] = "refused"
+        gateway.bind("req-x", admin)                        # legacy rebind: no effect, anomaly
+        out["repos"] = await proxy.dispatch("codehub.list_repos", {}, "req-x", token_a)
+        proxy.unbind("req-x", other)                         # someone else's handle: no effect
+        out["still_bound"] = await proxy.dispatch("codehub.list_repos", {}, "req-x", token_a)
+        proxy.unbind("req-x", handle_a)
+        gateway.release(handle_a)
+        out["stale"] = await handle_a.call("codehub", "list_repos", {})
+        out["anomalies"] = [entry["kind"] for entry in proxy.anomalies() + gateway.anomalies()]
+    return out
+
+
+def test_request_id_reuse_cannot_cross_callers(scenario_world):  # noqa: F811
+    out = anyio.run(_request_id_reuse, scenario_world)
+    assert out["gateway_duplicate"] == "refused" and out["proxy_duplicate"] == "refused"
+    for key in ("repos", "still_bound"):
+        repos = out[key]["items"]
+        assert repos and not [repo for repo in repos if repo.startswith("repo:identity/")], key
+    assert out["stale"]["error"]["code"] == "denied_or_not_found"
+    assert out["anomalies"].count("duplicate_request_binding") == 2          # gateway handle + legacy rebind
+    assert "binding_request_mismatch" in out["anomalies"]                     # proxy bind with another id's handle
+    assert "call_on_inactive_binding" in out["anomalies"]

@@ -143,3 +143,20 @@ def test_identity_signature_uses_places_and_acronyms():
     domain = {"payment"}
     assert identity_signature(code, domain) & identity_signature(page, domain) == {"pa"}
     assert not identity_signature(code, domain) & identity_signature(other, domain)
+
+
+def test_budget_counts_the_final_serialized_list():
+    """Codex M3-M8 #4: packing costs the evidence list as serialized (duplicate references and
+    list framing included) and never exceeds budget_tokens, for any budget."""
+    import json as _json
+    from sanctum_ref.text import token_count as _count
+    code = _candidate("codehub", "a1", "// repo:payments/payment-auth\\nclass RetryConfig {\\n  MAX_RETRIES = 5;\\n}\\n")
+    copies = [_candidate("dochub", f"c{index}", code.text, version="v1", location="space:PA") for index in range(3)]
+    filler = [_candidate("dochub", f"f{index}", f"retry payment auth notes {index} " * (20 + index), version="v1",
+                         location="space:OTHER", rank=index) for index in range(8)]
+    for budget in range(150, 1600, 37):
+        assembled = assemble([code, *copies, *filler], ("retry", "payment", "auth"), frozenset({"implementation"}),
+                             budget, "cl100k_base", common=True, dedup_exact=True, domain_terms={"payment"})
+        payload = [unit.model_dump(mode="json") for unit in assembled.evidence]
+        wire = max(_count(_json.dumps(payload), "cl100k_base"), _count(_json.dumps(payload, sort_keys=True), "cl100k_base"))
+        assert assembled.used_tokens == wire <= budget, budget

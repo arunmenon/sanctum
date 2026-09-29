@@ -126,7 +126,7 @@ class ProcessSUT:
                     types.ClientRequest(types.CallToolRequest(method="tools/call", params=params)),
                     types.CallToolResult)
         finally:
-            self._proxy.unbind(request.request_id)
+            self._proxy.unbind(request.request_id, context.gateway)
         return parse_retrieve_result(result)
 
     def anomalies(self) -> list[dict[str, Any]]:

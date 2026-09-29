@@ -202,3 +202,45 @@ def test_assertion_refs_carry_their_release():
     resolution, _planned, activations, _ = plans("What are the PA-svc retry limits?", PAYMENTS)
     refs = [ref for record in resolution.records for ref in record.assertion_refs] + [a.ref for a in activations]
     assert refs and all(ref.endswith("@r1") for ref in refs)
+
+
+class _FeedPort:
+    """A reader's per-reader feed view (dense reader_seq), as the proxy's change_events serves it."""
+
+    def __init__(self, reader, events):
+        self.reader = reader
+        self._events = events
+
+    async def change_events(self, after_seq):
+        return [event for event in self._events if event["reader_seq"] > after_seq]
+
+
+def test_change_feed_cursors_are_per_reader():
+    """Codex M3-M8 #5: A consumes its event 1; B's first request must still see B's own event 1
+    (a different place). Interleaved and concurrent requests keep histories apart."""
+    import anyio
+    from sanctum_ref.pipeline import MemoryState
+    unshare = lambda seq, place: {"reader_seq": seq, "hub": "dochub", "kind": "place_unshared", "subject": place}
+    port_a = _FeedPort("reader-a", [unshare(1, "space:PA")])
+    port_b = _FeedPort("reader-b", [unshare(1, "space:LEDGER"), unshare(2, "space:RISK")])
+
+    async def scenario():
+        state = MemoryState(SEED)
+        first_a = await state.consume_changes(port_a, port_a.reader)
+        first_b = await state.consume_changes(port_b, port_b.reader)
+        results = {}
+        async with anyio.create_task_group() as group:
+            async def run(name, port):
+                results[name] = await state.consume_changes(port, port.reader)
+            for index in range(5):
+                group.start_soon(run, f"a{index}", port_a)
+                group.start_soon(run, f"b{index}", port_b)
+        anonymous = await state.consume_changes(port_b, None)
+        return first_a, first_b, results, anonymous
+
+    first_a, first_b, results, anonymous = anyio.run(scenario)
+    assert first_a == {"space:PA"}
+    assert first_b == {"space:LEDGER", "space:RISK"}              # not skipped by A's cursor
+    assert all(results[f"a{i}"] == {"space:PA"} for i in range(5))
+    assert all(results[f"b{i}"] == {"space:LEDGER", "space:RISK"} for i in range(5))
+    assert anonymous == {"space:LEDGER", "space:RISK"}            # no id: whole own feed, nothing shared

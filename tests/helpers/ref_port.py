@@ -27,10 +27,11 @@ class GatewayPort:
         return await self._handle.call(hub_id, tool, arguments)
 
     async def caller_groups(self):
-        return self._gateway.caller_groups(self._request_id)
+        self.reader = self._gateway.reader_ref(self._handle)
+        return self._gateway.caller_groups(self._handle)
 
     async def change_events(self, after_seq):
-        return self._gateway.change_events(self._request_id, after_seq) or []
+        return self._gateway.change_events(self._handle, after_seq) or []
 
     async def capabilities(self):
         return {hub_id: json.loads((self._world_build_dir / "hubs" / hub_id / "capabilities.json").read_text())

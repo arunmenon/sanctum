@@ -72,6 +72,10 @@ def _place_has_versions(capabilities: dict[str, Any], hit: dict[str, Any]) -> bo
     return place_reads.get(hit.get("location") or "", True)
 
 
+def _invalidations(events: list[dict[str, Any]]) -> frozenset[str]:
+    return frozenset(str(event.get("subject")) for event in events if event.get("kind") in INVALIDATING_CHANGES)
+
+
 class MemoryState:
     """Process-lifetime memory state: pinned release cache and the change-feed cursor.
 
@@ -82,8 +86,9 @@ class MemoryState:
     def __init__(self, seed_dir: Optional[Path], release_id: Optional[str] = None):
         self.seed_dir = seed_dir
         self.release_id = release_id           # explicit release for this process; else ACTIVE
-        self.cursor = 0
-        self.invalidated_places: set[str] = set()
+        # change-feed sequence numbers are per reader, so cursors and invalidations are too
+        self._readers: dict[str, tuple[int, frozenset[str]]] = {}
+        self._locks: dict[str, anyio.Lock] = {}
         self._stores: dict[tuple[str, str], Any] = {}
 
     def pin(self, backend: str):
@@ -96,11 +101,19 @@ class MemoryState:
             self._stores[key] = (release, build_store(release, backend))
         return self._stores[key]
 
-    async def consume_changes(self, port: HubPort) -> None:
-        for event in await port.change_events(self.cursor) or []:
-            self.cursor = max(self.cursor, int(event.get("reader_seq", 0)))
-            if event.get("kind") in INVALIDATING_CHANGES:
-                self.invalidated_places.add(str(event.get("subject")))
+    async def consume_changes(self, port: HubPort, reader: Optional[str]) -> frozenset[str]:
+        """This reader's invalidated places after reading its feed past its own cursor. A caller
+        with no reader id reads its whole feed every time and shares nothing."""
+        if reader is None:
+            return _invalidations(await port.change_events(0) or [])
+        lock = self._locks.setdefault(reader, anyio.Lock())
+        async with lock:
+            cursor, invalidated = self._readers.get(reader, (0, frozenset()))
+            events = await port.change_events(cursor) or []
+            cursor = max([cursor, *(int(event.get("reader_seq", 0)) for event in events)])
+            invalidated = invalidated | _invalidations(events)
+            self._readers[reader] = (cursor, invalidated)
+            return invalidated
 
 
 class Retriever:
@@ -132,7 +145,7 @@ class Retriever:
         pinned_at_ms = None
         if self.arm.uses_memory:
             try:
-                await self.memory.consume_changes(port)
+                invalidated = await self.memory.consume_changes(port, getattr(port, "reader", None))
                 release, store = self.memory.pin(self.arm.memory_store)
                 release_id = release.release_id
                 pinned_at_ms = int((time.monotonic() - clock.started) * 1000)
@@ -142,7 +155,7 @@ class Retriever:
                     resolution = resolve(request, store, self.registry, set(groups), releases)
                 plans, activations, memory_reasons = apply_memory(
                     plans, resolution, store, self.registry, intent, set(groups),
-                    self.memory.invalidated_places, request.query, self.arm)
+                    set(invalidated), request.query, self.arm)
             except MemoryUnavailable:
                 degraded = ["memory_unavailable"]
                 resolution = None
@@ -153,6 +166,7 @@ class Retriever:
             degraded += decision_degraded
         deadline = time.monotonic() + min(request.deadline_ms, self.arm.deadline_ms) / 1000.0
         outcomes: dict[str, str] = {}
+        self._fetch_gaps: set[str] = set()
         candidates = await self._ask(request, plans, port, clock, deadline, intent.fact_kinds, outcomes,
                                      capabilities)
         assembled = assemble(candidates, intent.terms, intent.fact_kinds, request.budget_tokens,
@@ -160,7 +174,8 @@ class Retriever:
                              dedup_exact=self.arm.exact_dedup,
                              domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})
         sources, response_reasons, required_gap = self._sources(plans, outcomes,
-                                                                intent.detected_fact_kinds or intent.fact_kinds)
+                                                                intent.detected_fact_kinds or intent.fact_kinds,
+                                                                self._fetch_gaps)
         response_reasons += memory_reasons
         resolved = resolution is not None and bool(resolution.interpretations)
         status = self._status(assembled, intent.vague, required_gap, lexical_coverage=not resolved)
@@ -293,6 +308,7 @@ class Retriever:
                         group.start_soon(search, plan, ref)
 
         fetched: list[Candidate] = []
+        fetch_outcomes: dict[str, list[str]] = {}
         retrieved_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         budget = self.arm.candidates
         found_by: dict[tuple[str, str, str], set[int]] = {}
@@ -303,7 +319,11 @@ class Retriever:
             if arguments is None:
                 return
             payload = await call(hub_id, manifest.fetch.tool, arguments)
-            if _status_of(payload) != "ok" or "artifact" not in payload:
+            status = _status_of(payload)
+            if status == "ok" and "artifact" not in payload:
+                status = "error"
+            fetch_outcomes.setdefault(hub_id, []).append(status)
+            if status != "ok":
                 return
             artifact = payload["artifact"]
             fetched.append(Candidate(hub_id, rank, manifest, artifact,
@@ -323,6 +343,14 @@ class Retriever:
                     found_by[key] = {interpretation} if interpretation is not None else set()
                     budget -= 1
                     group.start_soon(fetch, hub_id, rank, ref, hit, key)
+        # A search that found hits whose evidence could not be read is not a successful retrieval:
+        # every fetch failed -> the source reports that failure; some failed -> `fetch_gaps`.
+        for hub_id, statuses in fetch_outcomes.items():
+            failed = [status for status in statuses if status != "ok"]
+            if failed and len(failed) == len(statuses) and outcomes.get(hub_id) == "ok":
+                outcomes[hub_id] = "timeout" if "timeout" in failed else "error"
+            elif failed:
+                self._fetch_gaps.add(hub_id)
         # deterministic evidence ids: hub order, then hub rank
         fetched.sort(key=lambda candidate: (candidate.source_id, candidate.hub_rank, candidate.unit.artifact_id))
         for index, candidate in enumerate(fetched):
@@ -332,7 +360,8 @@ class Retriever:
     # ---- stage 6 helpers ---------------------------------------------------------------------------
     @staticmethod
     def _sources(plans: list[SourcePlan], outcomes: dict[str, str],
-                 needed_kinds: frozenset[str] = frozenset()) -> tuple[list[SourceOutcome], list[str], bool]:
+                 needed_kinds: frozenset[str] = frozenset(),
+                 fetch_gaps: set[str] = frozenset()) -> tuple[list[SourceOutcome], list[str], bool]:
         """One outcome per source; per-interpretation plans for the same source are merged.
 
         A called source that is authoritative for a kind of fact the question needs is required
@@ -359,12 +388,12 @@ class Retriever:
             authoritative = plan.manifest is not None and any(
                 plan.manifest.authoritative_for(kind) for kind in needed_kinds)
             gap = None
-            if plan.call and authoritative and status in ("timeout", "error"):
+            if plan.call and authoritative and (status in ("timeout", "error") or plan.hub_id in fetch_gaps):
                 gap = "required_source_unavailable"
                 source_reasons.append(gap)
             elif plan.required and "required_source_denied" in source_reasons:
                 gap = "required_source_denied"
-            elif plan.required and status in ("timeout", "error", "unsupported_for_mode"):
+            elif plan.required and (status in ("timeout", "error", "unsupported_for_mode") or plan.hub_id in fetch_gaps):
                 gap = "required_source_unavailable"
                 source_reasons.append(gap)
             if gap:

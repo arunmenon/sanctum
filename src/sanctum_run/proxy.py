@@ -24,7 +24,7 @@ from mcp.server.lowlevel import Server
 
 from sanctum_hubs.interfaces import META_REQUEST_ID, ErrorCode
 
-from .gateway import GatewayHandle, HubGateway
+from .gateway import DuplicateRequestBinding, GatewayHandle, HubGateway
 
 META_CALLER_TOKEN = "lab/caller_token"
 CAPABILITIES_TOOL = "hub_capabilities"
@@ -73,14 +73,21 @@ class GatewayProxy:
 
     # ---- binding ------------------------------------------------------------------------------
     def bind(self, request_id: str, caller_token: str, handle: GatewayHandle) -> None:
+        """Bind one request id to one gateway invocation. The handle must be for that request id,
+        and an active binding is never replaced (duplicate ids are refused, with an anomaly)."""
+        if handle._GatewayHandle__request_id != request_id:
+            self._anomalies.append({"request_id": request_id, "kind": "binding_request_mismatch"})
+            raise DuplicateRequestBinding("handle is for another request id")
+        if request_id in self._bindings:
+            self._anomalies.append({"request_id": request_id, "kind": "duplicate_request_binding"})
+            raise DuplicateRequestBinding(f"request {request_id!r} is already bound")
         self._bindings[request_id] = (caller_token, handle)
 
-    def unbind(self, request_id: Optional[str] = None) -> None:
-        """Drop one request's binding, or every binding when no request id is given."""
-        if request_id is None:
-            self._bindings.clear()
-        else:
-            self._bindings.pop(request_id, None)
+    def unbind(self, request_id: str, handle: Optional[GatewayHandle] = None) -> None:
+        """Drop this request's binding only if it is still the given handle's (invocation-specific)."""
+        binding = self._bindings.get(request_id)
+        if binding is not None and (handle is None or binding[1] is handle):
+            del self._bindings[request_id]
 
     def anomalies(self) -> list[dict[str, Any]]:
         return [dict(entry) for entry in self._anomalies]
@@ -108,12 +115,12 @@ class GatewayProxy:
         binding = self._bindings.get(request_id) if request_id is not None else None
         bound = binding is not None and binding[0] == caller_token
         if name == CALLER_TOOL:
-            groups = self._gateway.caller_groups(request_id) if bound else None
+            groups = self._gateway.caller_groups(binding[1]) if bound else None
             if groups is None:
                 return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
-            return {"groups": groups}
+            return {"groups": groups, "reader": self._gateway.reader_ref(binding[1])}
         if name == CHANGES_TOOL:
-            events = self._gateway.change_events(request_id, int(arguments.get("after_seq") or 0)) if bound else None
+            events = self._gateway.change_events(binding[1], int(arguments.get("after_seq") or 0)) if bound else None
             if events is None:
                 return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
             return {"events": events}

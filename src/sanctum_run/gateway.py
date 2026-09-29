@@ -30,6 +30,10 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Optional
 
+import hashlib
+import secrets
+import uuid
+
 import anyio
 import yaml
 from mcp.shared.memory import create_connected_server_and_client_session
@@ -42,6 +46,10 @@ from sanctum_hubs.interfaces import (
 )
 from sanctum_hubs.servers import build_hub_server
 from sanctum_hubs.tokens import TokenService
+
+
+class DuplicateRequestBinding(RuntimeError):
+    """A request id already has an active invocation; credentials are never replaced."""
 
 
 class TokenMode(StrEnum):
@@ -84,7 +92,10 @@ class HubGateway:
         self.change_feed_path = Path(change_feed_path) if change_feed_path else None
         self._calls_by_request: dict[str, list[ObservedCall]] = {}
         self._exit_stack: Optional[AsyncExitStack] = None
-        self._bindings: dict[str, tuple[Optional[str], Optional[str]]] = {}
+        # invocation id -> (request id, caller token, principal): fixed when the handle is made
+        self._invocations: dict[str, tuple[str, Optional[str], Optional[str]]] = {}
+        self._active_requests: dict[str, str] = {}   # request id -> its one active invocation
+        self._reader_salt = secrets.token_hex(16)     # opaque reader ids are stable within this gateway
         self._anomalies: list[dict[str, Any]] = []
         self._active_request_id: Optional[str] = None
         self._gateway_exchanging = False
@@ -111,8 +122,8 @@ class HubGateway:
         service.issue_caller_token = watched_issue
         service.exchange = watched_exchange
 
-    def _anomaly(self, kind: str, **details: Any) -> None:
-        self._anomalies.append({"request_id": self._active_request_id, "kind": kind, **details})
+    def _anomaly(self, kind: str, request_id: Optional[str] = None, **details: Any) -> None:
+        self._anomalies.append({"request_id": request_id or self._active_request_id, "kind": kind, **details})
 
     def anomalies(self, request_id: Optional[str] = None) -> list[dict[str, Any]]:
         return [dict(entry) for entry in self._anomalies
@@ -177,8 +188,32 @@ class HubGateway:
         except TokenRejected:
             return None
 
+    def _open_invocation(self, request_id: str, caller_token: Optional[str]) -> str:
+        if request_id in self._active_requests:
+            self._anomaly("duplicate_request_binding", request_id=request_id)
+            raise DuplicateRequestBinding(f"request {request_id!r} already has an active binding")
+        invocation_id = uuid.uuid4().hex
+        self._invocations[invocation_id] = (request_id, caller_token, self._principal_of(caller_token, CALLER_AUDIENCE))
+        self._active_requests[request_id] = invocation_id
+        return invocation_id
+
     def bind(self, request_id: str, caller_token: Optional[str]) -> None:
-        self._bindings[request_id] = (caller_token, self._principal_of(caller_token, CALLER_AUDIENCE))
+        """Legacy entry point: binds only a request id with no active invocation. Rebinding an
+        active request never changes its credentials; it is refused and kept as an anomaly."""
+        if request_id in self._active_requests:
+            self._anomaly("duplicate_request_binding", request_id=request_id)
+            return
+        self._open_invocation(request_id, caller_token)
+
+    def release(self, handle: "GatewayHandle") -> None:
+        """End exactly this handle's invocation; a later call through it is denied."""
+        invocation_id = handle._GatewayHandle__invocation_id
+        request_id, _token, _principal = self._invocations.pop(invocation_id, (None, None, None))
+        if request_id is not None and self._active_requests.get(request_id) == invocation_id:
+            del self._active_requests[request_id]
+
+    def _credentials(self, invocation_id: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
+        return self._invocations.get(invocation_id, (None, None, None))
 
     def _audience_valid(self, hub_token: Optional[str]) -> bool:
         """Only an exchanged token is scoped to the hub; a passthrough token has `aud == sanctum`."""
@@ -188,10 +223,10 @@ class HubGateway:
         """The hub's MCP tool definitions (for the gateway proxy's tool list)."""
         return list((await self._sessions[hub_id].list_tools()).tools)
 
-    def caller_groups(self, request_id: str) -> Optional[list[str]]:
-        """The verified access groups of the request's bound caller token (never the principal),
-        or None when the token is invalid or the token service is down (fail closed)."""
-        caller_token, _principal = self._bindings.get(request_id, (None, None))
+    def caller_groups(self, handle: "GatewayHandle") -> Optional[list[str]]:
+        """The verified access groups of the handle's caller token (never the principal), or None
+        when the token is invalid, the handle is released, or the token service is down."""
+        _request_id, caller_token, _principal = self._credentials(handle._GatewayHandle__invocation_id)
         if not getattr(self._token_service, "available", True):
             return None
         try:
@@ -199,15 +234,25 @@ class HubGateway:
         except TokenRejected:
             return None
 
+    def reader_ref(self, handle: "GatewayHandle") -> Optional[str]:
+        """A stable opaque id for the handle's verified caller (partitions per-reader state such
+        as change-feed cursors); never the principal, and meaningless outside this gateway."""
+        _request_id, caller_token, _principal = self._credentials(handle._GatewayHandle__invocation_id)
+        try:
+            subject = self._token_service.verify(caller_token, CALLER_AUDIENCE).sub
+        except TokenRejected:
+            return None
+        return "reader-" + hashlib.sha256(f"{self._reader_salt}:{subject}".encode()).hexdigest()[:16]
+
     @property
     def stores(self) -> dict[str, HubStore]:
         """Lab side only (admin API wiring in tests and scenario scripts); never reaches a SUT."""
         return dict(self._stores)
 
-    def change_events(self, request_id: str, after_seq: int = 0) -> Optional[list[dict[str, Any]]]:
-        """The bound caller's per-reader change feed view (`ChangeFeed.events_for`), or None when
-        the caller cannot be verified. Empty when the run has no feed."""
-        caller_token, _principal = self._bindings.get(request_id, (None, None))
+    def change_events(self, handle: "GatewayHandle", after_seq: int = 0) -> Optional[list[dict[str, Any]]]:
+        """The handle's caller's per-reader change feed view (`ChangeFeed.events_for`), or None
+        when the caller cannot be verified. Empty when the run has no feed."""
+        _request_id, caller_token, _principal = self._credentials(handle._GatewayHandle__invocation_id)
         try:
             claims = self._token_service.verify(caller_token, CALLER_AUDIENCE)
         except TokenRejected:
@@ -226,15 +271,18 @@ class HubGateway:
         self._record(request_id, hub_id, tool, "denied", False)
         return {"error": {"code": ErrorCode.DENIED_OR_NOT_FOUND.value, "message": "not found or access denied"}}
 
-    async def call(self, request_id: str, hub_id: str, tool: str,
+    async def call(self, invocation_id: str, request_id: str, hub_id: str, tool: str,
                    arguments: Optional[dict[str, Any]] = None) -> dict[str, Any]:
-        """Call one hub tool for one request as its bound principal; returns the hub's JSON body
-        (or an error body). A request with no binding is denied."""
+        """Call one hub tool for one invocation as its bound principal; returns the hub's JSON
+        body (or an error body). A released or unknown invocation is denied and is an anomaly."""
+        if invocation_id not in self._invocations:
+            self._anomaly("call_on_inactive_binding", request_id=request_id, hub=hub_id)
+            return self._denied(request_id, hub_id, tool)
         session = self._sessions.get(hub_id)
         if session is None:
             self._record(request_id, hub_id, tool, "error", False)
             return {"error": {"code": ErrorCode.UPSTREAM_ERROR.value, "message": "unknown hub"}}
-        caller_token, bound_principal = self._bindings.get(request_id, (None, None))
+        _request_id, caller_token, bound_principal = self._credentials(invocation_id)
         try:
             hub_token = self._hub_token(caller_token, hub_id)
         except (TokenRejected, AuthUnavailable):
@@ -267,18 +315,18 @@ class HubGateway:
 
     def handle(self, request_id: str, caller_token: Optional[str]) -> "GatewayHandle":
         """Bind `caller_token` to `request_id` and return the SUT's handle for it."""
-        self.bind(request_id, caller_token)
-        return GatewayHandle(self, request_id)
+        return GatewayHandle(self, self._open_invocation(request_id, caller_token), request_id)
 
 
 class GatewayHandle:
     """What a SUT holds: hub ids and a call method bound to one request. The gateway itself is
     kept in a name-mangled slot so the SUT's public surface carries no hub internals. This is
     not a security boundary against hostile in-process code; see the module docstring."""
-    __slots__ = ("__gateway", "__request_id")
+    __slots__ = ("__gateway", "__invocation_id", "__request_id")
 
-    def __init__(self, gateway: HubGateway, request_id: str):
+    def __init__(self, gateway: HubGateway, invocation_id: str, request_id: str):
         self.__gateway = gateway
+        self.__invocation_id = invocation_id
         self.__request_id = request_id
 
     @property
@@ -286,7 +334,7 @@ class GatewayHandle:
         return self.__gateway.hub_ids
 
     async def call(self, hub_id: str, tool: str, arguments: Optional[dict[str, Any]] = None) -> dict[str, Any]:
-        return await self.__gateway.call(self.__request_id, hub_id, tool, arguments)
+        return await self.__gateway.call(self.__invocation_id, self.__request_id, hub_id, tool, arguments)
 
 
-__all__ = ["GatewayHandle", "HubGateway", "TokenMode", "released_hub_ids"]
+__all__ = ["DuplicateRequestBinding", "GatewayHandle", "HubGateway", "TokenMode", "released_hub_ids"]

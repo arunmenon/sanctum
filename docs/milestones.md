@@ -1,6 +1,6 @@
 # Lab milestones (source of truth)
 
-Supersedes the milestone numbering in `../sanctum-lab-plan.md` §10. Each milestone ends in a demo.
+Supersedes the milestone numbering in `docs/design/sanctum-lab-plan.md` §10. Each milestone ends in a demo.
 
 | Milestone | Deliverables | Done when |
 |---|---|---|

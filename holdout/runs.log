@@ -1,0 +1,4 @@
+{"at": "2026-09-29T18:02:54+00:00", "config": "C1-fair", "forced": false, "git_commit": "90c11dd580c6388d77dea0bd40773f4ae01a83dc", "milestone": "M5", "out": "runs/holdout-m5/C1-fair", "prior_runs": 0, "reason": null, "status": "ok"}
+{"at": "2026-09-29T18:02:58+00:00", "config": "C2", "forced": false, "git_commit": "90c11dd580c6388d77dea0bd40773f4ae01a83dc", "milestone": "M5", "out": "runs/holdout-m5/C2", "prior_runs": 0, "reason": null, "status": "ok"}
+{"at": "2026-09-29T18:03:03+00:00", "config": "C4", "forced": false, "git_commit": "90c11dd580c6388d77dea0bd40773f4ae01a83dc", "milestone": "M5", "out": "runs/holdout-m5/C4", "prior_runs": 0, "reason": null, "status": "ok"}
+{"at": "2026-09-29T18:03:08+00:00", "config": "C4a-equivalent", "forced": false, "git_commit": "90c11dd580c6388d77dea0bd40773f4ae01a83dc", "milestone": "M5", "out": "runs/holdout-m5/C4a-equivalent", "prior_runs": 0, "reason": null, "status": "ok"}

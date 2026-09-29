@@ -159,7 +159,8 @@ class Retriever:
                              self.arm.tokenizer, common=self.arm.common_assembly,
                              dedup_exact=self.arm.exact_dedup,
                              domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})
-        sources, response_reasons, required_gap = self._sources(plans, outcomes)
+        sources, response_reasons, required_gap = self._sources(plans, outcomes,
+                                                                intent.detected_fact_kinds or intent.fact_kinds)
         response_reasons += memory_reasons
         resolved = resolution is not None and bool(resolution.interpretations)
         status = self._status(assembled, intent.vague, required_gap, lexical_coverage=not resolved)
@@ -330,8 +331,13 @@ class Retriever:
 
     # ---- stage 6 helpers ---------------------------------------------------------------------------
     @staticmethod
-    def _sources(plans: list[SourcePlan], outcomes: dict[str, str]) -> tuple[list[SourceOutcome], list[str], bool]:
-        """One outcome per source; per-interpretation plans for the same source are merged."""
+    def _sources(plans: list[SourcePlan], outcomes: dict[str, str],
+                 needed_kinds: frozenset[str] = frozenset()) -> tuple[list[SourceOutcome], list[str], bool]:
+        """One outcome per source; per-interpretation plans for the same source are merged.
+
+        A called source that is authoritative for a kind of fact the question needs is required
+        for that fact (HLD §10 Ex9d): if it times out or errors, that is a visible gap
+        (`required_source_unavailable`), never a `sufficient` answer from other sources."""
         merged: dict[str, SourcePlan] = {}
         for plan in plans:
             current = merged.get(plan.hub_id)
@@ -350,8 +356,13 @@ class Retriever:
             if plan.call:
                 outcome = outcomes.get(plan.hub_id, "timeout")
                 status = {"ok": "called", "timeout": "timeout"}.get(outcome, "error")
+            authoritative = plan.manifest is not None and any(
+                plan.manifest.authoritative_for(kind) for kind in needed_kinds)
             gap = None
-            if plan.required and "required_source_denied" in source_reasons:
+            if plan.call and authoritative and status in ("timeout", "error"):
+                gap = "required_source_unavailable"
+                source_reasons.append(gap)
+            elif plan.required and "required_source_denied" in source_reasons:
                 gap = "required_source_denied"
             elif plan.required and status in ("timeout", "error", "unsupported_for_mode"):
                 gap = "required_source_unavailable"

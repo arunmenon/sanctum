@@ -1,0 +1,169 @@
+{
+  "source": "/Users/arunmenon/projects/sanctum/sanctum-intelligence-layer-hld-v5.1.md",
+  "source_sha256": "9cf5565f22b788b22bfaf68b23d80d4cd65e52bfc5590100d300e0b389cd48cb",
+  "source_unchanged": true,
+  "section_count": 23,
+  "sections": [
+    {
+      "section": 0,
+      "page": "hld.md",
+      "source_sha256": "6b3acad0badee7fca53ac46a14640820f0cc215751eeb19ed91f220ddbb8aad2",
+      "editorial_changes": 0,
+      "rendered_sha256": "852d823d16474928ef7e67c366ba10bc35c2b6c649eaaf2d8dae3573dc6d52f8"
+    },
+    {
+      "section": 1,
+      "page": "hld.md",
+      "source_sha256": "98034aa9298dc9d901c014cbfb52f4d32f0e128398c7380ef4094998d88a46fc",
+      "editorial_changes": 0,
+      "rendered_sha256": "154ba3ea874411da88cca34704093d3d050386737d6d51db53e468ea10127544"
+    },
+    {
+      "section": 2,
+      "page": "lab-spike.md",
+      "source_sha256": "2d0c6ff37bf378cdc4c60c19c4414e9b85374cdc13aab1104cf57a277a387ad0",
+      "editorial_changes": 0,
+      "rendered_sha256": "45aecd5f5f5a512978d918995a8a4e34073c7d55f666195f556494ae8951c99c"
+    },
+    {
+      "section": 3,
+      "page": "hld.md",
+      "source_sha256": "2bcda754fea2e3b29153612c24c1583305ac17e02bf63680bea1842f56454b54",
+      "editorial_changes": 0,
+      "rendered_sha256": "41ed324f094b9786fc7e93fff2bdf5628d85e0580c30cf378e88d564cc55106c"
+    },
+    {
+      "section": 4,
+      "page": "hld.md",
+      "source_sha256": "40c1e461a76209a83553fd301c1dde38b4a44e29710a9e0efef47ff826ac6116",
+      "editorial_changes": 0,
+      "rendered_sha256": "8f168219eee608e66bbe624e4f8b8bebe3e8005ca1ce3cb9cc9479e49c0f6b46"
+    },
+    {
+      "section": 5,
+      "page": "hld.md",
+      "source_sha256": "817eaaee7f968a12963f66a1f77a15c668fdf0681d901ed14fbdc5e840345e6f",
+      "editorial_changes": 0,
+      "rendered_sha256": "6e66ee3a4ff189a86c586b18620aa270aa9839e61e6456202d5e57378585e580"
+    },
+    {
+      "section": 6,
+      "page": "hld.md",
+      "source_sha256": "5207d18c97e93a5f7715b4934ca5d08df5845906dcbff7a173a35d78ca1a2bbd",
+      "editorial_changes": 0,
+      "rendered_sha256": "4e1b139ba0e032d6a6a429858901bdd44e32599b02ca8b92d86809b1f846cf3e"
+    },
+    {
+      "section": 7,
+      "page": "hld.md",
+      "source_sha256": "bfa3b173da5145034fe9f30ad1f6bd634b8259312ff8c0b1db0c5499ff469be3",
+      "editorial_changes": 0,
+      "rendered_sha256": "da00114e7b31284ae1214674fa1bbac7ea86aec5dd5d3e139113ba0121f12f7d"
+    },
+    {
+      "section": 8,
+      "page": "memory-design.md",
+      "source_sha256": "90a34e02d308e50193f74e4c2f688be0b2ccaf1855153878b2c6ecc6120db4c8",
+      "editorial_changes": 0,
+      "rendered_sha256": "3ddebc4fa0de1a7a7548854460dbc56af5d0a7e5f6dc4db694d47d787d62a45b"
+    },
+    {
+      "section": 9,
+      "page": "memory-design.md",
+      "source_sha256": "9b2492b374da28e6310d6e10771bb809217c134d4df63941e958ec2394be4b5b",
+      "editorial_changes": 0,
+      "rendered_sha256": "e2ae5dfeca4f957492592206553a0b98bcfdd42403292097bb9a56811303e75e"
+    },
+    {
+      "section": 10,
+      "page": "contracts-and-scenarios.md",
+      "source_sha256": "b28aefdf64f6a00031bc5cea61b33a7888033053a12e3605c29605d6d0993fdd",
+      "editorial_changes": 0,
+      "rendered_sha256": "b5337378afe5b446ff58935901d7ffb0a2ff388070355245e8b60971a501bfd3"
+    },
+    {
+      "section": 11,
+      "page": "hld.md",
+      "source_sha256": "5b4063b8b19e9095442f392bf8e21737d519f1356bb0557efc05f5b179427872",
+      "editorial_changes": 0,
+      "rendered_sha256": "6afef658f6970e9887b64907ac48b9f2ae19c443bf83710de3cacf667a8f7087"
+    },
+    {
+      "section": 12,
+      "page": "contracts-and-scenarios.md",
+      "source_sha256": "a60eeb0763bac5a6e067795f195590441ef60c7ca9363085bf03fbd781973ffd",
+      "editorial_changes": 0,
+      "rendered_sha256": "525a391b33296f5a03028519051fc8665f9ea4c206ecd83328f4d58662518608"
+    },
+    {
+      "section": 13,
+      "page": "hld.md",
+      "source_sha256": "5d5d6cbf2a1cc5a59d18767ff17fefeec0531c431e51e6f487451f32ddfa5096",
+      "editorial_changes": 0,
+      "rendered_sha256": "d2733629572c50cb46549e0be60c0db6aa5661bb1cb88e31dbdad0271aa3c2be"
+    },
+    {
+      "section": 14,
+      "page": "hld.md",
+      "source_sha256": "e5959c6ba6ce77cb036aac969dae334834098c141658374b9b603dbc737b4cb6",
+      "editorial_changes": 0,
+      "rendered_sha256": "0f7f6badda7494f9586e9f30d4b9c8e9b991f613d33ffbaf5badaf77099738dd"
+    },
+    {
+      "section": 15,
+      "page": "hld.md",
+      "source_sha256": "05cd3dbc16e472b60fb0aadafc4dc8d2d576fecf3e0bed79b0a3493f1e9f3995",
+      "editorial_changes": 0,
+      "rendered_sha256": "18bc33bab2a632a083997c8ecd6e41f4154b7138009d63517a2aaff409b21d62"
+    },
+    {
+      "section": 16,
+      "page": "lab-spike.md",
+      "source_sha256": "3816097ac24af8b5506167ef0a66ba4c4c8db6e7cfc70341c7de1657f231bc54",
+      "editorial_changes": 0,
+      "rendered_sha256": "016f5ca4b2270c3de879bcb7d7fd7e9a01ba2cb455c16184988dea00f8526496"
+    },
+    {
+      "section": 17,
+      "page": "lab-spike.md",
+      "source_sha256": "730d49a926d28f0fda6cdd36f02072470c601a866d09dd906f94baa98da0f890",
+      "editorial_changes": 1,
+      "rendered_sha256": "26077b9c55219552dde14d157ca2f14d97910a2a714253b49032b0d790000216"
+    },
+    {
+      "section": 18,
+      "page": "spike-plan.md",
+      "source_sha256": "44fbe4d388eb75f2de4ce0bfa1d9ea6a4bf59cd228b99a5fbc2fae3dfcb22b49",
+      "editorial_changes": 0,
+      "rendered_sha256": "a77496dd08c1674e94d4ee9c5c77214ee26280f6211136dd45809386395bb06d"
+    },
+    {
+      "section": 19,
+      "page": "review-history.md",
+      "source_sha256": "bfab22823ace40f74336d771ce4f57c031ce6cd7b342bd939130aab6baa6270c",
+      "editorial_changes": 0,
+      "rendered_sha256": "809781df26f905a637c5579889ed96906f66250d5b6e18aebc25703368204049"
+    },
+    {
+      "section": 20,
+      "page": "hld.md",
+      "source_sha256": "2012c95b914201acaae62259224708a97948999d312a31f3a4384f6cd02ae636",
+      "editorial_changes": 0,
+      "rendered_sha256": "7d753d42f723f3ec48db707ee032e280743f00648bc69738e939f6713b1ff4ad"
+    },
+    {
+      "section": 21,
+      "page": "hld.md",
+      "source_sha256": "0726a24b2756c8dfa08f1c60e88819c38a5973511bf44f11ca94985c6ad7e055",
+      "editorial_changes": 2,
+      "rendered_sha256": "62d5c5ed70be312a2b56dd119728b3e92ff6225dfda7fc44bff74cfbb1506307"
+    },
+    {
+      "section": 22,
+      "page": "review-history.md",
+      "source_sha256": "35c746d6afc8f059a4a9d939c1a24b8f81217c46b6f7f60aafdbfee6926a7780",
+      "editorial_changes": 0,
+      "rendered_sha256": "d2e3c61e7d1245e8a2c310dee28bd07fc4b8be29a341bc1cf95bf4c239188f33"
+    }
+  ]
+}

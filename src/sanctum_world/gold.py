@@ -77,6 +77,7 @@ class QuestionSpec(_Spec):
     contrast: Optional[Contrast] = None
     expected_ambiguity: Optional[InterpretationPolicy] = None
     bundle_id: Optional[str] = None
+    include_held_back: bool = False      # derive as if held-back hubs are released (M7 onboarding)
     budget_tokens: int = 4000
     deadline_ms: int = 3000
 
@@ -118,6 +119,9 @@ class _Deriver:
         self.target_env = spec.environment or "prod"
 
     # ---- access --------------------------------------------------------------------
+    def held_back(self, hub_id: str) -> bool:
+        return self.world.hubs[hub_id].held_back and not self.spec.include_held_back
+
     def is_restricted(self, world_artifact_id: str) -> bool:
         artifact = self.world.artifact(world_artifact_id)
         return (artifact.hub, artifact.place) in self.restricted_places
@@ -125,7 +129,7 @@ class _Deriver:
     def can_read(self, world_artifact_id: str) -> bool:
         artifact = self.world.artifact(world_artifact_id)
         hub = self.world.hubs[artifact.hub]
-        if hub.held_back:
+        if self.held_back(artifact.hub):
             return False
         if artifact.hub == "memoryhub" and artifact.principal != self.spec.principal:
             return False    # session memory is personal
@@ -158,7 +162,7 @@ class _Deriver:
 
     def entity_has_artifacts(self, entity_id: str) -> bool:
         return any(entity_id in artifact.about and not self.is_restricted(artifact.id)
-                   and not self.world.hubs[artifact.hub].held_back for artifact in self.world.artifacts)
+                   and not self.held_back(artifact.hub) for artifact in self.world.artifacts)
 
     def reviewed_name_visible(self, entity_id: str) -> bool:
         """HLD §8.5: only reviewed names establish identity. A name counts when the principal can
@@ -166,7 +170,7 @@ class _Deriver:
         as a shared composite skill, add no interpretation."""
         term = self.spec.name
         for hub_id, hub in self.world.hubs.items():
-            if (term.hub and hub_id != term.hub) or hub.held_back:
+            if (term.hub and hub_id != term.hub) or self.held_back(hub_id):
                 continue
             for place in hub.places:
                 if place.native == term.native and place.selects_for == entity_id \
@@ -210,7 +214,7 @@ class _Deriver:
         target_index = self.world.release_index(release)
         best_by_artifact: dict[str, dict] = {}
         for row in self.index.provenance:
-            if row["fact_id"] != fact_id or self.world.hubs[row["hub"]].held_back:
+            if row["fact_id"] != fact_id or self.held_back(row["hub"]):
                 continue
             if row["environment"] not in (None, env):
                 continue
@@ -418,7 +422,7 @@ class _Deriver:
         for artifact in self.world.artifacts:
             if not set(artifact.about) & set(entity_ids) or self.is_restricted(artifact.id):
                 continue
-            if self.world.hubs[artifact.hub].held_back or not self.can_read(artifact.id):
+            if self.held_back(artifact.hub) or not self.can_read(artifact.id):
                 continue
             if not self.world.hubs[artifact.hub].version_reads_for(artifact.place):
                 hubs.add(artifact.hub)

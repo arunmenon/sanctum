@@ -1,0 +1,12 @@
+id: sc-ex-12-2
+family: restricted_content
+principal: kestrel-payments
+text: How many duplicate postings did the ledger replay produce? (IncidentHub held
+  back)
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- duplicate_postings
+fact_kinds:
+- incident

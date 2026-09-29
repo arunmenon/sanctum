@@ -280,3 +280,13 @@ def test_unknown_name_is_unresolved_not_invented(world, build_dir, index):
                                           attributes=["max_retries"]), index=index)
     assert not gold.answerable and not gold.interpretations
     assert gold.expected.required_reasons == ["unresolved_term"]
+
+
+def test_held_back_hub_counts_only_when_released(world, build_dir, index):
+    fields = dict(principal="kestrel-payments", entities=["svc.ledger-post"],
+                  attributes=["duplicate_postings"], fact_kinds=["incident"])
+    held = derive(world, build_dir, _spec(**fields), index=index)
+    released = derive(world, build_dir, _spec(include_held_back=True, **fields), index=index)
+    assert not held.answerable and held.expected.required_reasons == ["no_coverage"]
+    assert released.answerable and released.expected.evidence_status.value == "sufficient"
+    assert {span.source_id for o in released.obligations for b in o.bundles for span in b.spans} == {"incidenthub"}

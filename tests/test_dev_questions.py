@@ -29,6 +29,7 @@ DEV_FAMILY_COUNTS = {
 M3_SCENARIOS = {"EX-01", "EX-02", "EX-03", "EX-04", "EX-06", "EX-07", "EX-08", "EX-09", "EX-10", "FX-24"}
 M4_SCENARIOS = {"EX-05", "EX-09b", "EX-15", "FX-16", "FX-17", "FX-18", "FX-19", "FX-20", "FX-21",
                 "FX-22", "FX-23"}
+M7_SCENARIOS = {"EX-12"}
 SCRIPT_ONLY = {"FX-18", "FX-22"}
 CODE_ONLY = "kestrel-codeonly"
 
@@ -148,8 +149,8 @@ def test_family_outcomes(dev_golds):
 def test_scenario_mapping_covers_m3_and_m4_scenarios(scenario_specs):
     document = yaml.safe_load(SCENARIO_CASES.read_text())
     mapping = document["scenarios"]
-    assert set(mapping) == M3_SCENARIOS | M4_SCENARIOS
+    assert set(mapping) == M3_SCENARIOS | M4_SCENARIOS | M7_SCENARIOS
     assert {scenario for scenario, case_ids in mapping.items() if not case_ids} == SCRIPT_ONLY
-    assert M4_SCENARIOS <= set(document["scripts"])
+    assert M4_SCENARIOS | M7_SCENARIOS <= set(document["scripts"])
     mapped = [case_id for case_ids in mapping.values() for case_id in case_ids]
     assert sorted(mapped) == sorted(scenario_specs)

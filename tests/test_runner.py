@@ -81,7 +81,8 @@ def test_stub_run_is_schema_valid_and_scores_like_score_m0(world_build, tmp_path
 
     for trace in traces:
         fixture_trace = load_trace(M0_TRACES / f"{trace.request_id}.json")
-        assert trace == fixture_trace
+        assert trace.elapsed_ms is not None and trace.elapsed_ms >= 0    # runner wall clock (M6)
+        assert trace.model_copy(update={"elapsed_ms": None}) == fixture_trace
 
 
 def test_fan_out_probe_gets_one_ok_call_per_released_hub(world_build, tmp_path):

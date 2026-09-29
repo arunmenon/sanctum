@@ -1,4 +1,6 @@
 """Runner-observed hub calls. The evaluator trusts these, not the SUT's self-report."""
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -14,6 +16,7 @@ class ObservedTrace(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     request_id: str
     calls: list[ObservedCall] = []
+    elapsed_ms: Optional[float] = None    # runner wall clock around the SUT call (M6 latency)
 
     def sources_attempted(self) -> set[str]:
         return {c.source_id for c in self.calls}

@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import time
 from contextlib import AsyncExitStack
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -140,9 +141,11 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
             caller_token = token_service.issue_caller_token(principal)
             context = SUTContext(caller_token=caller_token,
                                  gateway=gateway.handle(request.request_id, caller_token))
+            started = time.perf_counter()
             with gateway.sut_call(request.request_id):
                 response, receipt = await sut.retrieve(request, context)
-            trace = gateway.trace(request.request_id)
+            elapsed_ms = round((time.perf_counter() - started) * 1000.0, 3)
+            trace = gateway.trace(request.request_id).model_copy(update={"elapsed_ms": elapsed_ms})
             responses.append(response.model_dump(mode="json"))
             receipts.append(receipt.model_dump(mode="json"))
             traces.append(trace.model_dump(mode="json"))

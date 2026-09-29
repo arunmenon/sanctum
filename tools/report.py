@@ -9,6 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
+from sanctum_eval.degradation import deltas_vs_none, summarize_run
 from sanctum_eval.gold import GoldCase
 from sanctum_eval.leak_scan import LeakScanner, principals_for
 from sanctum_eval.load import load_gold
@@ -62,7 +63,9 @@ def _link(report_dir: Path, run: RunView, request_id: str) -> str:
 def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
            seed: int = DEFAULT_SEED) -> str:
     matrix = load_matrix()
-    out = ["# Sanctum Lab report", "", f"> {CAVEAT}", ""]
+    out = ["# Sanctum Lab report", "", f"> {CAVEAT}", "",
+           f"Ranker: `{matrix['shared']['ranker']}` in every arm; the B* cross-encoder profile is deferred "
+           "(discrepancy register 18), so these are lexical-ranker results.", ""]
 
     out += ["## Runs and provenance", "",
             "| config | run | world sha256 | seed | memory release | failure profile | git commit | dirty | integrity |",
@@ -127,6 +130,8 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
     if not compared:
         out += ["No matrix comparison has both arms in this run set.", ""]
 
+    if any(run.manifest["failure_profile"] != "none" for run in runs):
+        out += render_degradation([run.dir for run in runs], golds)
     out += ["## Failures", ""]
     for run in runs:
         failing = [c for c, s in sorted(run.scores.items()) if not s["safe_grounded_success"]]
@@ -138,6 +143,30 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
         out.append("")
     out += [f"> {CAVEAT}", ""]
     return "\n".join(out)
+
+
+def render_degradation(run_dirs: list[Path], golds: dict[str, GoldCase]) -> list[str]:
+    """Per arm and failure profile; deltas are against the same arm's `none` run."""
+    summaries = sorted((summarize_run(run_dir, golds) for run_dir in run_dirs),
+                       key=lambda s: (s.config_id, s.failure_profile != "none", s.failure_profile))
+    deltas = deltas_vs_none(summaries)
+    out = ["## Degradation under injected failures", "",
+           "Status honesty: never `sufficient` when a mandatory source's calls all timed out or errored "
+           "(runner-observed trace), and every source with a non-ok call reported as a gap. Latency is the "
+           "runner's wall clock around each request (simulated hub latency, scaled).", "",
+           "| config | profile | n | success | d success | honesty | overclaims | unreported gaps | unknown | "
+           "partial | failed calls | p50 ms | p95 ms | d p95 ms |",
+           "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for s in summaries:
+        d = deltas[(s.config_id, s.failure_profile)]
+        out.append(f"| {s.config_id} | {s.failure_profile} | {s.n_cases} | {_fmt(s.safe_success)} | "
+                   f"{_fmt(d['safe_success'])} | {_fmt(s.status_honesty)} | {s.overclaims} | {s.unreported_gaps} | "
+                   f"{_fmt(s.unknown_rate)} | {_fmt(s.partial_rate)} | {s.failed_calls} | "
+                   f"{_fmt(s.latency_p50_ms, 1)} | {_fmt(s.latency_p95_ms, 1)} | {_fmt(d['latency_p95_ms'], 1)} |")
+    for s in summaries:
+        if s.dishonest_cases:
+            out.append(f"- {s.config_id} / {s.failure_profile} dishonest status: {', '.join(s.dishonest_cases)}")
+    return out + [""]
 
 
 def build_report(run_dirs: list[Path], cases_dir: Path, world_build: Path, out_path: Path,

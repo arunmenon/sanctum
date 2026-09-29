@@ -1,0 +1,162 @@
+"""Markdown report for a set of runs over the same cases (lab plan §9.3).
+
+Usage: python tools/report.py --run runs/c1-fair --run runs/c2 --cases gold/dev --out report.md
+"""
+import argparse
+import json
+import os
+from collections import defaultdict
+from pathlib import Path
+from typing import Optional
+
+from sanctum_eval.gold import GoldCase
+from sanctum_eval.leak_scan import LeakScanner, principals_for
+from sanctum_eval.load import load_gold
+from sanctum_eval.stats import DEFAULT_SEED, metric_value, per_family_deltas
+from tools.config_diff import check_runs, load as load_matrix
+
+ROOT = Path(__file__).resolve().parents[1]
+CAVEAT = ("SYNTHETIC, NOT PRODUCTION EVIDENCE. 60 dev + 40 holdout questions support directional "
+          "results and debugging only, not population estimates.")
+PAIRED_METRICS = ("safe_grounded_success", "recall", "sources_attempted", "wrong_entity")
+# Hard gates, pass/fail per run, never averaged. Scope: no gateway anomaly (out-of-scope or
+# unauthorised call) and no token audience failure.
+GATES = ("leakage", "scope", "wrong_entity")
+
+
+def _read_jsonl(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+class RunView:
+    def __init__(self, run_dir: Path, golds: dict[str, GoldCase], scanner: LeakScanner,
+                 aliases: Optional[dict[str, str]]):
+        self.dir = Path(run_dir)
+        self.manifest = json.loads((self.dir / "manifest.json").read_text())
+        self.config_id = self.manifest["config_id"]
+        self.scores = {row["case_id"]: row for row in _read_jsonl(self.dir / "scores.jsonl")}
+        self.receipt_lines = {row["request_id"]: number for number, row in
+                              enumerate(_read_jsonl(self.dir / "receipts.jsonl"), start=1)}
+        self.releases = sorted({row.get("memory_release_id") or "none"
+                                for row in _read_jsonl(self.dir / "responses.jsonl")})
+        self.anomalies = _read_jsonl(self.dir / "anomalies.jsonl")
+        self.leaks = scanner.scan_run(self.dir, principals_for(golds.values(), aliases))
+        self.gates = {
+            "leakage": not self.leaks and not any(s["leaks"] for s in self.scores.values()),
+            "scope": not self.anomalies and not any("audience" in s["gates_failed"] for s in self.scores.values()),
+            "wrong_entity": not any(s["wrong_entity"] for s in self.scores.values()),
+        }
+
+
+def _fmt(value, digits: int = 2) -> str:
+    return "-" if value is None else f"{value:.{digits}f}"
+
+
+def _link(report_dir: Path, run: RunView, request_id: str) -> str:
+    target = os.path.relpath(run.dir / "receipts.jsonl", report_dir)
+    return f"[receipt]({target}#L{run.receipt_lines.get(request_id, 1)})"
+
+
+def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
+           seed: int = DEFAULT_SEED) -> str:
+    matrix = load_matrix()
+    out = ["# Sanctum Lab report", "", f"> {CAVEAT}", ""]
+
+    out += ["## Runs and provenance", "",
+            "| config | run | world sha256 | seed | memory release | failure profile | git commit | dirty | integrity |",
+            "|---|---|---|---|---|---|---|---|---|"]
+    for run in runs:
+        m = run.manifest
+        out.append(f"| {run.config_id} | `{run.dir.name}` | `{m['world_manifest_sha256'][:12]}` | {m['seed']} | "
+                   f"{', '.join(run.releases)} | {m['failure_profile']} | `{str(m.get('git_commit'))[:10]}` | "
+                   f"{m.get('git_dirty')} | {m['integrity']['ok']} |")
+
+    switches = list(next(iter(matrix["arms"].values())))
+    out += ["", "## Config matrix", "", "| config | " + " | ".join(switches) + " |",
+            "|---|" + "---|" * len(switches)]
+    for run in runs:
+        arm = matrix["arms"].get(run.config_id, {})
+        out.append(f"| {run.config_id} | " + " | ".join(str(arm.get(k, "-")) for k in switches) + " |")
+
+    out += ["", "## Gates (pass/fail, never averaged)", "", "| config | " + " | ".join(GATES) + " |",
+            "|---|" + "---|" * len(GATES)]
+    for run in runs:
+        out.append(f"| {run.config_id} | " + " | ".join("PASS" if run.gates[g] else "**FAIL**" for g in GATES) + " |")
+    for run in runs:
+        for leak in run.leaks[:20]:
+            out.append(f"- {run.config_id} leak: {leak.kind} `{leak.token[:60]}` in {leak.file}:{leak.line}")
+
+    out += ["", "## Per-family results", ""]
+    families = sorted({gold.family for gold in golds.values()})
+    header = "| family | n | " + " | ".join(f"{run.config_id} success | {run.config_id} recall" for run in runs) + " |"
+    out += [header, "|---|---|" + "---|---|" * len(runs)]
+    for family in families + ["all"]:
+        ids = [c for c, g in golds.items() if family in ("all", g.family)]
+        cells = []
+        for run in runs:
+            success = [metric_value(run.scores[c], "safe_grounded_success") for c in ids if c in run.scores]
+            recall = [v for v in (metric_value(run.scores[c], "recall") for c in ids if c in run.scores) if v is not None]
+            cells += [_fmt(sum(success) / len(success) if success else None),
+                      _fmt(sum(recall) / len(recall) if recall else None)]
+        out.append(f"| {family} | {len(ids)} | " + " | ".join(cells) + " |")
+
+    out += ["", "## Paired comparisons (b minus a, 95% cluster bootstrap by family and entity)", ""]
+    by_config = {run.config_id: run for run in runs}
+    compared = False
+    for name, comparison in matrix["comparisons"].items():
+        a, b = by_config.get(comparison["a"]), by_config.get(comparison["b"])
+        if not (a and b):
+            continue
+        compared = True
+        out += [f"### {name}: {comparison['a']} vs {comparison['b']}", ""]
+        problems = check_runs(matrix, name, a.manifest, b.manifest)
+        if problems:
+            out += [f"Not comparable: {'; '.join(problems)}", ""]
+            continue
+        out += ["| metric | scope | n | clusters | a | b | delta | interval | b better | a better |",
+                "|---|---|---|---|---|---|---|---|---|---|"]
+        for metric in PAIRED_METRICS:
+            for row in per_family_deltas(a.scores, b.scores, golds, metric, seed=seed):
+                if row.n_cases:
+                    out.append(f"| {metric} | {row.scope} | {row.n_cases} | {row.n_clusters} | {_fmt(row.mean_a)} | "
+                               f"{_fmt(row.mean_b)} | {_fmt(row.delta)} | [{_fmt(row.low)}, {_fmt(row.high)}] | "
+                               f"{row.b_better} | {row.a_better} |")
+        out.append("")
+    if not compared:
+        out += ["No matrix comparison has both arms in this run set.", ""]
+
+    out += ["## Failures", ""]
+    for run in runs:
+        failing = [c for c, s in sorted(run.scores.items()) if not s["safe_grounded_success"]]
+        out.append(f"**{run.config_id}**: {len(failing)} of {len(run.scores)} cases not safe-grounded-successful")
+        for case_id in failing:
+            gold = golds[case_id]
+            gates = ", ".join(run.scores[case_id]["gates_failed"]) or "quality"
+            out.append(f"- {case_id} ({gold.family}): {gates} {_link(report_dir, run, gold.request.request_id)}")
+        out.append("")
+    out += [f"> {CAVEAT}", ""]
+    return "\n".join(out)
+
+
+def build_report(run_dirs: list[Path], cases_dir: Path, world_build: Path, out_path: Path,
+                 aliases: Optional[dict[str, str]] = None, seed: int = DEFAULT_SEED) -> str:
+    golds = {gold.case_id: gold for gold in (load_gold(p) for p in sorted(Path(cases_dir).glob("*.yaml")))}
+    scanner = LeakScanner(world_build)
+    runs = [RunView(run_dir, golds, scanner, aliases) for run_dir in run_dirs]
+    text = render(runs, golds, Path(out_path).resolve().parent, seed)
+    Path(out_path).write_text(text, encoding="utf-8")
+    return text
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run", type=Path, action="append", required=True)
+    parser.add_argument("--cases", type=Path, required=True)
+    parser.add_argument("--world-build", type=Path, default=ROOT / "build" / "world")
+    parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument("--out", type=Path, required=True)
+    arguments = parser.parse_args()
+    build_report(arguments.run, arguments.cases, arguments.world_build, arguments.out, seed=arguments.seed)
+    print(f"wrote {arguments.out}")

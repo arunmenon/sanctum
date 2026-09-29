@@ -25,6 +25,25 @@ def check_comparison(m, name):
     return d, extra
 
 
+PAIRED_MANIFEST_KEYS = ("world_manifest_sha256", "seed", "failure_profile", "metrics_revision", "cases")
+
+
+def check_runs(m, name, manifest_a, manifest_b):
+    """Problems that make two runs unfit for comparison `name`; empty when they are paired."""
+    c = m["comparisons"][name]
+    problems = []
+    if (manifest_a.get("config_id"), manifest_b.get("config_id")) != (c["a"], c["b"]):
+        problems.append(f"runs are {manifest_a.get('config_id')} vs {manifest_b.get('config_id')}, "
+                        f"comparison needs {c['a']} vs {c['b']}")
+    _, extra = check_comparison(m, name)
+    if extra:
+        problems.append(f"switches outside may_differ: {sorted(extra)}")
+    for key in PAIRED_MANIFEST_KEYS:
+        if manifest_a.get(key) != manifest_b.get(key):
+            problems.append(f"{key} differs between runs")
+    return problems
+
+
 if __name__ == "__main__":
     m = load()
     names = sys.argv[1:] or list(m["comparisons"])

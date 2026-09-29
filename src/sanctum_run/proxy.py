@@ -46,7 +46,8 @@ class GatewayProxy:
         self._capabilities = capabilities
         self._tools = tools
         self._tool_targets = {tool.name: tuple(tool.name.split(TOOL_SEPARATOR, 1)) for tool in tools}
-        self._binding: Optional[tuple[str, str, GatewayHandle]] = None
+        # request_id -> (caller_token, handle); several requests may be in flight at once (M8)
+        self._bindings: dict[str, tuple[str, GatewayHandle]] = {}
         self._anomalies: list[dict[str, Any]] = []
         self.server = self._build_server()
 
@@ -72,10 +73,14 @@ class GatewayProxy:
 
     # ---- binding ------------------------------------------------------------------------------
     def bind(self, request_id: str, caller_token: str, handle: GatewayHandle) -> None:
-        self._binding = (request_id, caller_token, handle)
+        self._bindings[request_id] = (caller_token, handle)
 
-    def unbind(self) -> None:
-        self._binding = None
+    def unbind(self, request_id: Optional[str] = None) -> None:
+        """Drop one request's binding, or every binding when no request id is given."""
+        if request_id is None:
+            self._bindings.clear()
+        else:
+            self._bindings.pop(request_id, None)
 
     def anomalies(self) -> list[dict[str, Any]]:
         return [dict(entry) for entry in self._anomalies]
@@ -100,15 +105,15 @@ class GatewayProxy:
                        caller_token: Optional[str]) -> dict[str, Any]:
         if name == CAPABILITIES_TOOL:
             return {"hubs": self._capabilities}
-        binding = self._binding
-        bound = binding is not None and binding[0] == request_id and binding[1] == caller_token
+        binding = self._bindings.get(request_id) if request_id is not None else None
+        bound = binding is not None and binding[0] == caller_token
         if name == CALLER_TOOL:
-            groups = self._gateway.caller_groups(binding[0]) if bound else None
+            groups = self._gateway.caller_groups(request_id) if bound else None
             if groups is None:
                 return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
             return {"groups": groups}
         if name == CHANGES_TOOL:
-            events = self._gateway.change_events(binding[0], int(arguments.get("after_seq") or 0)) if bound else None
+            events = self._gateway.change_events(request_id, int(arguments.get("after_seq") or 0)) if bound else None
             if events is None:
                 return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
             return {"events": events}
@@ -117,12 +122,20 @@ class GatewayProxy:
             return {"error": {"code": ErrorCode.INVALID_ARGUMENT.value, "message": "invalid argument: unknown tool"}}
         hub_id, tool = target
         if not bound:
-            self._anomalies.append({"request_id": binding[0] if binding else None,
-                                    "kind": "proxy_call_outside_binding", "hub": hub_id, "tool": tool})
+            # Attribute the refusal to the request it claims when that one is bound (forged token),
+            # else to the only request in flight, else to the claimed id itself; always an anomaly.
             if binding is not None:
-                self._gateway.record_refused(binding[0], hub_id, tool)
+                refused_for = request_id
+            elif len(self._bindings) == 1:
+                refused_for = next(iter(self._bindings))
+            else:
+                refused_for = request_id or "unbound"
+            self._anomalies.append({"request_id": refused_for if self._bindings else None,
+                                    "kind": "proxy_call_outside_binding", "hub": hub_id, "tool": tool})
+            if self._bindings:
+                self._gateway.record_refused(refused_for, hub_id, tool)
             return _denied_body()
-        return await binding[2].call(hub_id, tool, arguments)
+        return await binding[1].call(hub_id, tool, arguments)
 
 
 __all__ = ["CALLER_TOOL", "CAPABILITIES_TOOL", "GatewayProxy", "META_CALLER_TOKEN", "TOOL_SEPARATOR"]

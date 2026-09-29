@@ -159,6 +159,21 @@ Uncertain answers keep the source; an unavailable layer keeps every candidate an
 | C4 | 18 | 38 | 2.57 |
 | C5 (standin) | 18 | 38 | 2.57 |
 
+### M7: IncidentHub onboarding
+
+IncidentHub joins with no `sanctum_ref` code change: an owner manifest
+(`owners/manifests/incidenthub.yaml`) and memory release `r2` (queue places, pinned descriptor),
+activated through `owners/memory_seed/ACTIVE`. It stays held back in `configs/hubs.yaml`; release it
+per run with `tools/run_lab.py --release-hub incidenthub` (the proxy exposes only released hubs).
+
+| Arm | Dev held back | Dev released |
+|---|---|---|
+| C2 | 26 | 24 |
+| C4 | 38 | 37 |
+
+Dev gold was derived with IncidentHub held back, so it cannot credit incident evidence; EX-12
+(released vs held back) is the onboarding test.
+
 ## M0 exit criteria (lab plan revised §10)
 
 | Criterion | Where | Status |

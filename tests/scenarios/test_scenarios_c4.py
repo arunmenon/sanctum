@@ -17,7 +17,7 @@ import json
 
 import pytest
 
-from .conftest import scenario_cases
+from .conftest import ROOT, scenario_cases
 
 M4_SCENARIOS = {"EX-05", "EX-09b", "EX-15", "FX-16", "FX-17", "FX-19", "FX-20", "FX-21", "FX-23", "EX-04", "EX-06"}
 EXPECTED_C4_FAIL = {
@@ -47,7 +47,8 @@ def test_scenario_on_c4(c4_run, case_id):
 def test_c4_run_is_clean_and_pinned(c4_run):
     assert c4_run.integrity_ok and c4_run.manifest["config_id"] == "C4"
     receipts = [json.loads(line) for line in (c4_run.out_dir / "receipts.jsonl").read_text().splitlines()]
-    assert {receipt["memory_release_id"] for receipt in receipts} == {"r1"}
+    active = (ROOT / "owners" / "memory_seed" / "ACTIVE").read_text().strip()
+    assert {receipt["memory_release_id"] for receipt in receipts} == {active}
     assert all(score.receipt_honest and not score.leaks and not score.wrong_entity for score in c4_run.scores)
 
 

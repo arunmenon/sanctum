@@ -1,7 +1,7 @@
 """Memory arms out of process: EX-09b (memory projection unavailable) and release pinning."""
 import json
 
-from .conftest import run_ref
+from .conftest import ROOT, run_ref
 
 
 def _rows(result, name):
@@ -24,5 +24,6 @@ def test_ex09b_memory_unavailable_degrades_visibly(scenario_world, c2_run, tmp_p
 def test_memory_arms_pin_and_report_the_release(scenario_world, tmp_path):
     result = run_ref(scenario_world, tmp_path / "run", config_id="C4")
     for response, receipt in zip(_rows(result, "responses.jsonl"), _rows(result, "receipts.jsonl")):
-        assert response["memory_release_id"] == receipt["memory_release_id"] == "r1"
+        active = (ROOT / "owners" / "memory_seed" / "ACTIVE").read_text().strip()
+        assert response["memory_release_id"] == receipt["memory_release_id"] == active
         assert receipt["config_id"] == "C4"

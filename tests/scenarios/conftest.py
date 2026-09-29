@@ -34,14 +34,16 @@ def alignment_for(world: Path, config_id: str):
         return None
     from sanctum_eval.alignment import load_alignment
     from sanctum_world.schema import load_world
-    aligned, _unaligned = load_alignment(ROOT / "owners" / "memory_seed" / "r1" / "entities.yaml",
+    active = (ROOT / "owners" / "memory_seed" / "ACTIVE").read_text().strip()
+    aligned, _unaligned = load_alignment(ROOT / "owners" / "memory_seed" / active / "entities.yaml",
                                          load_world(ROOT / "world" / "world.yaml"), world)
     return aligned
 
 
 def run_ref(world: Path, out_dir: Path, config_id: str = "C2", failure_profile: str = "none",
             registry: Path | None = None, time_scale: float | None = None, cases_dir: Path = SCENARIO_GOLD,
-            memory_seed: Path | None = None, extra_arguments: tuple[str, ...] = ()):
+            memory_seed: Path | None = None, extra_arguments: tuple[str, ...] = (),
+            include_held_back: bool = False):
     arguments = ["--config", config_id, *extra_arguments]
     if memory_seed is not None:
         arguments += ["--memory-seed", str(memory_seed)]
@@ -50,6 +52,7 @@ def run_ref(world: Path, out_dir: Path, config_id: str = "C2", failure_profile: 
     return run(ProcessSUT(arguments), RunConfig(
         cases_dir=cases_dir, out_dir=out_dir, seed=SEED, sut_name="ref", config_id=config_id,
         failure_profile=failure_profile, world_build_dir=world, time_scale=time_scale,
+        include_held_back=include_held_back,
         entity_alignment=alignment_for(world, config_id)))
 
 

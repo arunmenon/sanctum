@@ -1,0 +1,126 @@
+# Wire entity refs of release r1 and the places each selects for (repo and space only).
+# Contract with the evaluator-side alignment (src/sanctum_eval/alignment.py); keep this shape stable.
+entities:
+- id: ment-157c49398cb9
+  selects_for:
+  - repo:payments/billing-sync
+  - space:BILLSYNC
+- id: ment-ceefa2a46ae0
+  selects_for:
+  - repo:payments/card-vault
+  - space:CARDVAULT
+- id: ment-87481448ce57
+  selects_for:
+  - repo:payments/chargeback-desk
+  - space:CHARGEBACK
+- id: ment-e937fe7b7740
+  selects_for:
+  - repo:payments/fx-quote
+- id: ment-c7b872ac4834
+  selects_for:
+  - repo:payments/invoice-render
+  - space:INVOICES
+- id: ment-a2632d12c92b
+  selects_for:
+  - repo:payments/ledger-post
+  - space:LEDGER
+- id: ment-8a97d6af0a60
+  selects_for:
+  - repo:payments/merchant-onboard
+  - space:MERCHANTS
+- id: ment-5a177c036f21
+  selects_for:
+  - repo:payments/payment-auth
+  - space:PA
+- id: ment-63ecd27211fe
+  selects_for:
+  - repo:payments/payout-router
+  - space:DISBURSE
+- id: ment-5b94db641fdf
+  selects_for:
+  - repo:payments/refund-engine
+  - space:REFUNDS
+- id: ment-96c68aa24234
+  selects_for:
+  - repo:payments/risk-score
+  - space:RISK
+- id: ment-8c702a8d1920
+  selects_for:
+  - repo:payments/settlement-batch
+  - space:SETTLE
+- id: ment-9264794e5159
+  selects_for:
+  - repo:payments/tax-calc
+  - space:TAXCALC
+- id: ment-2bbeaed01802
+  selects_for:
+  - repo:identity/audit-trail
+  - space:AUDIT
+- id: ment-f7ef2b823622
+  selects_for:
+  - repo:identity/auth
+  - space:IDN
+- id: ment-53a15cea5940
+  selects_for:
+  - repo:identity/consent-records
+  - space:CONSENT
+- id: ment-48bd5426bdbb
+  selects_for:
+  - repo:identity/directory-sync
+  - space:DIRSYNC
+- id: ment-19063be2c7f5
+  selects_for:
+  - repo:identity/mfa-broker
+  - space:MFA
+- id: ment-49b1f04f09c0
+  selects_for:
+  - repo:identity/password-reset
+  - space:PWRESET
+- id: ment-f367e7b6d73a
+  selects_for:
+  - repo:identity/profile-api
+  - space:PROFILES
+- id: ment-9d5dcf94b883
+  selects_for:
+  - repo:identity/session-store
+  - space:SESSIONS
+- id: ment-25460f78980f
+  selects_for:
+  - repo:identity/token-mint
+  - space:TOKENS
+- id: ment-09c21e169bc9
+  selects_for:
+  - repo:platform/blob-archive
+  - space:ARCHIVE
+- id: ment-80d6c3fb60c7
+  selects_for:
+  - repo:platform/config-server
+  - space:CONFIG
+- id: ment-c3d9a3586e7b
+  selects_for:
+  - repo:platform/dns-updater
+  - space:DNS
+- id: ment-270f61f72096
+  selects_for:
+  - repo:platform/feature-flags
+  - space:FLAGS
+- id: ment-1baa21ffee0f
+  selects_for:
+  - repo:platform/gateway-edge
+  - space:EDGE
+- id: ment-a94fa448f2a8
+  selects_for:
+  - repo:platform/job-scheduler
+  - space:JOBS
+- id: ment-6eb01d0f799f
+  selects_for:
+  - repo:platform/metrics-relay
+  - space:METRICS
+- id: ment-ce13b2968b40
+  selects_for:
+  - repo:platform/queue-bridge
+  - space:QBRIDGE
+- id: ment-2aee208c64a1
+  selects_for:
+  - repo:platform/rate-limiter
+  - space:RATELIMIT

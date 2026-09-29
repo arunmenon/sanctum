@@ -31,7 +31,7 @@ def req(query, **fields):
 
 @pytest.fixture(scope="module")
 def release():
-    return load_release(SEED)
+    return load_release(SEED, "r1")
 
 
 def plans(query, groups, arm="C4", invalidated=frozenset(), **fields):
@@ -47,7 +47,7 @@ def plans(query, groups, arm="C4", invalidated=frozenset(), **fields):
 
 
 def test_release_validates_and_is_incomplete(release):
-    assert release.release_id == "r1" and (SEED / "ACTIVE").read_text().strip() == "r1"
+    assert release.release_id == "r1" and (SEED / "ACTIVE").read_text().strip() in {"r1", "r2"}
     labels = {term.label for term in release.terms}
     assert {"Auth Service", "PA-svc"} <= labels
     namespaces = {term.namespace for term in release.terms if term.label == "Auth Service"}
@@ -60,7 +60,7 @@ def test_unreadable_or_dangling_release_is_unavailable(tmp_path):
     with pytest.raises(MemoryUnavailable):
         load_release(tmp_path)
     shutil.copytree(SEED, tmp_path / "seed")
-    path = tmp_path / "seed" / "r1" / "release.yaml"
+    path = tmp_path / "seed" / (SEED / "ACTIVE").read_text().strip() / "release.yaml"
     data = yaml.safe_load(path.read_text())
     data["terms"][0]["denotes"] = "svc:nowhere"
     path.write_text(yaml.safe_dump(data))
@@ -180,6 +180,8 @@ def test_fx23_release_swap_and_rollback(tmp_path):
     from sanctum_ref.pipeline import MemoryState
     seed = tmp_path / "seed"
     shutil.copytree(SEED, seed)
+    (seed / "ACTIVE").write_text("r1\n")
+    shutil.rmtree(seed / "r2")
     shutil.copytree(seed / "r1", seed / "r2")
     release_file = seed / "r2" / "release.yaml"
     release_file.write_text(release_file.read_text().replace("release_id: r1", "release_id: r2"))

@@ -48,12 +48,13 @@ async def _drive(world, seed, feed, request: RetrieveRequest, principal: str):
 def test_fx21_refresh_inactive_and_unshare_invalidates(scenario_world, tmp_path):
     seed = tmp_path / "seed"
     shutil.copytree(ROOT / "owners" / "memory_seed", seed)
-    shutil.copytree(seed / "r1", seed / "r2")                   # the automated refresh: a candidate release
-    release = (seed / "r2" / "release.yaml").read_text().replace("release_id: r1", "release_id: r2")
+    active = (seed / "ACTIVE").read_text().strip()
+    shutil.copytree(seed / active, seed / "r9")                 # the automated refresh: a candidate release
+    release = (seed / "r9" / "release.yaml").read_text().replace(f"release_id: {active}", "release_id: r9")
     release = release.replace("status: active", "status: candidate", 1)
     release = release.replace("Ledger Posting (payments)", f"Ledger Posting (payments) {RESTRICTED_NAME}; {POISON}")
-    (seed / "r2" / "release.yaml").write_text(release)
-    assert (seed / "ACTIVE").read_text().strip() == "r1"       # never activated
+    (seed / "r9" / "release.yaml").write_text(release)
+    assert (seed / "ACTIVE").read_text().strip() == active     # never activated
     gold = load_gold(SCENARIO_GOLD / f"{scenario_cases()['FX-21'][0]}.yaml")
     request = RetrieveRequest.model_validate(gold.request.model_dump())
     (before, after), anomalies = anyio.run(_drive, scenario_world, seed, tmp_path / "feed.jsonl", request, gold.principal)
@@ -61,7 +62,7 @@ def test_fx21_refresh_inactive_and_unshare_invalidates(scenario_world, tmp_path)
     for response, receipt, _trace in (before, after):
         surfaces = json.dumps(response.model_dump(mode="json")) + json.dumps(receipt.model_dump(mode="json"))
         assert POISON not in surfaces and RESTRICTED_NAME not in surfaces
-        assert receipt.memory_release_id == "r1"
+        assert receipt.memory_release_id == active
     def dochub_selectors(receipt):
         return [s for plan in receipt.query_plans if plan.source_id == "dochub" for s in plan.selectors]
     assert "space=LEDGER" in dochub_selectors(before[1])

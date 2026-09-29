@@ -1,0 +1,16 @@
+manifest_version: 1
+hub_id: incidenthub
+owner: incident-ops-owners
+evidence_kind: ticket
+role: observed_event
+authority:                        # tickets record what happened; general reference, not policy
+  observed_event: authoritative
+  reference: non_authoritative
+search: {tool: search_incidents, place_filter: queue}
+fetch: {tool: get_incident, id_field: artifact_id, id_argument: id}
+versions:
+  semantics: none                 # capabilities.json: no version reads
+places:
+  - {prefix: "queue:PAYOPS", groups: [payments-eng], domain: payments}
+  - {prefix: "queue:IDOPS", groups: [identity-eng], domain: identity}
+  - {prefix: "queue:PLATOPS", groups: [platform-eng], domain: platform}

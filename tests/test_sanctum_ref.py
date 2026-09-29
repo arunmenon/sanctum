@@ -60,7 +60,7 @@ def test_registry_fails_closed(tmp_path):
         load_registry(tmp_path / "m")
     registry = load_registry(MANIFESTS)
     assert registry.manifest("skillhub").authoritative_for("procedure")
-    assert "incidenthub" not in registry.manifests      # held back until M7
+    assert registry.manifest("incidenthub").role.value == "observed_event"   # onboarded at M7 by manifest only
 
 
 def test_must_consult_and_capability_guards():

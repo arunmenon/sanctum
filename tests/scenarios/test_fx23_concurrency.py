@@ -116,12 +116,18 @@ def test_no_errors_no_drops_no_anomalies(load_run):
 
 def test_every_request_pins_exactly_one_release(load_run):
     _, results, _, _, phases = load_run
-    pinned = {}
+    pinned, refs_seen = {}, 0
     for case_id, row in results.items():
         response_release, receipt_release = row["response"].memory_release_id, row["receipt"].memory_release_id
         assert response_release == receipt_release, case_id      # no request mixes releases
         assert response_release in ("r1", "r2"), case_id
+        # every identity assertion used carries its release (fd91f01): none from the other release
+        refs = [ref for resolution in row["receipt"].resolutions for ref in resolution.assertion_refs]
+        assert all(ref.endswith(f"@{response_release}") for ref in refs), (case_id, refs)
+        refs_seen += len(refs)
+        assert "memory_pinned" in row["receipt"].timings_ms, case_id
         pinned[case_id] = response_release
+    assert refs_seen > 0
     assert phases["done_before_publish"] and {pinned[c] for c in phases["done_before_publish"]} == {"r1"}
     assert phases["r2_window"] and {pinned[c] for c in phases["r2_window"]} == {"r2"}
     assert {pinned[c] for c in phases["after_rollback"]} == {"r1"}   # new requests use the restored release

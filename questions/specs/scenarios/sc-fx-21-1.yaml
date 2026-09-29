@@ -1,0 +1,10 @@
+id: sc-fx-21-1
+family: named_service
+principal: kestrel-payments
+text: What is the ledger-post batch size and replay window?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+- replay_window_minutes

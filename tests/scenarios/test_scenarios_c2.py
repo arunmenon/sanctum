@@ -19,10 +19,13 @@ EXPECTED_C2_FAIL = {
     "EX-04": "no scope and no service named; needs request context or memory (C4)",
     "EX-06": "ambiguous 'auth' needs separated interpretations (memory resolution, C4)",
 }
+M3_SCENARIOS = PASS_ON_C2 | set(EXPECTED_C2_FAIL)    # the mapping also holds M4 (C4) scenarios
 
 
 def _params():
     for scenario, cases in sorted(scenario_cases().items()):
+        if scenario not in M3_SCENARIOS:
+            continue
         for case_id in cases:
             marks = []
             if scenario in EXPECTED_C2_FAIL:
@@ -31,7 +34,7 @@ def _params():
 
 
 def test_mapping_covers_the_m3_scenarios():
-    assert set(scenario_cases()) == PASS_ON_C2 | set(EXPECTED_C2_FAIL)
+    assert M3_SCENARIOS <= set(scenario_cases())
 
 
 @pytest.mark.parametrize("scenario,case_id", list(_params()))

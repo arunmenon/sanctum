@@ -1,0 +1,9 @@
+id: sc-fx-20-1
+family: named_service
+principal: kestrel-codeonly
+text: How many retries does payment-auth allow, per code and runbook?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

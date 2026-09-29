@@ -1,0 +1,11 @@
+id: sc-fx-23-1
+family: hub_specific_name
+principal: kestrel-payments
+text: What are the PA-svc retry limits on a gateway timeout? (release swap)
+mode: scoped
+scope: project:payments-auth-retry-fix
+name:
+  native: PA-svc
+  hub: memoryhub
+attributes:
+- max_retries

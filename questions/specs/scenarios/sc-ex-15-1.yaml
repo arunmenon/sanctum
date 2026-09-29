@@ -1,0 +1,11 @@
+id: sc-ex-15-1
+family: same_name_two_meanings
+principal: kestrel-both
+text: In the Identity skills, what retry limit does Auth Service set?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+  namespace: Identity
+attributes:
+- max_retries

@@ -1,0 +1,10 @@
+id: sc-fx-19-2
+family: hub_specific_name
+principal: kestrel-payments
+text: pay-authz retry limit at R41, not connection failures (no context)
+mode: scoped
+as_of: R41
+name:
+  native: pay-authz
+attributes:
+- max_retries

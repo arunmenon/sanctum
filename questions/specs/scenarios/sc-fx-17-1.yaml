@@ -1,0 +1,10 @@
+id: sc-fx-17-1
+family: same_name_two_meanings
+principal: kestrel-identity
+text: What retry limit does the Auth Service retries skill give?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries

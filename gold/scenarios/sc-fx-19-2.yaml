@@ -1,0 +1,30 @@
+case_id: sc-fx-19-2
+bundle_id: b-sc-fx-19-2
+family: hub_specific_name
+request:
+  schema_version: '1.0'
+  request_id: req-8d840a57bc6ba076
+  query: pay-authz retry limit at R41, not connection failures (no context)
+  mode: scoped
+  as_of: R41
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-payments
+answerable: false
+interpretation_policy: unique
+interpretations: []
+obligations: []
+source_obligations: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities: []
+  prohibited_activations: []
+expected:
+  evidence_status: insufficient
+  required_reasons:
+  - unresolved_term
+  source_status: {}

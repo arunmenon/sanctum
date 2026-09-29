@@ -332,7 +332,9 @@ class _Deriver:
         else:
             evidence_status = EvidenceStatus.insufficient
         required_reasons: list[str] = []
-        if (uncovered or not obligations) and (visible or not denied_entities):
+        if spec.name and not denoted:
+            required_reasons.append("unresolved_term")    # no reviewed name: no invented identity
+        elif (uncovered or not obligations) and (visible or not denied_entities):
             required_reasons.append("no_coverage")
         if denied or (not visible and denied_entities):
             required_reasons.append("required_source_denied")

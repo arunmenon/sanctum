@@ -273,3 +273,10 @@ def test_composite_artifact_adds_no_interpretation(world, build_dir, index):
                                           attributes=["max_retries"]), index=index)
     assert both.interpretation_policy == InterpretationPolicy.separate_alternatives
     assert len(both.interpretations) == 2
+
+
+def test_unknown_name_is_unresolved_not_invented(world, build_dir, index):
+    gold = derive(world, build_dir, _spec(principal="kestrel-payments", name={"native": "pay-authz"},
+                                          attributes=["max_retries"]), index=index)
+    assert not gold.answerable and not gold.interpretations
+    assert gold.expected.required_reasons == ["unresolved_term"]

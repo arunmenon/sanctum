@@ -1,4 +1,4 @@
-"""Static isolation checks (M0). Runtime image allowlists and canary probes arrive at M1/M2;
+"""Static isolation checks (M0, extended at M2 for sanctum_hubs and sanctum_run). Runtime image allowlists and canary probes arrive at M1/M2;
 a static scan alone is NOT sufficient isolation (lab-plan review L03)."""
 import ast
 from pathlib import Path
@@ -15,6 +15,8 @@ RULES = {
     "sanctum_contracts": {"forbid_imports": {"sanctum_eval", "sanctum_stub", "sut_ref", "gen", "world", "sanctum_world"}},
     "sanctum_stub": {"forbid_imports": {"sanctum_eval", "gen", "world", "sanctum_world"}},
     "sanctum_eval": {"forbid_imports": {"sanctum_stub", "sut_ref"}},
+    "sanctum_hubs": {"forbid_imports": {"sanctum_eval", "sanctum_world", "sanctum_stub", "sanctum_run"}},
+    "sanctum_run": {"forbid_imports": {"sanctum_world"}},
 }
 FORBIDDEN_LITERALS_RUNTIME = (
     "gold/", "gold\\", "world.yaml", "filler.yaml", "world/templates", "build/world",
@@ -43,7 +45,7 @@ def test_import_boundaries():
 def test_world_package_is_evaluator_side_only():
     """Only the evaluator side and tools may import sanctum_world; the runtime packages never."""
     assert (SRC / "sanctum_world").is_dir()
-    for pkg in ("sanctum_contracts", "sanctum_stub"):
+    for pkg in ("sanctum_contracts", "sanctum_stub", "sanctum_hubs", "sanctum_run"):
         for f in (SRC / pkg).rglob("*.py"):
             assert "sanctum_world" not in _imports(f), f"{f.relative_to(ROOT)} imports sanctum_world"
 
@@ -55,6 +57,21 @@ def test_runtime_packages_do_not_reference_evaluator_paths():
                 text = f.read_text()
                 for lit in FORBIDDEN_LITERALS_RUNTIME:
                     assert lit not in text, f"{f.relative_to(ROOT)} mentions {lit!r}"
+
+
+# Hubs serve only `build/world/hubs/<id>`; they must never name the evaluator side. `private/`
+# (not bare `private`) so corpus.py's PRIVATE_COMPONENT guard, which compares path parts,
+# stays legal. Comments are scanned too.
+FORBIDDEN_LITERALS_HUBS = ("private/", "private\\", "world.yaml", "gold/", "gold\\", "provenance.jsonl",
+                           "entity_refs.json", "tests/fixtures")
+
+
+def test_hubs_do_not_reference_evaluator_paths():
+    for f in (SRC / "sanctum_hubs").rglob("*"):
+        if f.is_file() and f.suffix in {".py", ".json", ".yaml"}:
+            text = f.read_text()
+            for lit in FORBIDDEN_LITERALS_HUBS:
+                assert lit not in text, f"{f.relative_to(ROOT)} mentions {lit!r}"
 
 
 def test_stub_responses_carry_no_gold_fields():

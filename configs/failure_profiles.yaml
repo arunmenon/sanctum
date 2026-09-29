@@ -1,0 +1,28 @@
+# Seeded failure knobs per hub per tool (plan decision 7).
+# latency_ms: lognormal with the given median and p95 (milliseconds, before time_scale).
+# timeout_rate, error_rate, partial_rate: independent per-call probabilities, drawn in that
+# order from one seeded uniform, so they must sum to at most 1.
+# partial_keep: fraction of results kept when a call is partial (at least one row is dropped).
+# Draws are seeded by (run_seed, request_id, hub, tool, call_index); time_scale multiplies
+# real sleeping (1.0 in runs, 0 in unit tests). A timeout is reported as a timeout error,
+# never as an empty result (error_semantics: timeout_distinct_from_empty).
+# Keys under a profile: `default` applies to every hub and tool; `<hub>.default` to every
+# tool of that hub; `<hub>.<tool>` to one tool. The most specific entry wins, field by field.
+defaults:
+  time_scale: 1.0
+  partial_keep: 0.5
+
+profiles:
+  none:
+    default: {latency_ms: {median: 0, p95: 0}, timeout_rate: 0.0, error_rate: 0.0, partial_rate: 0.0}
+
+  flaky:
+    default: {latency_ms: {median: 40, p95: 250}, timeout_rate: 0.05, error_rate: 0.05, partial_rate: 0.10}
+
+  degraded:
+    default: {latency_ms: {median: 120, p95: 900}, timeout_rate: 0.15, error_rate: 0.10, partial_rate: 0.20}
+
+  skillhub_timeout:
+    default: {latency_ms: {median: 20, p95: 80}, timeout_rate: 0.0, error_rate: 0.0, partial_rate: 0.0}
+    skillhub:
+      default: {latency_ms: {median: 3000, p95: 4000}, timeout_rate: 1.0, error_rate: 0.0, partial_rate: 0.0}

@@ -8,6 +8,7 @@ findings; an empty list means the build is fit to derive gold from. Rules:
 - coverage_gap_asserted: a planted coverage-gap fact is asserted somewhere after all.
 - span_mismatch: a provenance span's text[start:end] does not render its value.
 - acl_mismatch: a rendered core row's ACL differs from the authored access policy.
+- duplicate_path: two artifacts in one hub share a native path.
 - restricted_leak: a restricted canary, title, place name or authored sentence appears
   outside the restricted place (or inside it under a weakened ACL).
 - unexpected_field: a hub-visible row carries a field outside the public allowlist.
@@ -16,6 +17,10 @@ findings; an empty list means the build is fit to derive gold from. Rules:
   or canary (outside its own artifact) appears in hub-visible output.
 - filler_collision: a filler service or native collides with a core entity or native.
 
+The side documents `hubs/<hub>/capabilities.json` (hub-visible) and `identity/principals.json`
+(token service only) are covered by private_id_leak and restricted_leak, and each
+capabilities file by vocabulary_leak for its hub.
+
 `python -m sanctum_world.lint --leak-scan <build_dir>` runs only private_id_leak, with the
 exact identifiers listed under `<build_dir>/private/` (no world file, no regex guessing).
 """
@@ -23,7 +28,7 @@ import argparse
 import json
 import sys
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
@@ -58,6 +63,11 @@ class BuildView:
     canaries: list[dict]
     planted_index: dict[str, dict]
     artifact_map: dict[str, dict]
+    side_documents: dict[str, str] = field(default_factory=dict)   # relative path -> public text
+
+    def side_documents_for(self, hub_id: str) -> dict[str, str]:
+        prefix = f"hubs/{hub_id}/"
+        return {path: text for path, text in self.side_documents.items() if path.startswith(prefix)}
 
     def rows_for(self, opaque_artifact_id: str) -> list[dict]:
         return [row for rows in self.rows_by_hub.values() for row in rows
@@ -76,7 +86,12 @@ def load_build(build_dir: Path) -> BuildView:
         for hub_dir in sorted((build_dir / "hubs").iterdir())
         if (hub_dir / "artifacts.jsonl").exists()
     }
+    side_paths = sorted(build_dir.glob("hubs/*/capabilities.json")) + sorted(
+        build_dir.glob("identity/*.json"))
+    side_documents = {path.relative_to(build_dir).as_posix(): public_text(json.loads(path.read_text()))
+                      for path in side_paths}
     return BuildView(
+        side_documents=side_documents,
         rows_by_hub=rows_by_hub,
         provenance=_read_jsonl(private_dir / "provenance.jsonl"),
         entity_refs=json.loads((private_dir / "entity_refs.json").read_text()),
@@ -134,6 +149,13 @@ def check_private_leaks(view: BuildView, extra_identifiers: tuple[str, ...] = ()
                 if token in text and (row["artifact_id"] != owner or not acl_is_authored(row, authored_acl)):
                     findings.append(Finding("private_id_leak", _row_where(hub_id, row),
                                             f"canary {token!r} outside its own artifact"))
+    for path, text in sorted(view.side_documents.items()):
+        for identifier in identifiers:
+            if identifier in text:
+                findings.append(Finding("private_id_leak", path, f"private identifier {identifier!r}"))
+        for token in sorted(canary_owner):
+            if token in text:
+                findings.append(Finding("private_id_leak", path, f"canary {token!r} outside its own artifact"))
     return findings
 
 
@@ -277,6 +299,21 @@ def check_acls(view: BuildView) -> list[Finding]:
     return findings
 
 
+def check_unique_paths(view: BuildView) -> list[Finding]:
+    """A native path names one artifact per hub (versions of one artifact may share it)."""
+    findings = []
+    for hub_id, rows in sorted(view.rows_by_hub.items()):
+        owners: dict[str, set[str]] = {}
+        for row in rows:
+            if row.get("path"):
+                owners.setdefault(row["path"], set()).add(row["artifact_id"])
+        for path, artifact_ids in sorted(owners.items()):
+            if len(artifact_ids) > 1:
+                findings.append(Finding("duplicate_path", f"{hub_id}:{path}",
+                                        f"path used by {len(artifact_ids)} artifacts: {sorted(artifact_ids)}"))
+    return findings
+
+
 def distinctive_lines(text: str, noise_sentences: list[str]) -> set[str]:
     """Authored lines of a restricted page: shared filler noise removed, short lines skipped."""
     lines = set()
@@ -315,6 +352,11 @@ def check_restricted(world: World, view: BuildView, world_dir: Path = DEFAULT_WO
                     if secret in text:
                         findings.append(Finding("restricted_leak", _row_where(hub_id, row),
                                                 f"restricted {secret!r} from {planted.place} appears here"))
+        for path, text in sorted(view.side_documents.items()):
+            for secret in sorted(secrets):
+                if secret in text:
+                    findings.append(Finding("restricted_leak", path,
+                                            f"restricted {secret!r} from {planted.place} appears here"))
     return findings
 
 
@@ -339,6 +381,10 @@ def check_vocabulary(world: World, view: BuildView, world_dir: Path) -> list[Fin
                 if native in text:
                     findings.append(Finding("vocabulary_leak", _row_where(hub_id, row),
                                             f"{native!r} is not declared by {hub_id}"))
+        for path, text in sorted(view.side_documents_for(hub_id).items()):
+            for native in foreign:
+                if native in text:
+                    findings.append(Finding("vocabulary_leak", path, f"{native!r} is not declared by {hub_id}"))
     return findings
 
 
@@ -376,6 +422,7 @@ def lint(world: World, build_dir: Path, world_dir: Path = DEFAULT_WORLD_DIR) -> 
         + check_facts(world, view)
         + check_spans(view)
         + check_acls(view)
+        + check_unique_paths(view)
         + check_restricted(world, view, world_dir)
         + check_vocabulary(world, view, world_dir)
         + check_private_leaks(view, tuple(identifier for identifier in world_identifiers

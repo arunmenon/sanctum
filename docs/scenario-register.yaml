@@ -14,7 +14,7 @@ rows:
   - {id: EX-08, title: Nobody has the answer, hld: "§10 Ex8", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
   - {id: EX-09a, title: Decision layer unavailable, hld: "§10 Ex9", scope: full, milestone: M3, configs: [C3, C5], spec_alignment: checked, execution_status: planned}
   - {id: EX-09b, title: Memory projection unavailable, hld: "§10 Ex9", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
-  - {id: EX-09c, title: Registry/auth unavailable fails closed, hld: "§10 Ex9", scope: full, milestone: M2, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-09c, title: Registry/auth unavailable fails closed, hld: "§10 Ex9", scope: full, milestone: M2, configs: [all], spec_alignment: checked, execution_status: implemented-and-tested, note: "auth half; registry half at M3 (tests/test_ex09c.py)"}
   - {id: EX-09d, title: Mandatory SkillHub timeout, hld: "§10 Ex9", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
   - {id: EX-10, title: Injection in a document, hld: "§10 Ex10", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
   - {id: EX-11, title: Recording a learning (write), hld: "§10 Ex11", scope: deferred, milestone: none, configs: [], spec_alignment: checked, execution_status: negative-contract-only, note: "write tool absent/denied"}

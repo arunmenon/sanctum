@@ -14,6 +14,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+import yaml
+
+from sanctum_contracts import HubCapabilities as ContractHubCapabilities
+
 from .filler import FillerFile, filler_natives, generate_filler, load_filler, noise_paragraph
 from .rng import opaque_id, sub_rng
 from .schema import (
@@ -30,6 +34,7 @@ HUB_VISIBLE_KEYS = (
 TEMPLATE_SLOT = re.compile(r"\{\{([A-Za-z_]+)(?::([^}]*))?\}\}")
 STRUCTURAL_SLOTS = ("title", "place", "path", "name", "namespace", "principal", "noise")
 NO_VERSION_REF = "current"
+DEFAULT_HUB_CONFIG = Path(__file__).resolve().parents[2] / "configs" / "hubs.yaml"
 
 
 class RenderError(ValueError):
@@ -209,10 +214,49 @@ def _hub_row(*, artifact_id: str, kind: str, place: Optional[str], path: Optiona
     return row
 
 
-def render(world: World, seed: int, out_dir: Path, world_dir: Path) -> dict:
+def load_hub_config(path: Path = DEFAULT_HUB_CONFIG) -> dict[str, dict]:
+    return yaml.safe_load(Path(path).read_text())["hubs"]
+
+
+def hub_capabilities(world: World, hub_config: dict[str, dict]) -> dict[str, dict]:
+    """Hub-visible `capabilities.json` per hub (plan decision 3).
+
+    The `contract` part validates as the frozen `HubCapabilities`; a hub whose version reads
+    differ by place declares `version_reads: true` there and lists the places without version
+    reads under `place_version_reads` (discrepancy register: capabilities extension)."""
+    documents = {}
+    for hub_id, hub in sorted(world.hubs.items()):
+        if hub_id not in hub_config:
+            raise RenderError(f"configs/hubs.yaml has no entry for {hub_id}")
+        if bool(hub_config[hub_id].get("held_back", False)) != hub.held_back:
+            raise RenderError(f"configs/hubs.yaml held_back for {hub_id} disagrees with world.yaml")
+        reads = hub.capabilities.version_reads
+        place_reads = dict(sorted(reads.items())) if isinstance(reads, dict) else {}
+        contract = ContractHubCapabilities(
+            hub_id=hub_id,
+            version_reads=reads if isinstance(reads, bool) else True,
+            filters=list(hub.capabilities.filters),
+            max_results=hub_config[hub_id]["max_results"],
+            principal_scoped="principal" in hub.capabilities.filters,
+        )
+        documents[hub_id] = {"contract": contract.model_dump(mode="json"),
+                             "place_version_reads": place_reads}
+    return documents
+
+
+def principal_directory(world: World) -> list[dict]:
+    """`identity/principals.json`: read only by the lab token service (an IdP stand-in)."""
+    return [{"principal": principal.id, "groups": sorted(principal.groups)}
+            for principal in sorted(world.principals, key=lambda principal: principal.id)]
+
+
+def render(world: World, seed: int, out_dir: Path, world_dir: Path,
+           hub_config_path: Path = DEFAULT_HUB_CONFIG) -> dict:
     """Render every hub corpus and the private index into `out_dir`; return the manifest."""
     world_dir = Path(world_dir)
     out_dir = Path(out_dir)
+    hub_config = load_hub_config(hub_config_path)
+    capabilities = hub_capabilities(world, hub_config)
     filler = load_filler(world_dir / world.filler.file)
     vocabulary = build_vocabulary(world, filler)
 
@@ -311,7 +355,7 @@ def render(world: World, seed: int, out_dir: Path, world_dir: Path) -> dict:
     planted_index = _planted_index(world, core_ids)
 
     # ---- write ---------------------------------------------------------------------
-    for stale in (out_dir / "hubs", out_dir / "private"):
+    for stale in (out_dir / "hubs", out_dir / "private", out_dir / "identity"):
         if stale.exists():
             shutil.rmtree(stale)
     outputs: dict[str, str] = {}
@@ -319,6 +363,8 @@ def render(world: World, seed: int, out_dir: Path, world_dir: Path) -> dict:
         rows = [row for _, _, row in sorted(rows_by_hub[hub_id], key=lambda item: (item[0], item[1]))]
         counts[hub_id]["rows"] = len(rows)
         outputs[f"hubs/{hub_id}/artifacts.jsonl"] = _dump_jsonl(rows)
+        outputs[f"hubs/{hub_id}/capabilities.json"] = _dump_json(capabilities[hub_id])
+    outputs["identity/principals.json"] = _dump_json(principal_directory(world))
     provenance.sort(key=lambda row: (row["artifact_id"], row["version"], row["start"]))
     outputs["private/provenance.jsonl"] = _dump_jsonl(provenance)
     outputs["private/entity_refs.json"] = _dump_json(entity_refs)
@@ -341,6 +387,7 @@ def render(world: World, seed: int, out_dir: Path, world_dir: Path) -> dict:
         "world_version": world.world_version,
         "inputs": {path.relative_to(world_dir).as_posix(): _sha256(path.read_bytes())
                    for path in input_paths if path.exists()},
+        "hub_config": _sha256(Path(hub_config_path).read_bytes()),
         "files": {relative_path: _sha256(content.encode("utf-8"))
                   for relative_path, content in sorted(outputs.items())},
         "counts": counts,
@@ -430,6 +477,7 @@ def _planted_index(world: World, core_ids: dict[str, str]) -> dict:
     return index
 
 
-def build(world_dir: Path, seed: Optional[int], out_dir: Path) -> dict:
+def build(world_dir: Path, seed: Optional[int], out_dir: Path,
+          hub_config_path: Path = DEFAULT_HUB_CONFIG) -> dict:
     world = load_world(Path(world_dir) / "world.yaml")
-    return render(world, world.seed if seed is None else seed, out_dir, world_dir)
+    return render(world, world.seed if seed is None else seed, out_dir, world_dir, hub_config_path)

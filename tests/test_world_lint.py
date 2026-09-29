@@ -260,3 +260,16 @@ def test_quoted_private_id_in_decoded_value_is_reported(world, mutable_build):
     leaking_id = append_to_first_row(mutable_build, "codehub", 'key = "f.retry-limit.impl\\\\x"')
     assert any(finding.rule == "private_id_leak" and leaking_id in finding.where
                for finding in leak_scan(mutable_build))
+
+
+def test_duplicate_native_path_is_reported(world, mutable_build):
+    path = mutable_build / "hubs" / "skillhub" / "artifacts.jsonl"
+    rows = read_jsonl(path)
+    ids = sorted({row["artifact_id"] for row in rows})
+    first_path = next(row["path"] for row in rows if row["artifact_id"] == ids[0])
+    for row in rows:
+        if row["artifact_id"] == ids[1]:
+            row["path"] = first_path
+    write_jsonl(path, rows)
+    findings = lint(world, mutable_build, WORLD_DIR)
+    assert any(finding.rule == "duplicate_path" and first_path in finding.where for finding in findings)

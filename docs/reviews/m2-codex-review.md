@@ -1,0 +1,18 @@
+1. **P1 — Cancelled hub calls disappear from observed traces.** [gateway.py:199](/Users/arunmenon/projects/sanctum/sanctum-lab-m0/src/sanctum_run/gateway.py:199)  
+   Only the gateway’s own `TimeoutError` is recorded. A SUT deadline or cancelled fan-out task raises cancellation instead and bypasses `_record`. Reproduced with a 50 ms caller deadline against a 1 s hub call: the request was cancelled, but the trace contained zero calls. This requires only the public gateway API. **Fix:** record every attempt exactly once, including cancellation and transport exceptions, then propagate cancellation.
+
+2. **P1 — Filtered change feeds reveal hidden activity counts.** [change_feed.py:93](/Users/arunmenon/projects/sanctum/sanctum-lab-m0/src/sanctum_hubs/change_feed.py:93)  
+   `events_for` removes hidden events but preserves global `seq` and store-wide `at_revision`. A visible event, another principal’s revocation, then another visible event yields sequence numbers `[1, 3]`, revealing one hidden event. Store revision jumps similarly expose mutations affecting unreadable artifacts. The existing reader-view test checks subjects but misses these fields. **Fix:** expose reader-scoped positions or opaque cursors and revisions that do not encode hidden activity.
+
+3. **P2 — Unsharing suppresses the invalidation notification for the affected reader.** [change_feed.py:106](/Users/arunmenon/projects/sanctum/sanctum-lab-m0/src/sanctum_hubs/change_feed.py:106)  
+   Feed authorization uses the ACL *after* mutation. After removing payments access to `space:LEDGER`, the payments reader receives no `PLACE_UNSHARED` event. Ownership transfers likewise hide the notification from the former owner. Consumers cannot invalidate previously learned metadata through this feed, contrary to HLD §9.1. **Fix:** retain mutation-time visibility information and deliver minimal invalidation tombstones to previously authorized readers, without exposing new content.
+
+4. **P2 — Ordinary tool validation errors crash payload decoding and lose the trace.** [client.py:35](/Users/arunmenon/projects/sanctum/sanctum-lab-m0/src/sanctum_hubs/client.py:35)  
+   The parser assumes everything after the first `{` is JSON. Calling `search_code` with `{"query": {"nested": 1}}` produces a Pydantic error containing a Python dictionary representation. Reproduced: `JSONDecodeError`, followed by an empty trace. Uncaught, this also aborts the runner before outputs are written. **Fix:** handle non-JSON MCP errors with a safe fallback, validate decoded payload shape, and record the error regardless of decoding success.
+
+5. **P2 — Partial gateway startup leaks live MCP sessions.** [gateway.py:127](/Users/arunmenon/projects/sanctum/sanctum-lab-m0/src/sanctum_run/gateway.py:127)  
+   If a later hub fails loading or initialization, `__aenter__` exits without unwinding its `AsyncExitStack`; Python will not call `__aexit__`. Injecting a DocHub load failure after CodeHub started left CodeHub’s session and three background tasks alive. Explicit cleanup removed them. **Fix:** unwind all previously entered sessions on any startup exception or cancellation before re-raising.
+
+Verified with targeted in-memory probes using MCP 1.12.4/Pydantic 2.9.2; 10 failure-injector tests passed. Full suite not rerun under the read-only sandbox. No files changed.
+
+**Verdict: M2 needs fixes before acceptance; trace completeness and change-feed confidentiality are not yet reliable.**

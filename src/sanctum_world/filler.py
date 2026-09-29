@@ -136,6 +136,24 @@ def _fill_params(rng, text: str) -> str:
     return text
 
 
+def _unique_path(path: str, used: set[str]) -> str:
+    """Deterministic dedupe: add -2, -3, ... to the file stem (to the parent directory for
+    Java, whose file name must match the class)."""
+    if path not in used:
+        return path
+    directory, file_name = path.rsplit("/", 1)
+    stem, extension = file_name.rsplit(".", 1)
+    counter = 2
+    while True:
+        if extension == "java":
+            candidate = f"{directory}-{counter}/{file_name}"
+        else:
+            candidate = f"{directory}/{stem}-{counter}.{extension}"
+        if candidate not in used:
+            return candidate
+        counter += 1
+
+
 def generate_filler(world: World, filler: FillerFile, seed: int) -> list[FillerArtifact]:
     principals_by_group = {
         group: sorted(principal.id for principal in world.principals
@@ -143,6 +161,9 @@ def generate_filler(world: World, filler: FillerFile, seed: int) -> list[FillerA
         for group in sorted(set(filler.domain_groups.values()))
     }
     artifacts: list[FillerArtifact] = []
+    used_paths = {hub_id: {artifact.path for artifact in world.artifacts
+                           if artifact.hub == hub_id and artifact.path}
+                  for hub_id in filler.artifact_counts}
     for hub_id in sorted(filler.artifact_counts):
         weight_rng = sub_rng(seed, "filler-weights", hub_id)
         weights = [weight_rng.randint(1, 6) for _ in filler.services]
@@ -200,6 +221,11 @@ def generate_filler(world: World, filler: FillerFile, seed: int) -> list[FillerA
                 body = _fill_params(rng, _fill(body_skeleton, {**values, "param": "{{param}}"}))
                 env = ("experiment" if ref == "exp-branch" else "prod") if hub_id == "codehub" else None
                 versions.append(FillerVersion(ref=ref, env=env, body=body))
+            if path:
+                path = _unique_path(path, used_paths[hub_id])
+                used_paths[hub_id].add(path)
+                if hub_id == "codehub":
+                    title = path.rsplit("/", 1)[1]
             artifacts.append(FillerArtifact(
                 key=f"filler/{hub_id}/{index}", hub=hub_id, kind=kind, title=title, path=path,
                 place=place, name=name, namespace=namespace, principal=principal, acl=[group],

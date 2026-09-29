@@ -15,11 +15,16 @@ def test_all_hld_examples_and_fixtures_present():
         assert f"FX-{n}" in ids
 
 
+# Milestones already delivered; only their rows may claim to have run.
+REACHED_MILESTONES = {"M0", "M1", "M2"}
+
+
 def test_states_valid_and_nothing_claimed_as_run():
     for r in REG["rows"]:
         assert r["spec_alignment"] in ALIGN
         assert r["execution_status"] in EXEC
-        assert r["execution_status"] != "implemented-and-tested", r["id"]
+        if r["execution_status"] == "implemented-and-tested":
+            assert r["milestone"] in REACHED_MILESTONES, r["id"]
 
 
 def test_partial_and_deferred_are_labelled():

@@ -1,0 +1,10 @@
+# Simulated hubs (lab plan §6.1). Read by the world renderer (max_results goes into each
+# hub's capabilities.json) and by the runner (which hubs a SUT may reach by default).
+# Held-back hubs are rendered and conformance-tested but excluded from the runner's
+# default hub set until their release milestone.
+hubs:
+  codehub:     {max_results: 25, held_back: false}
+  skillhub:    {max_results: 25, held_back: false}
+  dochub:      {max_results: 25, held_back: false}
+  memoryhub:   {max_results: 25, held_back: false}
+  incidenthub: {max_results: 25, held_back: true, release_milestone: M7}

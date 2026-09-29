@@ -1,0 +1,19 @@
+# Principal aliases for running gold/m0 only. gold/m0 is frozen M0 evidence (the stub's canned
+# responses and fixture traces are keyed to it) and predates the rendered world's identities,
+# so its p-* principals are mapped onto world principals here. The world is authoritative;
+# gold/m1 onward uses world principals directly and gets no aliases.
+#
+# p-payments (m0-001: codehub and skillhub payments evidence) -> kestrel-payments.
+# p-both     (m0-002)                                        -> kestrel-both.
+# p-code-only (m0-003): NO WORLD PRINCIPAL FITS. m0-003 needs payments code readable on
+#   codehub (o-impl) while payments skills on skillhub are denied (o-proc unobtainable,
+#   skillhub expected denied_gap). In the world, codehub and skillhub payments artifacts carry
+#   the same ACL (payments-eng), so every principal either reads both (kestrel-payments,
+#   kestrel-both, admin-probe) or neither (kestrel-identity). kestrel-identity is a transport
+#   stand-in only: it keeps the skillhub denial but also loses the codehub evidence (reads
+#   come back empty, not denied). The stub's canned responses do not depend on hub content, so
+#   stub scores are unaffected; do not use this alias to evaluate a real SUT on m0-003.
+aliases:
+  p-payments: kestrel-payments
+  p-both: kestrel-both
+  p-code-only: kestrel-identity

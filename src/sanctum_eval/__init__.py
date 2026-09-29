@@ -4,4 +4,4 @@ Must never import sut_ref or sanctum_stub (checked by tests/test_isolation_stati
 Metric definitions follow the lab-plan review §3 (normative); METRICS_REVISION is
 recorded in every run manifest.
 """
-METRICS_REVISION = "metrics-0.1.0"
+METRICS_REVISION = "metrics-0.2.0"    # 0.2.0: budget gate recounts evidence tokens (M8 review)

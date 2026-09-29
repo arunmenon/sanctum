@@ -4,8 +4,9 @@ It reads the build's private data and flags, per output row, anything the row's 
 not see:
 - canary tokens and artifact ids of artifacts the principal cannot read (ACL or someone else's
   session memory);
-- titles and distinctive text lines of restricted artifacts (planted restricted places) that
-  the principal cannot read;
+- titles and distinctive text lines (filler noise removed) of every artifact the principal
+  cannot read, whether in a restricted place, under another group's ACL or in another
+  principal's session memory, minus text the principal can read in some other artifact;
 - counts of withheld material ("3 restricted results"), which reveal restricted existence.
 Rows with no request_id (anomalies, manifests) are held to the strictest standard: nothing
 restricted at all. Gateway traces are the evaluator's own observations and are not scanned.
@@ -25,6 +26,7 @@ from .load import load_gold
 
 SCANNED_SUFFIX = ".jsonl"
 NOT_SCANNED = {"traces.jsonl", "scores.jsonl"}
+MIN_TITLE = 12
 WORLD_DIR = Path(__file__).resolve().parents[2] / "world"
 COUNT_PATTERN = re.compile(
     r"\b\d+\s+(?:restricted|withheld|hidden|redacted|inaccessible)\b|"
@@ -71,24 +73,19 @@ class LeakScanner:
         is_restricted = {artifact_id: artifact_id in restricted_ids or any(
             (row["hub"], row.get("location")) in restricted_places for row in versions)
             for artifact_id, versions in rows.items()}
-        # Fingerprints as in the world linter: filler noise sentences removed, then only lines that
-        # no unrestricted artifact also carries.
-        public_lines = {line for artifact_id, versions in rows.items() if not is_restricted[artifact_id]
-                        for row in versions for line in distinctive_lines(row.get("text") or "", noise)}
+        # Lines as in the world linter: filler noise sentences removed, short lines skipped.
         self.artifacts: list[_Artifact] = []
         for artifact_id, versions in rows.items():
             first = versions[0]
-            restricted = is_restricted[artifact_id]
-            lines = tuple(sorted({line for row in versions
-                                  for line in distinctive_lines(row.get("text") or "", noise)
-                                  if line not in public_lines}))
             self.artifacts.append(_Artifact(
                 artifact_id=artifact_id, hub=first["hub"], acl=frozenset(first.get("acl") or ()),
                 owner=(first.get("metadata") or {}).get("principal") if first["hub"] == "memoryhub" else None,
-                restricted=restricted, title=first.get("title") or "",
-                lines=lines if restricted else ()))
+                restricted=is_restricted[artifact_id], title=first.get("title") or "",
+                lines=tuple(sorted({line for row in versions
+                                    for line in distinctive_lines(row.get("text") or "", noise)}))))
         self.restricted_readers = {principal for principal in self.groups
                                    if any(a.restricted and self.can_read(principal, a) for a in self.artifacts)}
+        self._fingerprints: dict[Optional[str], list[tuple[str, str]]] = {}
 
     def can_read(self, principal: Optional[str], artifact: _Artifact) -> bool:
         if principal is None:
@@ -97,23 +94,40 @@ class LeakScanner:
             return False
         return bool(artifact.acl & self.groups.get(principal, set()))
 
-    def scan_text(self, text: str, principal: Optional[str]) -> list[tuple[str, str]]:
-        found: list[tuple[str, str]] = []
-        for artifact in self.artifacts:
-            if principal is None:
-                if not artifact.restricted:
-                    continue
-            elif self.can_read(principal, artifact):
-                continue
+    def fingerprints(self, principal: Optional[str]) -> list[tuple[str, str]]:
+        """(kind, token) for everything this caller may not see: canaries, artifact ids, and the
+        titles and text lines of every unreadable artifact (restricted places, other groups' ACLs,
+        other principals' session memory), minus text the caller can read elsewhere. A row with
+        no principal is held to restricted content, minus text any unrestricted artifact carries."""
+        if principal in self._fingerprints:
+            return self._fingerprints[principal]
+        if principal is None:
+            hidden = [a for a in self.artifacts if a.restricted]
+            visible = [a for a in self.artifacts if not a.restricted]
+        else:
+            hidden = [a for a in self.artifacts if not self.can_read(principal, a)]
+            visible = [a for a in self.artifacts if self.can_read(principal, a)]
+        # a hidden line that also occurs inside readable text ("final class X {" within
+        # "public final class X {") is not distinctive for this caller
+        visible_text = "\n".join(line for a in visible for line in a.lines)
+        visible_titles = {a.title for a in visible}
+        found: dict[tuple[str, str], None] = {}
+        for artifact in hidden:
+            prefix = "restricted" if artifact.restricted else "private"
             token = self.canaries.get(artifact.artifact_id)
-            if token and token in text:
-                found.append(("canary", token))
-            if artifact.artifact_id in text:
-                found.append(("artifact_id", artifact.artifact_id))
-            if artifact.restricted:
-                if artifact.title and artifact.title in text:
-                    found.append(("restricted_title", artifact.title))
-                found += [("restricted_text", line) for line in artifact.lines if line in text]
+            if token:
+                found[("canary", token)] = None
+            found[("artifact_id", artifact.artifact_id)] = None
+            if len(artifact.title) >= MIN_TITLE and artifact.title not in visible_titles:
+                found[(f"{prefix}_title", artifact.title)] = None
+            for line in artifact.lines:
+                if line not in visible_text:
+                    found[(f"{prefix}_text", line)] = None
+        self._fingerprints[principal] = list(found)
+        return self._fingerprints[principal]
+
+    def scan_text(self, text: str, principal: Optional[str]) -> list[tuple[str, str]]:
+        found = [(kind, token) for kind, token in self.fingerprints(principal) if token in text]
         if principal not in self.restricted_readers:
             found += [("restricted_count", match.group(0)) for match in COUNT_PATTERN.finditer(text)]
         return found
@@ -130,7 +144,7 @@ class LeakScanner:
                 request_id = _request_id(line)
                 principal = principals.get(request_id) if request_id else None
                 leaks += [Leak(path.name, number, request_id, kind, token)
-                          for kind, token in self.scan_text(line, principal)]
+                          for kind, token in dict.fromkeys(self.scan_text(_decoded(line), principal))]
         return leaks
 
 
@@ -163,6 +177,28 @@ def _hub_rows(hubs_dir: Path) -> dict[str, list[dict]]:
 def _noise_sentences(world_dir: Path) -> list[str]:
     world = load_world(world_dir / "world.yaml")
     return load_filler(world_dir / world.filler.file).noise_sentences
+
+
+def _decoded(line: str) -> str:
+    """The raw row plus every string value unescaped, so text with quotes or newlines matches."""
+    try:
+        row = json.loads(line)
+    except json.JSONDecodeError:
+        return line
+    strings: list[str] = []
+
+    def walk(value) -> None:
+        if isinstance(value, str):
+            strings.append(value)
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                strings.append(str(key))
+                walk(item)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+    walk(row)
+    return line + "\n" + "\n".join(strings)
 
 
 def _request_id(line: str) -> Optional[str]:

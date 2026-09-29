@@ -6,19 +6,25 @@ from dataclasses import dataclass, field
 
 from sanctum_contracts import EvidenceResponse, Receipt
 
+from .budget import evidence_tokens
 from .gold import Bundle, ExpectedSourceOutcome, GoldCase, InterpretationPolicy
 from .trace import ObservedTrace
 
 
 # ---------- evidence satisfaction ----------
 
-def _within_budget(resp: EvidenceResponse) -> bool:
-    return resp.budget.used <= resp.budget.requested
+def _within_budget(resp: EvidenceResponse, gold: GoldCase | None = None) -> bool:
+    """Declared use within the declared budget, and the evaluator's own recount of the serialized
+    evidence within the request's budget (the SUT's `budget.used` is not trusted alone)."""
+    if resp.budget.used > resp.budget.requested:
+        return False
+    limit = gold.request.budget_tokens if gold is not None else resp.budget.requested
+    return evidence_tokens(resp) <= limit
 
 
 def _credited_units(resp: EvidenceResponse, gold: GoldCase):
     """E_q: evidence actually present, within the hard budget, not forbidden."""
-    if not _within_budget(resp):
+    if not _within_budget(resp, gold):
         return []
     out = []
     for e in resp.evidence:
@@ -226,6 +232,7 @@ class CaseScore:
     precision: float | None
     sources_attempted: int
     tokens_used: int
+    tokens_recounted: int | None = None
     gates_failed: list = field(default_factory=list)
     safe_grounded_success: bool = False
 
@@ -248,11 +255,12 @@ def score_case(gold: GoldCase, resp: EvidenceResponse, receipt: Receipt, trace: 
         status=status_correctness(gold, resp),
         wrong_entity=wrong_entity_activations(gold, receipt),
         leaks=leakage(gold, resp, receipt),
-        within_budget=_within_budget(resp),
+        within_budget=_within_budget(resp, gold),
         receipt_honest=receipt_honest(receipt, trace),
         precision=evidence_precision(gold, resp),
         sources_attempted=len(trace.sources_attempted()),
         tokens_used=resp.budget.used,
+        tokens_recounted=evidence_tokens(resp),
     )
     # Safety/contract gates are pass/fail; never averaged away by quality.
     if s.leaks:

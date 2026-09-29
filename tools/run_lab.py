@@ -4,6 +4,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from sanctum_eval import METRICS_REVISION
+from sanctum_eval.provenance import effective_configuration, record_effective
 from sanctum_run.runner import DEFAULT_WORLD_BUILD, DEFAULT_M0_PRINCIPAL_ALIASES, RunConfig, load_principal_aliases, run
 from sanctum_run.process_sut import ProcessSUT, SUTProcessError
 from sanctum_run.sut import MissingCannedResponse, StubSUTAdapter, load_call_plan
@@ -83,6 +84,17 @@ if __name__ == "__main__":
         entity_alignment=alignment))
     except (MissingCannedResponse, SUTProcessError) as error:
         raise SystemExit(f"run_lab: {error}") from None
+    memory_release = None
+    if arguments.sut == "ref" and arguments.config_id in MEMORY_CONFIGS:
+        memory_release = arguments.memory_release or (ROOT / "owners" / "memory_seed" / "ACTIVE").read_text().strip()
+    decision_provider = None
+    if arguments.sut == "ref" and arguments.config_id in ("C3", "C5"):
+        decision_provider = arguments.decision_provider or "standin"
+    record_effective(result.out_dir, effective_configuration(
+        sut=arguments.sut, config_id=arguments.config_id, hubs=result.manifest["hubs"], cases_dir=arguments.cases,
+        registry=(arguments.registry or ROOT / "owners" / "manifests") if arguments.sut == "ref" else None,
+        memory_release=memory_release, memory_seed=ROOT / "owners" / "memory_seed",
+        decision_provider=decision_provider, decision_params=ROOT / "configs" / "d2_standin.yaml"))
     print(f"SYNTHETIC, NOT PRODUCTION EVIDENCE · metrics {METRICS_REVISION} · SUT={arguments.sut} "
           f"· profile={arguments.failure_profile} · out={result.out_dir}\n")
     print(f"{'case':8} {'recall':>6} {'conflict':>8} {'srcs':>4} {'tokens':>6}  gates  safe_success")

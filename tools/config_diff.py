@@ -4,6 +4,8 @@ from pathlib import Path
 
 import yaml
 
+from sanctum_eval.provenance import effective_problems
+
 MATRIX = Path(__file__).resolve().parents[1] / "configs" / "matrix.yaml"
 
 
@@ -25,7 +27,8 @@ def check_comparison(m, name):
     return d, extra
 
 
-PAIRED_MANIFEST_KEYS = ("world_manifest_sha256", "seed", "failure_profile", "metrics_revision", "cases")
+PAIRED_MANIFEST_KEYS = ("world_manifest_sha256", "seed", "failure_profile", "metrics_revision", "cases", "hubs",
+                        "git_commit", "git_diff_sha256")
 
 
 def check_runs(m, name, manifest_a, manifest_b):
@@ -41,6 +44,8 @@ def check_runs(m, name, manifest_a, manifest_b):
     for key in PAIRED_MANIFEST_KEYS:
         if manifest_a.get(key) != manifest_b.get(key):
             problems.append(f"{key} differs between runs")
+    # what each run actually used, from its own manifest (not today's matrix)
+    problems += effective_problems(manifest_a.get("effective"), manifest_b.get("effective"), c["may_differ"])
     return problems
 
 

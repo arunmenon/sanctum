@@ -9,6 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
+from sanctum_eval.budget import serialized_evidence_tokens
 from sanctum_eval.degradation import deltas_vs_none, summarize_run
 from sanctum_eval.gold import GoldCase
 from sanctum_eval.leak_scan import LeakScanner, principals_for
@@ -21,8 +22,9 @@ CAVEAT = ("SYNTHETIC, NOT PRODUCTION EVIDENCE. 60 dev + 40 holdout questions sup
           "results and debugging only, not population estimates.")
 PAIRED_METRICS = ("safe_grounded_success", "recall", "sources_attempted", "wrong_entity")
 # Hard gates, pass/fail per run, never averaged. Scope: no gateway anomaly (out-of-scope or
-# unauthorised call) and no token audience failure.
-GATES = ("leakage", "scope", "wrong_entity")
+# unauthorised call) and no token audience failure. Budget: the evaluator's own cl100k recount of
+# every response's serialized evidence is within the request's budget_tokens.
+GATES = ("leakage", "scope", "wrong_entity", "budget")
 
 
 def _read_jsonl(path: Path) -> list[dict]:
@@ -44,10 +46,16 @@ class RunView:
                                 for row in _read_jsonl(self.dir / "responses.jsonl")})
         self.anomalies = _read_jsonl(self.dir / "anomalies.jsonl")
         self.leaks = scanner.scan_run(self.dir, principals_for(golds.values(), aliases))
+        budgets = {gold.request.request_id: gold.request.budget_tokens for gold in golds.values()}
+        recounts = [(row["request_id"], serialized_evidence_tokens(row.get("evidence", [])))
+                    for row in _read_jsonl(self.dir / "responses.jsonl") if row["request_id"] in budgets]
+        self.over_budget = sorted((request_id, used, budgets[request_id]) for request_id, used in recounts
+                                  if used > budgets[request_id])
         self.gates = {
             "leakage": not self.leaks and not any(s["leaks"] for s in self.scores.values()),
             "scope": not self.anomalies and not any("audience" in s["gates_failed"] for s in self.scores.values()),
             "wrong_entity": not any(s["wrong_entity"] for s in self.scores.values()),
+            "budget": not self.over_budget and not any("budget" in s["gates_failed"] for s in self.scores.values()),
         }
 
 
@@ -88,6 +96,8 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
     for run in runs:
         out.append(f"| {run.config_id} | " + " | ".join("PASS" if run.gates[g] else "**FAIL**" for g in GATES) + " |")
     for run in runs:
+        for request_id, used, budget in run.over_budget:
+            out.append(f"- {run.config_id} over budget: {request_id} recounted {used} > {budget} tokens")
         for leak in run.leaks[:20]:
             out.append(f"- {run.config_id} leak: {leak.kind} `{leak.token[:60]}` in {leak.file}:{leak.line}")
 
@@ -151,8 +161,9 @@ def render_degradation(run_dirs: list[Path], golds: dict[str, GoldCase]) -> list
                        key=lambda s: (s.config_id, s.failure_profile != "none", s.failure_profile))
     deltas = deltas_vs_none(summaries)
     out = ["## Degradation under injected failures", "",
-           "Status honesty: never `sufficient` when a mandatory source's calls all timed out or errored "
-           "(runner-observed trace), and every source with a non-ok call reported as a gap. Latency is the "
+           "Status honesty: never `sufficient` when a retrieval operation (search or fetch, per tool) on a "
+           "mandatory source timed out or errored without a successful retry (runner-observed trace), and every "
+           "failed source reported as a gap with a failure status or explicit failure reason. Latency is the "
            "runner's wall clock around each request (simulated hub latency, scaled).", "",
            "| config | profile | n | success | d success | honesty | overclaims | unreported gaps | unknown | "
            "partial | failed calls | p50 ms | p95 ms | d p95 ms |",

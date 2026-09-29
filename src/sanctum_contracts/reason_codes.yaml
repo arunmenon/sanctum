@@ -1,0 +1,18 @@
+# Versioned reason codes (HLD v5.1 §12.2). Add codes by bumping `version`.
+version: "1.0.0"
+codes:
+  unresolved_term:              {attaches_to: [response, interpretation]}
+  ambiguous_term:               {attaches_to: [response]}
+  clarification_requested:      {attaches_to: [response]}
+  insufficient_budget:          {attaches_to: [response, interpretation]}
+  required_source_unavailable:  {attaches_to: [response, source]}
+  required_source_denied:       {attaches_to: [response, source]}
+  procedure_conflict:           {attaches_to: [response]}
+  unsupported_for_as_of:        {attaches_to: [source]}
+  not_selected:                 {attaches_to: [source]}
+  no_coverage:                  {attaches_to: [response]}
+  decision_layer_unavailable:   {attaches_to: [degraded]}
+  memory_unavailable:           {attaches_to: [degraded]}
+  receipt_incomplete:           {attaches_to: [response]}
+  must_consult:                 {attaches_to: [source]}
+  routing_selected:             {attaches_to: [source]}

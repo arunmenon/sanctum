@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "DecisionStatus": {
+      "enum": [
+        "answered",
+        "abstained",
+        "unavailable",
+        "invalid"
+      ],
+      "title": "DecisionStatus",
+      "type": "string"
+    },
+    "Disposition": {
+      "enum": [
+        "use",
+        "preserve_candidate",
+        "escalate",
+        "abstain"
+      ],
+      "title": "Disposition",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "calibration": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibration"
+    },
+    "cost": {
+      "minimum": 0.0,
+      "title": "Cost",
+      "type": "number"
+    },
+    "disposition": {
+      "$ref": "#/$defs/Disposition"
+    },
+    "distribution": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Distribution"
+    },
+    "latency_ms": {
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "model_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Version"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/DecisionStatus"
+    },
+    "target": {
+      "title": "Target",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {},
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Value"
+    }
+  },
+  "required": [
+    "status",
+    "target",
+    "disposition",
+    "provider",
+    "policy_version",
+    "latency_ms",
+    "cost"
+  ],
+  "title": "DecisionResult",
+  "type": "object"
+}

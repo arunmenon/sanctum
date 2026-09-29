@@ -1,0 +1,40 @@
+# Machine-readable scenario register (lab plan revised §9).
+# spec_alignment: checked | discrepancy | pending   (document check against HLD v5.1)
+# execution_status: planned | implemented-and-tested | negative-contract-only | deferred
+# Nothing has run yet: no row may be implemented-and-tested at M0.
+hld: "sanctum-intelligence-layer-hld-v5.1.md"
+rows:
+  - {id: EX-01, title: Scoped build question, hld: "§10 Ex1", scope: full, milestone: M3, configs: [C1-fair, C2, C4], spec_alignment: checked, execution_status: planned}
+  - {id: EX-02, title: Same document in three places, hld: "§10 Ex2, §7.5", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-03, title: Policy/implementation divergence, hld: "§10 Ex3", scope: partial, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned, note: "sync half only; async reconciliation deferred"}
+  - {id: EX-04, title: Historical as_of question, hld: "§10 Ex4, §7.5", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-05, title: Four names for one service, hld: "§10 Ex5, §9.2-9.3", scope: full, milestone: M4, configs: [C4, C4a-equivalent, C4a-label-only], spec_alignment: checked, execution_status: planned}
+  - {id: EX-06, title: Vague open question, hld: "§10 Ex6", scope: partial, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned, note: "honest partial only; no LLM decomposition"}
+  - {id: EX-07, title: Verify mode, hld: "§10 Ex7, §12.1", scope: partial, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned, note: "evidence + flags; verdicts absent until D7"}
+  - {id: EX-08, title: Nobody has the answer, hld: "§10 Ex8", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-09a, title: Decision layer unavailable, hld: "§10 Ex9", scope: full, milestone: M3, configs: [C3, C5], spec_alignment: checked, execution_status: planned}
+  - {id: EX-09b, title: Memory projection unavailable, hld: "§10 Ex9", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: EX-09c, title: Registry/auth unavailable fails closed, hld: "§10 Ex9", scope: full, milestone: M2, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-09d, title: Mandatory SkillHub timeout, hld: "§10 Ex9", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-10, title: Injection in a document, hld: "§10 Ex10", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: EX-11, title: Recording a learning (write), hld: "§10 Ex11", scope: deferred, milestone: none, configs: [], spec_alignment: checked, execution_status: negative-contract-only, note: "write tool absent/denied"}
+  - {id: EX-12, title: Adding a fifth backend, hld: "§10 Ex12", scope: deferred, milestone: M7, configs: [], spec_alignment: checked, execution_status: deferred}
+  - {id: EX-13, title: Observations after a month, hld: "§10 Ex13", scope: deferred, milestone: none, configs: [], spec_alignment: checked, execution_status: deferred, note: "observation fields logged only"}
+  - {id: EX-14, title: Memory fixes a gap it found, hld: "§10 Ex14", scope: deferred, milestone: none, configs: [], spec_alignment: checked, execution_status: deferred, note: "manual release evaluation only"}
+  - {id: EX-15, title: Two services called auth (governance), hld: "§10 Ex15", scope: partial, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-16, title: Two accessible Auth Service meanings, hld: "§10 Fx16, §9.2", scope: full, milestone: M4, configs: [C4, C4a-equivalent, C4a-label-only], spec_alignment: checked, execution_status: planned, note: "agent default = separated interpretations"}
+  - {id: FX-17, title: Composite skill, hld: "§10 Fx17, §8.5", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-18, title: Non-identity relation cannot activate procedure, hld: "§10 Fx18, §8.7", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-19, title: Unknown alias and many reverse aliases, hld: "§10 Fx19, §9.3", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-20, title: Required source denied; recipes conflict, hld: "§10 Fx20, §9.4", scope: full, milestone: M4, configs: [C2, C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-21, title: Descriptor poisoning and unshare, hld: "§10 Fx21, §9.7", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-22, title: Probe access context, hld: "§10 Fx22, §9.1", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-23, title: Release swap and rollback mid-request, hld: "§10 Fx23, §9.6", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: FX-24, title: Newer artifact not applicable, hld: "§10 Fx24, §7.5", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: FX-25, title: Evaluation honesty, hld: "§10 Fx25, §9.10", scope: full, milestone: M1, configs: [evaluator], spec_alignment: checked, execution_status: planned}
+  # Tests beyond the 25 labels (lab review §8)
+  - {id: X-BACKEND-INDEP, title: MemoryHub outage does not disable other hubs, hld: "§8.2", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: X-RELATION-USE, title: Non-accepted/disabled relations have no effect, hld: "§8.7", scope: full, milestone: M4, configs: [C4, C4a-equivalent], spec_alignment: checked, execution_status: planned}
+  - {id: X-RECEIPT-FAIL, title: Receipt persistence failure is visible, hld: "§9.5", scope: full, milestone: M3, configs: [all], spec_alignment: checked, execution_status: planned}
+  - {id: X-RECONSTRUCT, title: Rebuild offline; report lost replay after deletion, hld: "§9.9", scope: full, milestone: M4, configs: [C4], spec_alignment: checked, execution_status: planned}
+  - {id: X-REF-CLOSURE, title: Reference closure in responses, hld: "§12.2", scope: full, milestone: M0, configs: [contracts], spec_alignment: checked, execution_status: planned, note: "enforced by schema validator; becomes implemented-and-tested when M0 tests are accepted"}

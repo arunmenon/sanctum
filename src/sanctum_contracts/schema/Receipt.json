@@ -1,0 +1,372 @@
+{
+  "$defs": {
+    "Activation": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_ref": {
+          "title": "Entity Ref",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref": {
+          "title": "Ref",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        }
+      },
+      "required": [
+        "kind",
+        "ref",
+        "entity_ref"
+      ],
+      "title": "Activation",
+      "type": "object"
+    },
+    "DecisionResult": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calibration"
+        },
+        "cost": {
+          "minimum": 0.0,
+          "title": "Cost",
+          "type": "number"
+        },
+        "disposition": {
+          "$ref": "#/$defs/Disposition"
+        },
+        "distribution": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Distribution"
+        },
+        "latency_ms": {
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "model_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Version"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/DecisionStatus"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "status",
+        "target",
+        "disposition",
+        "provider",
+        "policy_version",
+        "latency_ms",
+        "cost"
+      ],
+      "title": "DecisionResult",
+      "type": "object"
+    },
+    "DecisionStatus": {
+      "enum": [
+        "answered",
+        "abstained",
+        "unavailable",
+        "invalid"
+      ],
+      "title": "DecisionStatus",
+      "type": "string"
+    },
+    "Disposition": {
+      "enum": [
+        "use",
+        "preserve_candidate",
+        "escalate",
+        "abstain"
+      ],
+      "title": "Disposition",
+      "type": "string"
+    },
+    "QueryPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "as_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Of"
+        },
+        "original_query": {
+          "title": "Original Query",
+          "type": "string"
+        },
+        "selectors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Selectors",
+          "type": "array"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "original_query"
+      ],
+      "title": "QueryPlan",
+      "type": "object"
+    },
+    "ResolutionOrigin": {
+      "enum": [
+        "denotes",
+        "request_context",
+        "alias_table",
+        "none"
+      ],
+      "title": "ResolutionOrigin",
+      "type": "string"
+    },
+    "SelfReportedCall": {
+      "additionalProperties": false,
+      "properties": {
+        "ended_ms": {
+          "title": "Ended Ms",
+          "type": "integer"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "started_ms": {
+          "title": "Started Ms",
+          "type": "integer"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "tool": {
+          "title": "Tool",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "tool",
+        "status",
+        "started_ms",
+        "ended_ms"
+      ],
+      "title": "SelfReportedCall",
+      "type": "object"
+    },
+    "TermResolution": {
+      "additionalProperties": false,
+      "properties": {
+        "assertion_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assertion Refs",
+          "type": "array"
+        },
+        "candidates": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "chosen": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Chosen",
+          "type": "array"
+        },
+        "origin": {
+          "$ref": "#/$defs/ResolutionOrigin"
+        },
+        "term": {
+          "title": "Term",
+          "type": "string"
+        }
+      },
+      "required": [
+        "term",
+        "candidates",
+        "chosen",
+        "origin"
+      ],
+      "title": "TermResolution",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "activations": {
+      "items": {
+        "$ref": "#/$defs/Activation"
+      },
+      "title": "Activations",
+      "type": "array"
+    },
+    "calls": {
+      "items": {
+        "$ref": "#/$defs/SelfReportedCall"
+      },
+      "title": "Calls",
+      "type": "array"
+    },
+    "complete": {
+      "default": true,
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "config_id": {
+      "title": "Config Id",
+      "type": "string"
+    },
+    "contract_revision": {
+      "title": "Contract Revision",
+      "type": "string"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/DecisionResult"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "memory_release_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Memory Release Id"
+    },
+    "query_plans": {
+      "items": {
+        "$ref": "#/$defs/QueryPlan"
+      },
+      "title": "Query Plans",
+      "type": "array"
+    },
+    "receipt_id": {
+      "title": "Receipt Id",
+      "type": "string"
+    },
+    "request_id": {
+      "title": "Request Id",
+      "type": "string"
+    },
+    "resolutions": {
+      "items": {
+        "$ref": "#/$defs/TermResolution"
+      },
+      "title": "Resolutions",
+      "type": "array"
+    },
+    "timings_ms": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Timings Ms",
+      "type": "object"
+    }
+  },
+  "required": [
+    "receipt_id",
+    "request_id",
+    "config_id",
+    "contract_revision"
+  ],
+  "title": "Receipt",
+  "type": "object"
+}

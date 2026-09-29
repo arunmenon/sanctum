@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "error_semantics": {
+      "default": "timeout_distinct_from_empty",
+      "title": "Error Semantics",
+      "type": "string"
+    },
+    "filters": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Filters",
+      "type": "array"
+    },
+    "hub_id": {
+      "title": "Hub Id",
+      "type": "string"
+    },
+    "max_results": {
+      "exclusiveMinimum": 0,
+      "title": "Max Results",
+      "type": "integer"
+    },
+    "principal_scoped": {
+      "default": false,
+      "title": "Principal Scoped",
+      "type": "boolean"
+    },
+    "version_reads": {
+      "title": "Version Reads",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "hub_id",
+    "version_reads",
+    "max_results"
+  ],
+  "title": "HubCapabilities",
+  "type": "object"
+}

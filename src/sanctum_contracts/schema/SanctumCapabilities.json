@@ -1,0 +1,63 @@
+{
+  "$defs": {
+    "ReplayLevel": {
+      "enum": [
+        "none",
+        "recompute_on_candidates",
+        "exact_bundle"
+      ],
+      "title": "ReplayLevel",
+      "type": "string"
+    },
+    "SupportLevel": {
+      "enum": [
+        "supported",
+        "partial",
+        "unsupported"
+      ],
+      "title": "SupportLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_revision": {
+      "title": "Contract Revision",
+      "type": "string"
+    },
+    "features": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SupportLevel"
+      },
+      "title": "Features",
+      "type": "object"
+    },
+    "modes": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SupportLevel"
+      },
+      "title": "Modes",
+      "type": "object"
+    },
+    "reason_codes_version": {
+      "title": "Reason Codes Version",
+      "type": "string"
+    },
+    "replay_levels": {
+      "items": {
+        "$ref": "#/$defs/ReplayLevel"
+      },
+      "title": "Replay Levels",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_revision",
+    "reason_codes_version",
+    "modes",
+    "features",
+    "replay_levels"
+  ],
+  "title": "SanctumCapabilities",
+  "type": "object"
+}

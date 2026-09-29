@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "bounded_state": {
+      "title": "Bounded State",
+      "type": "object"
+    },
+    "candidate_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Candidate Ids",
+      "type": "array"
+    },
+    "classification": {
+      "default": "internal",
+      "title": "Classification",
+      "type": "string"
+    },
+    "deadline_ms": {
+      "exclusiveMinimum": 0,
+      "title": "Deadline Ms",
+      "type": "integer"
+    },
+    "decision_type": {
+      "title": "Decision Type",
+      "type": "string"
+    },
+    "provider_policy_version": {
+      "title": "Provider Policy Version",
+      "type": "string"
+    },
+    "rubric_version": {
+      "title": "Rubric Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision_type",
+    "rubric_version",
+    "candidate_ids",
+    "bounded_state",
+    "deadline_ms",
+    "provider_policy_version"
+  ],
+  "title": "DecisionRequest",
+  "type": "object"
+}

@@ -1,0 +1,19 @@
+[project]
+name = "sanctum-lab"
+version = "0.0.1"
+description = "Sanctum Lab: evaluation harness for the Sanctum HLD (M0 scaffold)"
+requires-python = "==3.12.*"
+dependencies = [
+  "pydantic==2.9.2",
+  "pyyaml==6.0.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.3"]
+# Pinned at M2 when hubs and transport are built:
+# mcp = ["mcp==<pin at M2>"]
+# tokenizer = ["tiktoken==<pin at M3>"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]

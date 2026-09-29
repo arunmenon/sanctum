@@ -1,0 +1,109 @@
+{
+  "response": {
+    "request_id": "req-2d80",
+    "receipt_id": "rc-03",
+    "memory_release_id": "r1",
+    "effective_scope_ref": "scope-x3",
+    "replay_level": "recompute_on_candidates",
+    "interpretations": [
+      {
+        "interpretation_id": "x1",
+        "entity_ref": "ent-17",
+        "resolution_origin": "denotes",
+        "evidence_ids": [
+          "ev-a1"
+        ],
+        "evidence_status": "partial",
+        "reasons": []
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "ev-a1",
+        "source_id": "codehub",
+        "artifact_id": "art-rc",
+        "source_version": "R42",
+        "native_ref": "codehub:art-rc@R42#100-200",
+        "span": {
+          "start": 100,
+          "end": 200
+        },
+        "content_hash": "h-art-rc-R42-100",
+        "text": "static final int MAX_RETRIES = 5; // gateway timeout path",
+        "kind": "code",
+        "role": "implemented_behavior",
+        "applicability": {
+          "branch": "main",
+          "environment": "prod",
+          "effective_from": "R42",
+          "applicability_status": "known"
+        },
+        "retrieved_at": "2026-10-01T09:00:00Z",
+        "exact_token_count": 40,
+        "tokenizer_id": "cl100k_base",
+        "duplicates": []
+      }
+    ],
+    "sources": [
+      {
+        "source_id": "codehub",
+        "status": "called",
+        "reasons": [
+          "routing_selected"
+        ]
+      },
+      {
+        "source_id": "skillhub",
+        "status": "skipped",
+        "reasons": [
+          "required_source_denied"
+        ]
+      }
+    ],
+    "evidence_status": "partial",
+    "reasons": [
+      "required_source_denied"
+    ],
+    "budget": {
+      "requested": 4000,
+      "used": 150,
+      "tokenizer_id": "cl100k_base"
+    }
+  },
+  "receipt": {
+    "receipt_id": "rc-03",
+    "request_id": "req-2d80",
+    "config_id": "stub",
+    "contract_revision": "lab-contract-0.1.0+hld-v5.1",
+    "memory_release_id": "r1",
+    "resolutions": [
+      {
+        "term": "PA-svc",
+        "candidates": [
+          "ent-17"
+        ],
+        "chosen": [
+          "ent-17"
+        ],
+        "origin": "denotes"
+      }
+    ],
+    "activations": [
+      {
+        "kind": "procedure",
+        "ref": "proc-must-consult-skillhub@v3",
+        "entity_ref": "ent-17",
+        "source_id": "skillhub"
+      }
+    ],
+    "calls": [
+      {
+        "source_id": "codehub",
+        "tool": "search_code",
+        "status": "ok",
+        "started_ms": 4,
+        "ended_ms": 55
+      }
+    ]
+  }
+}

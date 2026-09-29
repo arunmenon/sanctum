@@ -1,0 +1,16 @@
+# What the pilot SUT advertises (HLD v5.1 §12.3). Partial support is advertised as partial.
+sanctum_ref_pilot:
+  modes: {scoped: supported, explore: supported, verify: partial}
+  features:
+    separated_interpretations: supported
+    clarification: supported           # interactive callers only
+    synthesize: unsupported
+    writes: unsupported
+    llm_decomposition: unsupported
+    d7_verdicts: unsupported
+  replay_levels: [recompute_on_candidates]
+hubs_minimum:                          # to be reconciled with the real adapter survey (decision D-ADAPTER)
+  codehub:   {version_reads: true,  filters: [repo, ref],        principal_scoped: false}
+  skillhub:  {version_reads: true,  filters: [path_prefix],      principal_scoped: false}
+  dochub:    {version_reads: partial, filters: [space],          principal_scoped: false, note: "no version reads for some spaces"}
+  memoryhub: {version_reads: false, filters: [],                 principal_scoped: true}

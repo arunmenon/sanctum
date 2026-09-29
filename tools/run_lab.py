@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 M0_TRACES = ROOT / "tests" / "fixtures" / "m0" / "traces"
 
 
-REF_CONFIGS = ("C1-naive", "C1-fair", "C2")
+MEMORY_CONFIGS = ("C4", "C4a-equivalent", "C4a-label-only")
+REF_CONFIGS = ("C1-naive", "C1-fair", "C2", "C4", "C4a-equivalent", "C4a-label-only")
 
 
 def make_sut(name: str, config_id: str = "stub", registry=None):
@@ -54,11 +55,19 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     arguments.config_id = arguments.config_id or ("C2" if arguments.sut == "ref" else "stub")
     sut = make_sut(arguments.sut, arguments.config_id, arguments.registry)
+    alignment = None
+    if arguments.sut == "ref" and arguments.config_id in MEMORY_CONFIGS:
+        # evaluator side: map the SUT's memory entity refs to world refs before scoring
+        from sanctum_eval.alignment import load_alignment
+        from sanctum_world.schema import load_world
+        alignment, _unaligned = load_alignment(ROOT / "owners" / "memory_seed" / "r1" / "entities.yaml",
+                                               load_world(ROOT / "world" / "world.yaml"), arguments.world_build)
     try:
         result = run(sut, RunConfig(
         cases_dir=arguments.cases, out_dir=arguments.out, seed=arguments.seed, sut_name=arguments.sut,
         config_id=arguments.config_id, failure_profile=arguments.failure_profile,
-        world_build_dir=arguments.world_build, principal_aliases=principal_aliases_for(arguments.cases, arguments.principal_aliases)))
+        world_build_dir=arguments.world_build, principal_aliases=principal_aliases_for(arguments.cases, arguments.principal_aliases),
+        entity_alignment=alignment))
     except (MissingCannedResponse, SUTProcessError) as error:
         raise SystemExit(f"run_lab: {error}") from None
     print(f"SYNTHETIC, NOT PRODUCTION EVIDENCE · metrics {METRICS_REVISION} · SUT={arguments.sut} "

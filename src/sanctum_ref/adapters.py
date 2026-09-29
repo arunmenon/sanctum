@@ -6,7 +6,7 @@ that artifact version. Hub text is data: nothing here interprets it."""
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional, Protocol
 
 from sanctum_contracts import Applicability, ApplicabilityStatus, EvidenceUnit, Span
@@ -25,6 +25,8 @@ class HubPort(Protocol):
     async def caller_groups(self) -> Optional[list[str]]: ...
 
     async def capabilities(self) -> Optional[dict[str, Any]]: ...
+
+    async def change_events(self, after_seq: int) -> list[dict[str, Any]]: ...
 
 
 def search_arguments(manifest: HubManifest, query: str, selectors: dict[str, str],
@@ -56,6 +58,7 @@ class Candidate:
     manifest: HubManifest
     artifact: dict[str, Any]
     unit: EvidenceUnit
+    interpretations: set[int] = field(default_factory=set)   # which interpretations' plans found it
 
     @property
     def text(self) -> str:

@@ -21,7 +21,7 @@ from mcp.server.stdio import stdio_server
 from sanctum_contracts import RetrieveRequest
 
 from .config import ArmConfig
-from .pipeline import Retriever
+from .pipeline import MemoryState, Retriever
 from .registry import RegistryUnavailable, load_registry
 
 RETRIEVE_TOOL = "sanctum.retrieve"
@@ -29,6 +29,7 @@ META_CALLER_TOKEN = "lab/caller_token"
 META_REQUEST_ID = "lab/request_id"
 CALLER_TOOL = "caller_access"
 CAPABILITIES_TOOL = "hub_capabilities"
+CHANGES_TOOL = "change_events"
 
 
 class ProxyPort:
@@ -55,14 +56,21 @@ class ProxyPort:
         groups = body.get("groups")
         return list(groups) if isinstance(groups, list) and "error" not in body else None
 
+    async def change_events(self, after_seq: int) -> list[dict[str, Any]]:
+        body = await self._call(CHANGES_TOOL, {"after_seq": after_seq})
+        events = body.get("events")
+        return list(events) if isinstance(events, list) else []
+
     async def capabilities(self) -> Optional[dict[str, Any]]:
         body = await self._call(CAPABILITIES_TOOL, {})
         hubs = body.get("hubs")
         return dict(hubs) if isinstance(hubs, dict) else None
 
 
-def build_server(arm: ArmConfig, registry_dir: Path, proxy: ClientSession) -> Server:
+def build_server(arm: ArmConfig, registry_dir: Path, proxy: ClientSession,
+                 memory_seed: Optional[Path] = None) -> Server:
     server: Server = Server("sanctum-ref")
+    memory = MemoryState(memory_seed)            # one per process: release cache, change cursor
     schema = RetrieveRequest.model_json_schema()
 
     @server.list_tools()
@@ -78,9 +86,9 @@ def build_server(arm: ArmConfig, registry_dir: Path, proxy: ClientSession) -> Se
         extra = dict(meta.model_extra or {}) if meta is not None else {}
         request = RetrieveRequest.model_validate(arguments)
         try:
-            retriever = Retriever(arm, load_registry(registry_dir))
+            retriever = Retriever(arm, load_registry(registry_dir), memory=memory)
         except RegistryUnavailable as error:
-            retriever = Retriever(arm, None, str(error))
+            retriever = Retriever(arm, None, str(error), memory=memory)
         port = ProxyPort(proxy, request.request_id, extra.get(META_CALLER_TOKEN))
         response, receipt = await retriever.retrieve(request, port)
         return {"response": response.model_dump(mode="json"), "receipt": receipt.model_dump(mode="json")}
@@ -102,8 +110,9 @@ async def proxy_session(read_descriptor: int, write_descriptor: int):
             yield session
 
 
-async def serve(arm: ArmConfig, registry_dir: Path, proxy_read_fd: int, proxy_write_fd: int) -> None:
+async def serve(arm: ArmConfig, registry_dir: Path, proxy_read_fd: int, proxy_write_fd: int,
+                memory_seed: Optional[Path] = None) -> None:
     async with proxy_session(proxy_read_fd, proxy_write_fd) as proxy:
-        server = build_server(arm, registry_dir, proxy)
+        server = build_server(arm, registry_dir, proxy, memory_seed)
         async with stdio_server() as (read_stream, write_stream):
             await server.run(read_stream, write_stream, server.create_initialization_options())

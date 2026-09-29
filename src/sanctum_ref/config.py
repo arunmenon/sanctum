@@ -1,8 +1,8 @@
 """Arm configuration from `configs/matrix.yaml` switches only (lab plan §7.2).
 
 An arm is the shared switches plus its own. `sanctum_ref` implements the modules that C1-naive,
-C1-fair and C2 enable; any arm that switches on a module not built yet (memory resolution,
-translation, a decision provider) is refused rather than silently run as something else.
+C1-fair, C2, C4, C4a-equivalent and C4a-label-only enable; any arm that switches on a module not
+built yet (a decision provider: C3, C5) is refused rather than silently run as something else.
 """
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ import yaml
 IMPLEMENTED = {
     "routing": {"fanout_all", "rules"},
     "assembly": {"concatenate", "common"},
-    "resolution": {"none"},
-    "translation": {False},
-    "procedures": {False, "registry_only"},
-    "memory_store": {"none"},
+    "resolution": {"none", "denotes", "label_only"},
+    "translation": {False, True},
+    "procedures": {False, "registry_only", "memory"},
+    "memory_store": {"none", "relations", "tables"},
     "decision_provider": {"none"},
 }
 
@@ -33,6 +33,9 @@ class ArmConfig:
     routing: str
     assembly: str
     procedures: Any
+    resolution: str
+    translation: bool
+    memory_store: str
     response_tokens: int
     candidates: int
     calls: int
@@ -52,6 +55,10 @@ class ArmConfig:
         return self.procedures == "registry_only"
 
     @property
+    def uses_memory(self) -> bool:
+        return self.memory_store != "none"
+
+    @property
     def common_assembly(self) -> bool:
         return self.assembly == "common"
 
@@ -69,7 +76,8 @@ def load_arm(matrix_path: Path, config_id: str) -> ArmConfig:
     budgets = shared["budgets"]
     return ArmConfig(
         config_id=config_id, routing=switches["routing"], assembly=switches["assembly"],
-        procedures=switches["procedures"], response_tokens=int(budgets["response_tokens"]),
+        procedures=switches["procedures"], resolution=switches["resolution"],
+        translation=bool(switches["translation"]), memory_store=switches["memory_store"], response_tokens=int(budgets["response_tokens"]),
         candidates=int(budgets["candidates"]), calls=int(budgets["calls"]),
         deadline_ms=int(budgets["deadline_ms"]), tokenizer=str(shared["tokenizer"]),
         exact_dedup=bool(shared["exact_dedup"]),

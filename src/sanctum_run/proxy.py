@@ -2,7 +2,7 @@
 
 The proxy runs in the runner's process and serves MCP over a pipe pair handed to the SUT
 process. It exposes every released hub tool as `<hub>.<tool>` (with the hub's own input
-schema) plus `hub_capabilities` and `caller_access` (the verified groups of the bound caller token, the
+schema) plus `hub_capabilities`, `change_events` (the caller's per-reader invalidation feed) and `caller_access` (the verified groups of the bound caller token, the
 broker's "who is asking" stage; never the principal), and forwards each call through `HubGateway`, which holds the
 token service and its secret. The SUT therefore never sees a secret or a hub token, and every
 forwarded call is recorded by the gateway as an `ObservedCall`.
@@ -29,6 +29,7 @@ from .gateway import GatewayHandle, HubGateway
 META_CALLER_TOKEN = "lab/caller_token"
 CAPABILITIES_TOOL = "hub_capabilities"
 CALLER_TOOL = "caller_access"
+CHANGES_TOOL = "change_events"
 TOOL_SEPARATOR = "."
 
 
@@ -63,6 +64,8 @@ class GatewayProxy:
                                         description=tool.description, inputSchema=tool.inputSchema))
         tools.append(types.Tool(name=CALLER_TOOL, description="Verified access groups of the bound caller.",
                                 inputSchema={"type": "object", "properties": {}}))
+        tools.append(types.Tool(name=CHANGES_TOOL, description="The bound caller's change feed after a cursor.",
+                                inputSchema={"type": "object", "properties": {"after_seq": {"type": "integer"}}}))
         tools.append(types.Tool(name=CAPABILITIES_TOOL, description="Released hubs and their capabilities.",
                                 inputSchema={"type": "object", "properties": {}}))
         return cls(gateway, capabilities, tools)
@@ -104,6 +107,11 @@ class GatewayProxy:
             if groups is None:
                 return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
             return {"groups": groups}
+        if name == CHANGES_TOOL:
+            events = self._gateway.change_events(binding[0], int(arguments.get("after_seq") or 0)) if bound else None
+            if events is None:
+                return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
+            return {"events": events}
         target = self._tool_targets.get(name)
         if target is None:
             return {"error": {"code": ErrorCode.INVALID_ARGUMENT.value, "message": "invalid argument: unknown tool"}}

@@ -24,6 +24,8 @@ src/sanctum_run/         runner (M2, evaluator side): HubGateway, SUT protocol, 
 src/sanctum_ref/         reference Sanctum (M3): C1-naive, C1-fair, C2; runs as its own process, reaches
                          hubs only through the gateway proxy (discrepancy register 16)
 owners/manifests/        owner manifests (registry): authority per fact kind, places, must-consult
+owners/memory_seed/      memory releases (M4): ACTIVE pointer, r1 (DENOTES, SELECTS_FOR, MEMBER_OF, procedure,
+                         descriptors, reviewed project contexts); r1/entities.yaml feeds evaluator-side alignment
 src/sanctum_world/       world schema, seeded renderer, filler, linter, gold derivation (evaluator side)
 world/world.yaml         authored ground truth: services, releases, principals, facts, hub names, planted situations
 world/filler.yaml        filler services, artifact counts per hub, noise vocabulary
@@ -42,7 +44,7 @@ docs/                    measurement plan, scenario register, capability matrix,
 tools/                   schema export, config diff, M0 fixture builder, M0 scoring, world build/lint, gold derivation
 ```
 
-Planned later (not present): `gen/`, `owners/memory_seed/`.
+Planned later (not present): `gen/`.
 
 ## Boundaries (enforced by tests at M0; by runtime images from M1)
 
@@ -117,6 +119,25 @@ PYTHONPATH=src:. <u> python tools/run_lab.py --sut ref --config C1-fair --cases 
 `--sut ref` launches `python -m sanctum_ref` as a child process with no secrets in its
 environment; `sanctum.retrieve` travels over its stdio and hub calls over two inherited pipes to
 the runner's gateway proxy. Receipts carry the `config_id`.
+
+### M4: memory v0
+
+```bash
+PYTHONPATH=src:. <u> python tools/run_lab.py --sut ref --config C4 --cases gold/dev --out runs/m4-c4
+# also C4a-equivalent, C4a-label-only; memory arms are scored through the entity alignment
+```
+
+C4 stores the release as typed relations, C4a-equivalent as flat tables (same plans, checked by
+the Q3b test), C4a-label-only resolves through one flat label table. Each request pins the release
+named by `owners/memory_seed/ACTIVE`; place unshares and renames arrive through the proxy's
+`change_events` tool (per-reader `ChangeFeed.events_for`) and stop the affected selectors.
+
+| Arm | Scenarios (22) | Dev (60) |
+|---|---|---|
+| C2 | 15 | 26 |
+| C4 | 18 | 38 |
+| C4a-equivalent | 18 | 38 |
+| C4a-label-only | 15 | 33 |
 
 ## M0 exit criteria (lab plan revised §10)
 

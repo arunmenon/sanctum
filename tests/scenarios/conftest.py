@@ -28,16 +28,41 @@ def scenario_world(tmp_path_factory) -> Path:
     return out_dir
 
 
+def alignment_for(world: Path, config_id: str):
+    """Evaluator side: memory entity refs -> world refs (src/sanctum_eval/alignment.py)."""
+    if config_id not in ("C4", "C4a-equivalent", "C4a-label-only"):
+        return None
+    from sanctum_eval.alignment import load_alignment
+    from sanctum_world.schema import load_world
+    aligned, _unaligned = load_alignment(ROOT / "owners" / "memory_seed" / "r1" / "entities.yaml",
+                                         load_world(ROOT / "world" / "world.yaml"), world)
+    return aligned
+
+
 def run_ref(world: Path, out_dir: Path, config_id: str = "C2", failure_profile: str = "none",
-            registry: Path | None = None, time_scale: float | None = None, cases_dir: Path = SCENARIO_GOLD):
+            registry: Path | None = None, time_scale: float | None = None, cases_dir: Path = SCENARIO_GOLD,
+            memory_seed: Path | None = None):
     arguments = ["--config", config_id]
+    if memory_seed is not None:
+        arguments += ["--memory-seed", str(memory_seed)]
     if registry is not None:
         arguments += ["--registry", str(registry)]
     return run(ProcessSUT(arguments), RunConfig(
         cases_dir=cases_dir, out_dir=out_dir, seed=SEED, sut_name="ref", config_id=config_id,
-        failure_profile=failure_profile, world_build_dir=world, time_scale=time_scale))
+        failure_profile=failure_profile, world_build_dir=world, time_scale=time_scale,
+        entity_alignment=alignment_for(world, config_id)))
 
 
 @pytest.fixture(scope="session")
 def c2_run(scenario_world, tmp_path_factory):
     return run_ref(scenario_world, tmp_path_factory.mktemp("c2-scenarios"))
+
+
+@pytest.fixture(scope="session")
+def c4_run(scenario_world, tmp_path_factory):
+    return run_ref(scenario_world, tmp_path_factory.mktemp("c4-scenarios"), config_id="C4")
+
+
+@pytest.fixture(scope="session")
+def label_only_run(scenario_world, tmp_path_factory):
+    return run_ref(scenario_world, tmp_path_factory.mktemp("c4a-label-scenarios"), config_id="C4a-label-only")

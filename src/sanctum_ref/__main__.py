@@ -20,6 +20,8 @@ def main(argv=None) -> int:
     parser.add_argument("--config", required=True, help="arm id from configs/matrix.yaml")
     parser.add_argument("--matrix", type=Path, default=ROOT / "configs" / "matrix.yaml")
     parser.add_argument("--registry", type=Path, default=ROOT / "owners" / "manifests")
+    parser.add_argument("--memory-seed", type=Path, default=ROOT / "owners" / "memory_seed",
+                        help="memory releases (used by memory arms only)")
     parser.add_argument("--proxy-read-fd", type=int, required=True)
     parser.add_argument("--proxy-write-fd", type=int, required=True)
     arguments = parser.parse_args(argv)
@@ -28,7 +30,8 @@ def main(argv=None) -> int:
     except UnsupportedArm as error:
         print(f"sanctum_ref: {error}", file=sys.stderr)
         return 2
-    anyio.run(serve, arm, arguments.registry, arguments.proxy_read_fd, arguments.proxy_write_fd)
+    anyio.run(serve, arm, arguments.registry, arguments.proxy_read_fd, arguments.proxy_write_fd,
+              arguments.memory_seed if arm.uses_memory else None)
     return 0
 
 

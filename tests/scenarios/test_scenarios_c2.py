@@ -22,8 +22,13 @@ EXPECTED_C2_FAIL = {
 M3_SCENARIOS = PASS_ON_C2 | set(EXPECTED_C2_FAIL)    # the mapping also holds M4 (C4) scenarios
 
 
+M3_SCENARIOS = PASS_ON_C2 | set(EXPECTED_C2_FAIL)
+
+
 def _params():
     for scenario, cases in sorted(scenario_cases().items()):
+        if scenario not in M3_SCENARIOS:
+            continue
         if scenario not in M3_SCENARIOS:
             continue
         for case_id in cases:

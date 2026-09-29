@@ -7,12 +7,13 @@ import json
 from pathlib import Path
 
 from sanctum_ref.config import load_arm
-from sanctum_ref.pipeline import Retriever
+from sanctum_ref.pipeline import MemoryState, Retriever
 from sanctum_ref.registry import RegistryUnavailable, load_registry
 
 ROOT = Path(__file__).resolve().parents[2]
 MATRIX = ROOT / "configs" / "matrix.yaml"
 MANIFESTS = ROOT / "owners" / "manifests"
+MEMORY_SEED = ROOT / "owners" / "memory_seed"
 
 
 class GatewayPort:
@@ -28,6 +29,9 @@ class GatewayPort:
     async def caller_groups(self):
         return self._gateway.caller_groups(self._request_id)
 
+    async def change_events(self, after_seq):
+        return self._gateway.change_events(self._request_id, after_seq) or []
+
     async def capabilities(self):
         return {hub_id: json.loads((self._world_build_dir / "hubs" / hub_id / "capabilities.json").read_text())
                 for hub_id in self._gateway.hub_ids}
@@ -36,8 +40,10 @@ class GatewayPort:
 class InProcessRef:
     """Runs `Retriever` under the runner's SUT protocol (tests only)."""
 
-    def __init__(self, config_id: str, world_build_dir: Path, registry_dir: Path = MANIFESTS):
+    def __init__(self, config_id: str, world_build_dir: Path, registry_dir: Path = MANIFESTS,
+                 memory_seed: Path = MEMORY_SEED):
         self._arm = load_arm(MATRIX, config_id)
+        self.memory = MemoryState(memory_seed)
         self._registry_dir = registry_dir
         self._world_build_dir = world_build_dir
         self.gateway = None
@@ -57,4 +63,4 @@ class InProcessRef:
         except RegistryUnavailable:
             registry = None
         port = GatewayPort(self.gateway, request.request_id, context.gateway, self._world_build_dir)
-        return await Retriever(self._arm, registry).retrieve(request, port)
+        return await Retriever(self._arm, registry, memory=self.memory).retrieve(request, port)

@@ -33,6 +33,8 @@ class SourcePlan:
     version_refs: list[Optional[str]] = field(default_factory=lambda: [None])   # one search per ref
     as_of: Optional[str] = None
     procedure_refs: list[str] = field(default_factory=list)
+    interpretation: Optional[int] = None     # index into the resolution's interpretations
+    aliases: list[str] = field(default_factory=list)
 
 
 DEFAULT_ENVIRONMENTS = {None, "prod", "production"}
@@ -98,13 +100,15 @@ def plan_sources(request: RetrieveRequest, arm: ArmConfig, registry: Registry, i
                                    ["routing_selected" if wanted else "not_selected"],
                                    version_refs=refs, as_of=as_of)
 
-    if arm.registry_procedures:
+    if arm.registry_procedures or arm.uses_memory:
         for procedure in registry.procedures:
             if _triggered(procedure, intent):
                 _apply_must_consult(procedure, registry, plans, request, capabilities, groups)
-    if sum(len(plan.version_refs) for plan in plans.values() if plan.call) > arm.calls:
-        raise ValueError("routing exceeds the arm's call budget")
     return [plans[hub_id] for hub_id in sorted(plans)]
+
+
+def search_calls(plans: list[SourcePlan]) -> int:
+    return sum(len(plan.version_refs) for plan in plans if plan.call)
 
 
 def _triggered(procedure: Procedure, intent: Intent) -> bool:
@@ -136,3 +140,77 @@ def _apply_must_consult(procedure: Procedure, registry: Registry, plans: dict[st
     plan.reasons = ["must_consult"]
     plan.selectors.update(selector)
     plan.procedure_refs.append(procedure.procedure_id)
+
+
+def apply_memory(base: list[SourcePlan], resolution, store, registry: Registry, intent: Intent,
+                 groups: set[str], invalidated_places: set[str], query: str, arm: ArmConfig):
+    """Overlay memory on the base plans (HLD §9.3-§9.5): one plan per source per interpretation,
+    with SELECTS_FOR selectors and preferred-label aliases (translation), and memory procedures
+    triggered through explicit MEMBER_OF. Returns (plans, activations, response reasons)."""
+    from copy import deepcopy
+
+    from sanctum_contracts.receipt import Activation
+
+    from .resolution import compatible, entity_plan, procedure_activations
+
+    if not resolution.interpretations:
+        return base, [], []
+    plans: list[SourcePlan] = []
+    activations: list = []
+    reasons: list[str] = []
+    for index, interpretation in enumerate(resolution.interpretations):
+        by_hub: dict[str, SourcePlan] = {}
+        for plan in base:
+            copy = deepcopy(plan)
+            copy.interpretation = index
+            by_hub[plan.hub_id] = copy
+        # memory procedures (policy and explicit constraints already applied in `base`)
+        for procedure, activation in procedure_activations(store, interpretation.entity_id,
+                                                           interpretation.entity_ref, intent.detected_fact_kinds):
+            activations.append(activation)
+            hub_id = procedure.action.must_consult
+            manifest = registry.manifest(hub_id)
+            place = next(iter(procedure.action.selector.values()), "")
+            plan = by_hub.get(hub_id)
+            if manifest is None or not manifest.place_accessible(place, groups):
+                by_hub[hub_id] = SourcePlan(hub_id, manifest, False, "skipped", ["required_source_denied"],
+                                            required=True, procedure_refs=[procedure.procedure_id],
+                                            interpretation=index)
+                continue
+            if plan is None:
+                plan = SourcePlan(hub_id, manifest, True, "called", [], interpretation=index)
+                by_hub[hub_id] = plan
+            if plan.status == "unsupported_for_mode":
+                plan.required = True
+                continue
+            plan.call, plan.status, plan.required, plan.reasons = True, "called", True, ["must_consult"]
+            plan.selectors.update(procedure.action.selector)
+            if procedure.procedure_id not in plan.procedure_refs:
+                plan.procedure_refs.append(procedure.procedure_id)
+        for hub_id, plan in by_hub.items():
+            if not plan.call:
+                continue
+            memory_plan = entity_plan(store, registry, interpretation.entity_id, hub_id, groups,
+                                      invalidated_places, query)
+            for key, value in memory_plan.selectors.items():
+                if key in plan.selectors:
+                    narrowed = compatible(plan.selectors[key], value)
+                    if narrowed is None:
+                        reasons.append("procedure_conflict")   # never a filter union, never a guess
+                        continue
+                    plan.selectors[key] = narrowed
+                else:
+                    plan.selectors[key] = value
+                activations.extend(Activation(kind="selector", ref=ref, entity_ref=interpretation.entity_ref,
+                                              source_id=hub_id) for ref in memory_plan.selector_refs)
+            if arm.translation:
+                plan.aliases = memory_plan.aliases
+        plans.extend(by_hub[hub_id] for hub_id in sorted(by_hub))
+    # stay within the call budget: required sources first, then interpretation order
+    while search_calls(plans) > arm.calls:
+        optional = [plan for plan in plans if plan.call and not plan.required]
+        if not optional:
+            break
+        victim = optional[-1]
+        victim.call, victim.status, victim.reasons = False, "skipped", ["not_selected"]
+    return plans, activations, sorted(set(reasons))

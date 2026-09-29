@@ -59,6 +59,7 @@ class Assembled:
     relevant_packed: int
     uncovered_terms: list[str] = field(default_factory=list)
     subject_terms: int = 0
+    relevant_ids: list[str] = field(default_factory=list)
 
     @property
     def uncovered_share(self) -> float:
@@ -193,6 +194,9 @@ def find_conflicts(ranked: list[Ranked], terms: tuple[str, ...],
                 continue
             if not same_subject(pool[i].candidate, pool[j].candidate, domain_terms):
                 continue
+            meanings_a, meanings_b = pool[i].candidate.interpretations, pool[j].candidate.interpretations
+            if meanings_a and meanings_b and not meanings_a & meanings_b:
+                continue                 # separated interpretations are never compared (no blending)
             clash = any(key in values[j] and values[j][key] != value for key, value in values[i].items())
             if clash:
                 conflicts.append((pool[i], pool[j], relation_type(a, b)))
@@ -247,7 +251,8 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
                  for index, (a, b, relation) in enumerate(flagged)]
     return Assembled(evidence=evidence, conflicts=conflicts, omitted=[], used_tokens=used,
                      truncated_relevant=truncated_relevant,
-                     relevant_packed=sum(1 for item in chosen if item.relevant))
+                     relevant_packed=sum(1 for item in chosen if item.relevant),
+                     relevant_ids=[item.unit.evidence_id for item in chosen if item.relevant])
 
 
 def assemble(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: frozenset[str],

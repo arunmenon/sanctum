@@ -72,7 +72,7 @@ class HubGateway:
 
     def __init__(self, world_build_dir: Path, hub_ids: list[str], token_service: TokenService,
                  failures: Optional[FailureInjector] = None, token_mode: TokenMode = TokenMode.EXCHANGE,
-                 call_timeout_seconds: Optional[float] = None):
+                 call_timeout_seconds: Optional[float] = None, change_feed_path: Optional[Path] = None):
         self._world_build_dir = Path(world_build_dir)
         self._hub_ids = sorted(hub_ids)
         self._token_service = token_service
@@ -80,6 +80,8 @@ class HubGateway:
         self._token_mode = TokenMode(token_mode)
         self._call_timeout_seconds = call_timeout_seconds
         self._sessions: dict[str, Any] = {}
+        self._stores: dict[str, HubStore] = {}
+        self.change_feed_path = Path(change_feed_path) if change_feed_path else None
         self._calls_by_request: dict[str, list[ObservedCall]] = {}
         self._exit_stack: Optional[AsyncExitStack] = None
         self._bindings: dict[str, tuple[Optional[str], Optional[str]]] = {}
@@ -131,6 +133,7 @@ class HubGateway:
         try:
             for hub_id in self._hub_ids:
                 store = HubStore.load(self._world_build_dir / "hubs" / hub_id)
+                self._stores[hub_id] = store
                 server = build_hub_server(store, self._token_service, self._failures)
                 self._sessions[hub_id] = await self._exit_stack.enter_async_context(
                     create_connected_server_and_client_session(server._mcp_server))
@@ -195,6 +198,25 @@ class HubGateway:
             return list(self._token_service.verify(caller_token, CALLER_AUDIENCE).groups)
         except TokenRejected:
             return None
+
+    @property
+    def stores(self) -> dict[str, HubStore]:
+        """Lab side only (admin API wiring in tests and scenario scripts); never reaches a SUT."""
+        return dict(self._stores)
+
+    def change_events(self, request_id: str, after_seq: int = 0) -> Optional[list[dict[str, Any]]]:
+        """The bound caller's per-reader change feed view (`ChangeFeed.events_for`), or None when
+        the caller cannot be verified. Empty when the run has no feed."""
+        caller_token, _principal = self._bindings.get(request_id, (None, None))
+        try:
+            claims = self._token_service.verify(caller_token, CALLER_AUDIENCE)
+        except TokenRejected:
+            return None
+        if self.change_feed_path is None:
+            return []
+        from sanctum_hubs.change_feed import ChangeFeed
+        return [{"reader_seq": event.reader_seq, "hub": event.hub, "kind": str(event.kind), "subject": event.subject}
+                for event in ChangeFeed(self.change_feed_path).events_for(claims, after_seq=after_seq)]
 
     def record_refused(self, request_id: str, hub_id: str, tool: str) -> None:
         """A call the proxy refused before it reached the gateway (binding mismatch)."""

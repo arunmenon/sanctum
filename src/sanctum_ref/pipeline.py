@@ -16,13 +16,14 @@ import hashlib
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 import anyio
 
 from sanctum_contracts import (
-    CONTRACT_REVISION, Budget, EvidenceResponse, EvidenceStatus, Receipt, RetrieveRequest,
-    SourceOutcome,
+    CONTRACT_REVISION, Budget, EvidenceResponse, EvidenceStatus, Interpretation, Receipt,
+    RetrieveRequest, SourceOutcome,
 )
 from sanctum_contracts.receipt import QueryPlan, SelfReportedCall
 
@@ -31,12 +32,15 @@ from .assembly import assemble
 from .config import ArmConfig
 from .intent import analyze
 from .registry import Registry, RegistryUnavailable
-from .routing import SourcePlan, plan_sources
-from .text import stem
+from .memory import LabelTable, MemoryUnavailable, build_store, load_release
+from .resolution import resolve, resolve_label_only
+from .routing import SourcePlan, apply_memory, plan_sources
+from .text import stem, words
 
 FETCH_PER_SOURCE = 5
 UNCOVERED_SHARE = 0.25
 MEMORY_RELEASE = "none"                      # no memory store in C1/C2
+INVALIDATING_CHANGES = {"place_unshared", "path_renamed"}
 TIMEOUT_CODES = {"timeout"}
 
 
@@ -67,12 +71,43 @@ def _place_has_versions(capabilities: dict[str, Any], hit: dict[str, Any]) -> bo
     return place_reads.get(hit.get("location") or "", True)
 
 
+class MemoryState:
+    """Process-lifetime memory state: pinned release cache and the change-feed cursor.
+
+    Invalidations are consumed from the proxy's per-reader change feed before each request:
+    an unshared or renamed place stops being used as a selector (HLD §9.5 "stale": uncertain,
+    no exclusive filter) until a new release re-binds it."""
+
+    def __init__(self, seed_dir: Optional[Path]):
+        self.seed_dir = seed_dir
+        self.cursor = 0
+        self.invalidated_places: set[str] = set()
+        self._stores: dict[tuple[str, str], Any] = {}
+
+    def pin(self, backend: str):
+        """(release, store) for the release active now; raises MemoryUnavailable."""
+        if self.seed_dir is None:
+            raise MemoryUnavailable("no memory seed configured")
+        release = load_release(self.seed_dir)
+        key = (release.release_id, backend)
+        if key not in self._stores:
+            self._stores[key] = (release, build_store(release, backend))
+        return self._stores[key]
+
+    async def consume_changes(self, port: HubPort) -> None:
+        for event in await port.change_events(self.cursor) or []:
+            self.cursor = max(self.cursor, int(event.get("reader_seq", 0)))
+            if event.get("kind") in INVALIDATING_CHANGES:
+                self.invalidated_places.add(str(event.get("subject")))
+
+
 class Retriever:
     def __init__(self, arm: ArmConfig, registry: Optional[Registry],
-                 registry_error: Optional[str] = None):
+                 registry_error: Optional[str] = None, memory: Optional[MemoryState] = None):
         self.arm = arm
         self.registry = registry
         self.registry_error = registry_error
+        self.memory = memory
 
     # ---- entry point ---------------------------------------------------------------------------
     async def retrieve(self, request: RetrieveRequest, port: HubPort) -> tuple[EvidenceResponse, Receipt]:
@@ -87,6 +122,25 @@ class Retriever:
         releases = {release for manifest in self.registry.manifests.values() for release in manifest.versions.releases}
         intent = analyze(request.query, self.registry.domains, releases, verify=request.mode.value == "verify")
         plans = plan_sources(request, self.arm, self.registry, intent, capabilities, set(groups))
+
+        # memory: pin one release for the whole request (HLD §9.6); failure degrades, never widens
+        release_id, degraded, resolution, activations, memory_reasons = MEMORY_RELEASE, [], None, [], []
+        if self.arm.uses_memory:
+            try:
+                await self.memory.consume_changes(port)
+                release, store = self.memory.pin(self.arm.memory_store)
+                release_id = release.release_id
+                if self.arm.resolution == "label_only":
+                    resolution = resolve_label_only(request, LabelTable(release), store, releases)
+                else:
+                    resolution = resolve(request, store, self.registry, set(groups), releases)
+                plans, activations, memory_reasons = apply_memory(
+                    plans, resolution, store, self.registry, intent, set(groups),
+                    self.memory.invalidated_places, request.query, self.arm)
+            except MemoryUnavailable:
+                degraded = ["memory_unavailable"]
+                resolution = None
+
         deadline = time.monotonic() + min(request.deadline_ms, self.arm.deadline_ms) / 1000.0
         outcomes: dict[str, str] = {}
         candidates = await self._ask(request, plans, port, clock, deadline, intent.fact_kinds, outcomes,
@@ -96,51 +150,99 @@ class Retriever:
                              dedup_exact=self.arm.exact_dedup,
                              domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})
         sources, response_reasons, required_gap = self._sources(plans, outcomes)
-        status = self._status(assembled, intent.vague, required_gap)
+        response_reasons += memory_reasons
+        resolved = resolution is not None and bool(resolution.interpretations)
+        status = self._status(assembled, intent.vague, required_gap, lexical_coverage=not resolved)
+        if resolved and status != EvidenceStatus.insufficient:
+            # the entity is covered, but is what was asked about it covered? (HLD §10 Ex8) Only
+            # when nothing returned mentions any of the non-name subject words is it not.
+            name_terms = {stem(word) for i in resolution.interpretations for word in words(i.term)}
+            asked = [term for term in intent.terms if term not in name_terms]
+            if asked and set(asked) <= set(assembled.uncovered_terms):
+                status = EvidenceStatus.insufficient
+        interpretations = []
+        if resolution is not None:
+            interpretations, status = self._interpretations(resolution, candidates, assembled, status,
+                                                            required_gap, response_reasons, request)
         if assembled.truncated_relevant:
             response_reasons.append("insufficient_budget")
         if status == EvidenceStatus.insufficient and not required_gap:
             response_reasons.append("no_coverage")
         receipt = Receipt(
             receipt_id=receipt_id, request_id=request.request_id, config_id=self.arm.config_id,
-            contract_revision=CONTRACT_REVISION, memory_release_id=MEMORY_RELEASE,
+            contract_revision=CONTRACT_REVISION, memory_release_id=release_id,
+            resolutions=resolution.records if resolution else [], activations=activations,
             query_plans=[QueryPlan(source_id=plan.hub_id, original_query=request.query,
                                    selectors=[f"{key}={value}" for key, value in sorted(plan.selectors.items())],
-                                   as_of=plan.as_of)
+                                   aliases=list(plan.aliases), as_of=plan.as_of)
                          for plan in plans if plan.call],
             calls=clock.calls, complete=True,
             timings_ms={"total": int((time.monotonic() - clock.started) * 1000)})
         response = EvidenceResponse(
-            request_id=request.request_id, receipt_id=receipt_id, memory_release_id=MEMORY_RELEASE,
+            request_id=request.request_id, receipt_id=receipt_id, memory_release_id=release_id,
             effective_scope_ref=self._scope_ref(request, groups),
             policy_versions={"registry": self.registry.version, "config": self.arm.config_id},
-            replay_level="recompute_on_candidates", evidence=assembled.evidence,
+            replay_level="recompute_on_candidates", interpretations=interpretations,
+            evidence=assembled.evidence,
             conflicts=assembled.conflicts, sources=sources, evidence_status=status,
             reasons=sorted(set(response_reasons)), omitted=assembled.omitted,
             budget=Budget(requested=request.budget_tokens, used=assembled.used_tokens,
                           tokenizer_id=self.arm.tokenizer),
-            truncation=assembled.truncated_relevant)
+            truncation=assembled.truncated_relevant, degraded_reasons=degraded)
         return response, receipt
+
+    def _interpretations(self, resolution, candidates, assembled, status, required_gap,
+                         reasons: list[str], request: RetrieveRequest):
+        """One interpretation per resolved meaning, each with only the evidence its own plans
+        found (no blending), its own conflicts and status (HLD §9.2)."""
+        if resolution.unresolved and not resolution.interpretations:
+            reasons.append("unresolved_term")
+            if status == EvidenceStatus.sufficient:
+                status = EvidenceStatus.partial
+        if resolution.ambiguous:
+            reasons.append("ambiguous_term")
+            if request.caller_profile.value == "interactive":
+                reasons.append("clarification_requested")
+        found_by = {candidate.unit.content_hash: set() for candidate in candidates}
+        for candidate in candidates:
+            found_by[candidate.unit.content_hash] |= candidate.interpretations
+        out = []
+        for index, interpretation in enumerate(resolution.interpretations):
+            evidence_ids = [unit.evidence_id for unit in assembled.evidence if index in found_by.get(unit.content_hash, set())]
+            conflict_ids = [c.conflict_id for c in assembled.conflicts if c.a in evidence_ids and c.b in evidence_ids]
+            relevant = {item for item in assembled.relevant_ids} & set(evidence_ids)
+            branch_status = EvidenceStatus.insufficient if not relevant else (
+                EvidenceStatus.partial if required_gap else EvidenceStatus.sufficient)
+            out.append(Interpretation(interpretation_id=f"in-{index + 1}", entity_ref=interpretation.entity_ref,
+                                      resolution_origin=interpretation.origin, evidence_ids=evidence_ids,
+                                      conflict_ids=conflict_ids, evidence_status=branch_status))
+        if resolution.ambiguous and any(i.evidence_status != EvidenceStatus.sufficient for i in out):
+            status = EvidenceStatus.partial          # some meaning is not fully answered
+        elif resolution.ambiguous and out:
+            status = EvidenceStatus.sufficient
+        return out, status
 
     # ---- stage 4 -------------------------------------------------------------------------------
     async def _ask(self, request: RetrieveRequest, plans: list[SourcePlan], port: HubPort, clock: CallLog,
                    deadline: float, fact_kinds: frozenset[str], outcomes: dict[str, str],
                    capabilities: dict[str, Any]) -> list[Candidate]:
-        hits: dict[str, list[tuple[Optional[str], dict[str, Any]]]] = {}
+        hits: dict[str, list[tuple[Optional[str], dict[str, Any], Optional[int]]]] = {}
+        manifests = {plan.hub_id: plan.manifest for plan in plans}
 
-        async def call(plan: SourcePlan, tool: str, arguments: dict[str, Any]) -> Optional[dict[str, Any]]:
+        async def call(hub_id: str, tool: str, arguments: dict[str, Any]) -> Optional[dict[str, Any]]:
             started = time.monotonic()
             payload: Optional[dict[str, Any]] = None
             try:
                 with anyio.move_on_after(max(0.0, deadline - time.monotonic())):
-                    payload = await port.call(plan.hub_id, tool, arguments)
+                    payload = await port.call(hub_id, tool, arguments)
             finally:
-                clock.record(plan.hub_id, tool, _status_of(payload), started)
+                clock.record(hub_id, tool, _status_of(payload), started)
             return payload
 
         async def search(plan: SourcePlan, ref: Optional[str]) -> None:
-            payload = await call(plan, plan.manifest.search.tool,
-                                 search_arguments(plan.manifest, request.query, plan.selectors, ref))
+            query = " ".join([request.query, *plan.aliases])      # the original question is always kept
+            payload = await call(plan.hub_id, plan.manifest.search.tool,
+                                 search_arguments(plan.manifest, query, plan.selectors, ref))
             status = _status_of(payload)
             # a source is "called" only if every search it needed succeeded
             if outcomes.get(plan.hub_id, "ok") == "ok":
@@ -148,7 +250,7 @@ class Retriever:
             if status == "ok":
                 results = [hit for hit in payload.get("results") or []
                            if not plan.as_of or _place_has_versions(capabilities.get(plan.hub_id, {}), hit)]
-                hits.setdefault(plan.hub_id, []).extend((ref, hit) for hit in results[:FETCH_PER_SOURCE])
+                hits.setdefault(plan.hub_id, []).extend((ref, hit, plan.interpretation) for hit in results[:FETCH_PER_SOURCE])
 
         async with anyio.create_task_group() as group:
             for plan in plans:
@@ -158,33 +260,37 @@ class Retriever:
 
         fetched: list[Candidate] = []
         retrieved_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        by_hub = {plan.hub_id: plan for plan in plans}
         budget = self.arm.candidates
+        found_by: dict[tuple[str, str, str], set[int]] = {}
 
-        async def fetch(plan: SourcePlan, rank: int, ref: Optional[str], hit: dict[str, Any]) -> None:
-            arguments = fetch_arguments(plan.manifest, hit, ref)
+        async def fetch(hub_id: str, rank: int, ref: Optional[str], hit: dict[str, Any], key) -> None:
+            manifest = manifests[hub_id]
+            arguments = fetch_arguments(manifest, hit, ref)
             if arguments is None:
                 return
-            payload = await call(plan, plan.manifest.fetch.tool, arguments)
+            payload = await call(hub_id, manifest.fetch.tool, arguments)
             if _status_of(payload) != "ok" or "artifact" not in payload:
                 return
             artifact = payload["artifact"]
-            fetched.append(Candidate(plan.hub_id, rank, plan.manifest, artifact,
-                                     evidence_unit(plan.manifest, artifact, "", retrieved_at,
-                                                   self.arm.tokenizer, fact_kinds)))
+            fetched.append(Candidate(hub_id, rank, manifest, artifact,
+                                     evidence_unit(manifest, artifact, "", retrieved_at, self.arm.tokenizer, fact_kinds),
+                                     found_by[key]))
 
         async with anyio.create_task_group() as group:
             for hub_id in sorted(hits):
-                seen: set[tuple[str, str]] = set()
-                for rank, (ref, hit) in enumerate(hits[hub_id]):
-                    key = (str(hit.get("artifact_id")), str(hit.get("version")))
-                    if budget <= 0 or key in seen:
+                for rank, (ref, hit, interpretation) in enumerate(hits[hub_id]):
+                    key = (hub_id, str(hit.get("artifact_id")), str(hit.get("version")))
+                    if key in found_by:
+                        if interpretation is not None:
+                            found_by[key].add(interpretation)
                         continue
-                    seen.add(key)
+                    if budget <= 0:
+                        continue
+                    found_by[key] = {interpretation} if interpretation is not None else set()
                     budget -= 1
-                    group.start_soon(fetch, by_hub[hub_id], rank, ref, hit)
+                    group.start_soon(fetch, hub_id, rank, ref, hit, key)
         # deterministic evidence ids: hub order, then hub rank
-        fetched.sort(key=lambda candidate: (candidate.source_id, candidate.hub_rank))
+        fetched.sort(key=lambda candidate: (candidate.source_id, candidate.hub_rank, candidate.unit.artifact_id))
         for index, candidate in enumerate(fetched):
             candidate.unit = candidate.unit.model_copy(update={"evidence_id": f"ev-{index + 1}"})
         return fetched
@@ -192,8 +298,21 @@ class Retriever:
     # ---- stage 6 helpers ---------------------------------------------------------------------------
     @staticmethod
     def _sources(plans: list[SourcePlan], outcomes: dict[str, str]) -> tuple[list[SourceOutcome], list[str], bool]:
-        sources, reasons, required_gap = [], [], False
+        """One outcome per source; per-interpretation plans for the same source are merged."""
+        merged: dict[str, SourcePlan] = {}
         for plan in plans:
+            current = merged.get(plan.hub_id)
+            if current is None:
+                merged[plan.hub_id] = SourcePlan(plan.hub_id, plan.manifest, plan.call, plan.status,
+                                                 list(plan.reasons), plan.required)
+                continue
+            current.required = current.required or plan.required
+            if plan.call and not current.call:
+                current.call, current.status, current.reasons = True, plan.status, list(plan.reasons)
+            elif plan.call == current.call:
+                current.reasons = sorted(set(current.reasons) | set(plan.reasons))
+        sources, reasons, required_gap = [], [], False
+        for plan in (merged[hub_id] for hub_id in sorted(merged)):
             status, source_reasons = plan.status, list(plan.reasons)
             if plan.call:
                 outcome = outcomes.get(plan.hub_id, "timeout")
@@ -211,10 +330,13 @@ class Retriever:
         return sources, reasons, required_gap
 
     @staticmethod
-    def _status(assembled, vague: bool, required_gap: bool) -> EvidenceStatus:
+    def _status(assembled, vague: bool, required_gap: bool, lexical_coverage: bool = True) -> EvidenceStatus:
         # a large share of the subject that no source returned anything about (the asked-for
-        # attribute of a service nobody documents, HLD §10 Ex8): the question is not covered
-        if not assembled.relevant_packed or assembled.uncovered_share >= UNCOVERED_SHARE:
+        # attribute of a service nobody documents, HLD §10 Ex8): the question is not covered.
+        # With a resolved entity the pool is narrowed to its places, where this lexical signal
+        # misfires, so it applies only to unresolved questions.
+        uncovered = lexical_coverage and assembled.uncovered_share >= UNCOVERED_SHARE
+        if not assembled.relevant_packed or uncovered:
             return EvidenceStatus.insufficient
         if required_gap or vague or assembled.truncated_relevant:
             return EvidenceStatus.partial

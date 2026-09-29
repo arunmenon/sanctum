@@ -43,7 +43,9 @@ def test_arms_come_from_matrix_switches_only():
     assert load_arm(MATRIX, "C1-fair").routing == "fanout_all"
     c2 = load_arm(MATRIX, "C2")
     assert c2.rules_routing and c2.registry_procedures and c2.tokenizer == "cl100k_base"
-    for unbuilt in ("C3", "C4", "C4a-equivalent", "C4a-label-only", "C5", "nope"):
+    assert load_arm(MATRIX, "C4").memory_store == "relations"
+    assert load_arm(MATRIX, "C4a-label-only").resolution == "label_only"
+    for unbuilt in ("C3", "C5", "nope"):
         with pytest.raises(UnsupportedArm):
             load_arm(MATRIX, unbuilt)
 

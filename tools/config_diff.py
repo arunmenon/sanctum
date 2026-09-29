@@ -27,8 +27,11 @@ def check_comparison(m, name):
     return d, extra
 
 
+# Paired runs must share these and the recorded effective inputs (`manifest["effective"]`, content
+# hashes of SUT code, configs, registry, memory, provider and cases). The whole-tree diff hash and
+# git_dirty stay provenance only: unrelated tracked files (holdout/runs.log) change between runs.
 PAIRED_MANIFEST_KEYS = ("world_manifest_sha256", "seed", "failure_profile", "metrics_revision", "cases", "hubs",
-                        "git_commit", "git_diff_sha256")
+                        "git_commit")
 
 
 def check_runs(m, name, manifest_a, manifest_b):

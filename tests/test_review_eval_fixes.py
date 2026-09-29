@@ -113,3 +113,43 @@ def test_budget_gate_recounts_evidence(case):
     score = score_case(gold, padded, Receipt.model_validate(receipt), trace)
     assert not score.within_budget and "budget" in score.gates_failed and not score.safe_grounded_success
     assert score.tokens_recounted == evidence_tokens(padded)
+
+
+# ---- holdout re-report false positives ---------------------------------------------------------
+def test_request_echo_is_not_a_leak(scanner):
+    foreign_title = next(token for kind, token in scanner.fingerprints("kestrel-payments") if kind == "private_title")
+    receipt_row = json.dumps({"query_plans": [{"original_query": f"What about {foreign_title}?"}]})
+    assert ("private_title", foreign_title) in scanner.scan_text(receipt_row, "kestrel-payments")
+    assert scanner.scan_text(receipt_row, "kestrel-payments", request_text=f"What about {foreign_title}?") == []
+
+
+def test_readable_identifiers_suppress_title_fragments(scanner):
+    # "sampling-106.md" titles an unreadable payments repo file, and is a fragment of the identity
+    # skill path the identity caller can read
+    row = '{"native_ref": "skills/identity/token-mint-sampling-106.md@v3"}'
+    assert scanner.scan_text(row, "kestrel-identity") == []
+    assert ("private_title", "sampling-106.md") not in scanner.fingerprints("kestrel-identity")
+    # the unreadable artifact's own full path is still a fingerprint, matched as a whole identifier
+    leak = '{"native_ref": "payments/chargeback-desk/docs/sampling-106.md@exp-branch"}'
+    assert ("private_path", "payments/chargeback-desk/docs/sampling-106.md") in scanner.scan_text(leak, "kestrel-identity")
+
+
+def test_title_matches_whole_identifiers_only(scanner):
+    title = next(token for kind, token in scanner.fingerprints("kestrel-payments") if kind == "private_title"
+                 and not token[0].isspace())
+    assert scanner.scan_text(f"see {title} now", "kestrel-payments")
+    assert not [f for f in scanner.scan_text(f"see x-{title}-y", "kestrel-payments") if f[1] == title]
+
+
+def test_pairing_ignores_whole_tree_diff_hash():
+    from tools.config_diff import check_runs, load as load_matrix
+    from sanctum_eval.provenance import effective_configuration
+    matrix = load_matrix()
+    effective = lambda config_id: effective_configuration(sut="ref", config_id=config_id, hubs=["codehub"],
+                                                          cases_dir=GOLD_DEV)
+    base = {"world_manifest_sha256": "w", "seed": 1, "failure_profile": "none", "metrics_revision": "m",
+            "cases": ["x"], "hubs": ["codehub"], "git_commit": "abc"}
+    a = {**base, "config_id": "C1-fair", "effective": effective("C1-fair"), "git_dirty": True, "git_diff_sha256": "1"}
+    b = {**base, "config_id": "C2", "effective": effective("C2"), "git_dirty": True, "git_diff_sha256": "2"}
+    assert check_runs(matrix, "Q2_routing", a, b) == []
+    assert "git_commit differs between runs" in check_runs(matrix, "Q2_routing", a, {**b, "git_commit": "def"})

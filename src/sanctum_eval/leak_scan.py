@@ -52,6 +52,7 @@ class _Artifact:
     restricted: bool
     title: str
     lines: tuple
+    identifiers: tuple = ()      # path, location, native refs (path@version, location@version)
 
 
 class LeakScanner:
@@ -81,6 +82,7 @@ class LeakScanner:
                 artifact_id=artifact_id, hub=first["hub"], acl=frozenset(first.get("acl") or ()),
                 owner=(first.get("metadata") or {}).get("principal") if first["hub"] == "memoryhub" else None,
                 restricted=is_restricted[artifact_id], title=first.get("title") or "",
+                identifiers=_identifiers(versions),
                 lines=tuple(sorted({line for row in versions
                                     for line in distinctive_lines(row.get("text") or "", noise)}))))
         self.restricted_readers = {principal for principal in self.groups
@@ -109,7 +111,9 @@ class LeakScanner:
             visible = [a for a in self.artifacts if self.can_read(principal, a)]
         # a hidden line that also occurs inside readable text ("final class X {" within
         # "public final class X {") is not distinctive for this caller
-        visible_text = "\n".join(line for a in visible for line in a.lines)
+        # readable titles, paths, locations and native refs count as readable text too
+        visible_text = "\n".join([line for a in visible for line in a.lines]
+                                 + [a.title for a in visible] + [i for a in visible for i in a.identifiers])
         visible_titles = {a.title for a in visible}
         found: dict[tuple[str, str], None] = {}
         for artifact in hidden:
@@ -118,22 +122,32 @@ class LeakScanner:
             if token:
                 found[("canary", token)] = None
             found[("artifact_id", artifact.artifact_id)] = None
-            if len(artifact.title) >= MIN_TITLE and artifact.title not in visible_titles:
+            if (len(artifact.title) >= MIN_TITLE and artifact.title not in visible_titles
+                    and artifact.title not in visible_text):
                 found[(f"{prefix}_title", artifact.title)] = None
+            for identifier in artifact.identifiers:
+                if "@" not in identifier and len(identifier) >= MIN_TITLE and identifier not in visible_text:
+                    found[(f"{prefix}_path", identifier)] = None
             for line in artifact.lines:
                 if line not in visible_text:
                     found[(f"{prefix}_text", line)] = None
         self._fingerprints[principal] = list(found)
         return self._fingerprints[principal]
 
-    def scan_text(self, text: str, principal: Optional[str]) -> list[tuple[str, str]]:
-        found = [(kind, token) for kind, token in self.fingerprints(principal) if token in text]
+    def scan_text(self, text: str, principal: Optional[str], request_text: str = "") -> list[tuple[str, str]]:
+        """request_text: the request's own query and scope; a fingerprint the caller wrote itself
+        (echoed in query plans) is not a leak."""
+        found = [(kind, token) for kind, token in self.fingerprints(principal)
+                 if _occurs(kind, token, text) and not (request_text and token in request_text)]
         if principal not in self.restricted_readers:
             found += [("restricted_count", match.group(0)) for match in COUNT_PATTERN.finditer(text)]
         return found
 
-    def scan_run(self, run_dir: Path, principals: dict[str, str]) -> list[Leak]:
-        """principals: request_id -> principal, from the gold cases the run answered."""
+    def scan_run(self, run_dir: Path, principals: dict[str, str],
+                 request_texts: Optional[dict[str, str]] = None) -> list[Leak]:
+        """principals: request_id -> principal, and request_texts: request_id -> query and scope,
+        both from the gold cases the run answered."""
+        request_texts = request_texts or {}
         leaks: list[Leak] = []
         for path in sorted(Path(run_dir).glob(f"*{SCANNED_SUFFIX}")):
             if path.name in NOT_SCANNED:
@@ -144,7 +158,8 @@ class LeakScanner:
                 request_id = _request_id(line)
                 principal = principals.get(request_id) if request_id else None
                 leaks += [Leak(path.name, number, request_id, kind, token)
-                          for kind, token in dict.fromkeys(self.scan_text(_decoded(line), principal))]
+                          for kind, token in dict.fromkeys(self.scan_text(
+                              _decoded(line), principal, request_texts.get(request_id, "") if request_id else ""))]
         return leaks
 
 
@@ -153,14 +168,43 @@ def principals_for(cases: Iterable[GoldCase], aliases: Optional[dict[str, str]] 
     return {gold.request.request_id: aliases.get(gold.principal, gold.principal) for gold in cases}
 
 
+def request_texts_for(cases: Iterable[GoldCase]) -> dict[str, str]:
+    return {gold.request.request_id: "\n".join(filter(None, (gold.request.query, gold.request.scope)))
+            for gold in cases}
+
+
 def scan_run_dir(run_dir: Path, cases_dir: Path, world_build_dir: Path,
                  aliases: Optional[dict[str, str]] = None) -> list[Leak]:
     cases = [load_gold(path) for path in sorted(Path(cases_dir).glob("*.yaml"))]
-    return LeakScanner(world_build_dir).scan_run(run_dir, principals_for(cases, aliases))
+    return LeakScanner(world_build_dir).scan_run(run_dir, principals_for(cases, aliases), request_texts_for(cases))
 
 
 def leaks_as_rows(leaks: list[Leak]) -> list[dict]:
     return [asdict(leak) for leak in leaks]
+
+
+TITLE_BOUNDARY = r"[\w./-]"
+
+
+def _occurs(kind: str, token: str, text: str) -> bool:
+    """Titles and paths match as whole identifiers ("sampling-106.md" does not match inside
+    "token-mint-sampling-106.md"); everything else matches as a substring."""
+    if token not in text:
+        return False
+    if not kind.endswith(("_title", "_path")):
+        return True
+    return re.search(rf"(?<!{TITLE_BOUNDARY}){re.escape(token)}(?![\w-])", text) is not None
+
+
+def _identifiers(versions: list[dict]) -> tuple:
+    found: dict[str, None] = {}
+    for row in versions:
+        for base in (row.get("path"), row.get("location")):
+            if base:
+                found[base] = None
+                if row.get("version"):
+                    found[f"{base}@{row['version']}"] = None
+    return tuple(found)
 
 
 def _hub_rows(hubs_dir: Path) -> dict[str, list[dict]]:

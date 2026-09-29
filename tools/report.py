@@ -12,7 +12,7 @@ from typing import Optional
 from sanctum_eval.budget import serialized_evidence_tokens
 from sanctum_eval.degradation import deltas_vs_none, summarize_run
 from sanctum_eval.gold import GoldCase
-from sanctum_eval.leak_scan import LeakScanner, principals_for
+from sanctum_eval.leak_scan import LeakScanner, principals_for, request_texts_for
 from sanctum_eval.load import load_gold
 from sanctum_eval.stats import DEFAULT_SEED, metric_value, per_family_deltas
 from tools.config_diff import check_runs, load as load_matrix
@@ -45,7 +45,8 @@ class RunView:
         self.releases = sorted({row.get("memory_release_id") or "none"
                                 for row in _read_jsonl(self.dir / "responses.jsonl")})
         self.anomalies = _read_jsonl(self.dir / "anomalies.jsonl")
-        self.leaks = scanner.scan_run(self.dir, principals_for(golds.values(), aliases))
+        self.leaks = scanner.scan_run(self.dir, principals_for(golds.values(), aliases),
+                                      request_texts_for(golds.values()))
         budgets = {gold.request.request_id: gold.request.budget_tokens for gold in golds.values()}
         recounts = [(row["request_id"], serialized_evidence_tokens(row.get("evidence", [])))
                     for row in _read_jsonl(self.dir / "responses.jsonl") if row["request_id"] in budgets]

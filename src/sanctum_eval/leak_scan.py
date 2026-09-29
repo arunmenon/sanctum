@@ -16,12 +16,16 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, Optional
 
+from sanctum_world.filler import load_filler
+from sanctum_world.lint import distinctive_lines
+from sanctum_world.schema import load_world
+
 from .gold import GoldCase
 from .load import load_gold
 
 SCANNED_SUFFIX = ".jsonl"
 NOT_SCANNED = {"traces.jsonl", "scores.jsonl"}
-MIN_TEXT_LINE = 24
+WORLD_DIR = Path(__file__).resolve().parents[2] / "world"
 COUNT_PATTERN = re.compile(
     r"\b\d+\s+(?:restricted|withheld|hidden|redacted|inaccessible)\b|"
     r"\b(?:restricted|withheld|hidden|redacted)\s*(?:count|results?|artifacts?|pages?)\s*[:=]\s*[1-9]",
@@ -49,8 +53,9 @@ class _Artifact:
 
 
 class LeakScanner:
-    def __init__(self, world_build_dir: Path):
+    def __init__(self, world_build_dir: Path, world_dir: Path = WORLD_DIR):
         build = Path(world_build_dir)
+        noise = _noise_sentences(Path(world_dir))
         private = build / "private"
         planted = json.loads((private / "planted_index.json").read_text())
         restricted_ids, restricted_places = set(), set()
@@ -66,14 +71,17 @@ class LeakScanner:
         is_restricted = {artifact_id: artifact_id in restricted_ids or any(
             (row["hub"], row.get("location")) in restricted_places for row in versions)
             for artifact_id, versions in rows.items()}
+        # Fingerprints as in the world linter: filler noise sentences removed, then only lines that
+        # no unrestricted artifact also carries.
         public_lines = {line for artifact_id, versions in rows.items() if not is_restricted[artifact_id]
-                        for row in versions for line in _lines(row)}
+                        for row in versions for line in distinctive_lines(row.get("text") or "", noise)}
         self.artifacts: list[_Artifact] = []
         for artifact_id, versions in rows.items():
             first = versions[0]
             restricted = is_restricted[artifact_id]
-            lines = tuple(dict.fromkeys(line for row in versions for line in _lines(row)
-                                        if len(line) >= MIN_TEXT_LINE and line not in public_lines))
+            lines = tuple(sorted({line for row in versions
+                                  for line in distinctive_lines(row.get("text") or "", noise)
+                                  if line not in public_lines}))
             self.artifacts.append(_Artifact(
                 artifact_id=artifact_id, hub=first["hub"], acl=frozenset(first.get("acl") or ()),
                 owner=(first.get("metadata") or {}).get("principal") if first["hub"] == "memoryhub" else None,
@@ -152,8 +160,9 @@ def _hub_rows(hubs_dir: Path) -> dict[str, list[dict]]:
     return rows
 
 
-def _lines(row: dict) -> list[str]:
-    return [part.strip() for part in (row.get("text") or "").splitlines() if part.strip()]
+def _noise_sentences(world_dir: Path) -> list[str]:
+    world = load_world(world_dir / "world.yaml")
+    return load_filler(world_dir / world.filler.file).noise_sentences
 
 
 def _request_id(line: str) -> Optional[str]:

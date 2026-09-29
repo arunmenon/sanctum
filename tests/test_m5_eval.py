@@ -80,6 +80,16 @@ def test_restricted_text_title_and_count(scanner):
     assert {kind for kind, _ in scanner.scan_text(text, None)} == kinds   # rows with no principal: strictest
 
 
+def test_filler_noise_in_restricted_page_is_not_a_leak(scanner):
+    # shared filler noise from world/filler.yaml, rendered into ~470 artifacts including INC-2291
+    noise = "Load tests ran in the staging cluster overnight. Staging mirrors production configuration where possible."
+    assert scanner.scan_text(json.dumps({"text": noise}), "kestrel-payments") == []
+    assert scanner.scan_text(noise, None) == []
+    restricted = [a for a in scanner.artifacts if a.restricted]
+    assert all(line.strip() and "Load tests ran" not in line for a in restricted for line in a.lines)
+    assert any("Root cause: retry storm amplified by gateway timeouts." in a.lines for a in restricted)
+
+
 def test_unreadable_artifact_ids_and_foreign_memory(scanner):
     identity_code = next(a for a in scanner.artifacts if a.hub == "codehub" and a.acl == {"identity-eng"})
     assert ("artifact_id", identity_code.artifact_id) in scanner.scan_text(identity_code.artifact_id, "kestrel-payments")

@@ -8,12 +8,12 @@ Ranker: `lexical_smoke` in every arm; the B* cross-encoder profile is deferred (
 
 | config | run | world sha256 | seed | memory release | failure profile | git commit | dirty | integrity |
 |---|---|---|---|---|---|---|---|---|
-| C1-naive | `C1-naive` | `452b57d9686b` | 20260930 | none | none | `1b720dfffe` | True | True |
-| C1-fair | `C1-fair` | `452b57d9686b` | 20260930 | none | none | `1b720dfffe` | True | True |
-| C2 | `C2` | `452b57d9686b` | 20260930 | none | none | `1b720dfffe` | True | True |
-| C4 | `C4` | `452b57d9686b` | 20260930 | r1 | none | `1b720dfffe` | True | True |
-| C4a-equivalent | `C4a-equivalent` | `452b57d9686b` | 20260930 | r1 | none | `1b720dfffe` | True | True |
-| C4a-label-only | `C4a-label-only` | `452b57d9686b` | 20260930 | r1 | none | `1b720dfffe` | True | True |
+| C1-naive | `C1-naive` | `452b57d9686b` | 20260930 | none | none | `00fc963fe1` | False | True |
+| C1-fair | `C1-fair` | `452b57d9686b` | 20260930 | none | none | `00fc963fe1` | False | True |
+| C2 | `C2` | `452b57d9686b` | 20260930 | none | none | `00fc963fe1` | False | True |
+| C4 | `C4` | `452b57d9686b` | 20260930 | r1 | none | `00fc963fe1` | False | True |
+| C4a-equivalent | `C4a-equivalent` | `452b57d9686b` | 20260930 | r1 | none | `00fc963fe1` | False | True |
+| C4a-label-only | `C4a-label-only` | `452b57d9686b` | 20260930 | r1 | none | `00fc963fe1` | False | True |
 
 ## Config matrix
 
@@ -28,14 +28,14 @@ Ranker: `lexical_smoke` in every arm; the B* cross-encoder profile is deferred (
 
 ## Gates (pass/fail, never averaged)
 
-| config | leakage | scope | wrong_entity |
-|---|---|---|---|
-| C1-naive | PASS | PASS | PASS |
-| C1-fair | PASS | PASS | PASS |
-| C2 | PASS | PASS | PASS |
-| C4 | PASS | PASS | PASS |
-| C4a-equivalent | PASS | PASS | PASS |
-| C4a-label-only | PASS | PASS | **FAIL** |
+| config | leakage | scope | wrong_entity | budget |
+|---|---|---|---|---|
+| C1-naive | PASS | PASS | PASS | PASS |
+| C1-fair | PASS | PASS | PASS | PASS |
+| C2 | PASS | PASS | PASS | PASS |
+| C4 | PASS | PASS | PASS | PASS |
+| C4a-equivalent | PASS | PASS | PASS | PASS |
+| C4a-label-only | PASS | PASS | **FAIL** | PASS |
 
 ## Per-family results
 

@@ -8,10 +8,10 @@ Ranker: `lexical_smoke` in every arm; the B* cross-encoder profile is deferred (
 
 | config | run | world sha256 | seed | memory release | failure profile | git commit | dirty | integrity |
 |---|---|---|---|---|---|---|---|---|
-| C1-fair | `C1-fair` | `452b57d9686b` | 20260930 | none | none | `90c11dd580` | True | True |
-| C2 | `C2` | `452b57d9686b` | 20260930 | none | none | `90c11dd580` | True | True |
-| C4 | `C4` | `452b57d9686b` | 20260930 | r1 | none | `90c11dd580` | True | True |
-| C4a-equivalent | `C4a-equivalent` | `452b57d9686b` | 20260930 | r1 | none | `90c11dd580` | True | True |
+| C1-fair | `C1-fair` | `452b57d9686b` | 20260930 | none | none | `00fc963fe1` | True | True |
+| C2 | `C2` | `452b57d9686b` | 20260930 | none | none | `00fc963fe1` | True | True |
+| C4 | `C4` | `452b57d9686b` | 20260930 | r1 | none | `00fc963fe1` | True | True |
+| C4a-equivalent | `C4a-equivalent` | `452b57d9686b` | 20260930 | r1 | none | `00fc963fe1` | True | True |
 
 ## Config matrix
 
@@ -24,12 +24,12 @@ Ranker: `lexical_smoke` in every arm; the B* cross-encoder profile is deferred (
 
 ## Gates (pass/fail, never averaged)
 
-| config | leakage | scope | wrong_entity |
-|---|---|---|---|
-| C1-fair | PASS | PASS | PASS |
-| C2 | PASS | PASS | PASS |
-| C4 | PASS | PASS | PASS |
-| C4a-equivalent | PASS | PASS | PASS |
+| config | leakage | scope | wrong_entity | budget |
+|---|---|---|---|---|
+| C1-fair | PASS | PASS | PASS | PASS |
+| C2 | PASS | PASS | PASS | PASS |
+| C4 | PASS | PASS | PASS | PASS |
+| C4a-equivalent | PASS | PASS | PASS | PASS |
 
 ## Per-family results
 
@@ -196,72 +196,72 @@ Ranker: `lexical_smoke` in every arm; the B* cross-encoder profile is deferred (
 ## Failures
 
 **C1-fair**: 13 of 40 cases not safe-grounded-successful
-- h-009 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L9)
-- h-013 (same_name_two_meanings): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L13)
-- h-017 (historical): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L17)
-- h-018 (historical): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L18)
-- h-019 (historical): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L19)
-- h-020 (historical): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L20)
-- h-021 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L21)
-- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L23)
-- h-027 (verify_claim): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L27)
-- h-028 (vague): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L28)
-- h-029 (vague): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L29)
-- h-032 (no_source): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L32)
-- h-033 (no_source): quality [receipt](../../runs/holdout-m5/C1-fair/receipts.jsonl#L33)
+- h-009 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L9)
+- h-013 (same_name_two_meanings): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L13)
+- h-017 (historical): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L17)
+- h-018 (historical): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L18)
+- h-019 (historical): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L19)
+- h-020 (historical): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L20)
+- h-021 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L21)
+- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L23)
+- h-027 (verify_claim): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L27)
+- h-028 (vague): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L28)
+- h-029 (vague): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L29)
+- h-032 (no_source): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L32)
+- h-033 (no_source): quality [receipt](../../runs/holdout-m5b/C1-fair/receipts.jsonl#L33)
 
 **C2**: 20 of 40 cases not safe-grounded-successful
-- h-005 (named_service): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L5)
-- h-007 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L7)
-- h-008 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L8)
-- h-009 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L9)
-- h-012 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L12)
-- h-013 (same_name_two_meanings): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L13)
-- h-017 (historical): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L17)
-- h-018 (historical): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L18)
-- h-019 (historical): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L19)
-- h-020 (historical): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L20)
-- h-021 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L21)
-- h-022 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L22)
-- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L23)
-- h-027 (verify_claim): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L27)
-- h-028 (vague): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L28)
-- h-029 (vague): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L29)
-- h-033 (no_source): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L33)
-- h-034 (multi_hub): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L34)
-- h-035 (multi_hub): quality [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L35)
-- h-037 (multi_hub): mandatory_source [receipt](../../runs/holdout-m5/C2/receipts.jsonl#L37)
+- h-005 (named_service): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L5)
+- h-007 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L7)
+- h-008 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L8)
+- h-009 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L9)
+- h-012 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L12)
+- h-013 (same_name_two_meanings): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L13)
+- h-017 (historical): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L17)
+- h-018 (historical): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L18)
+- h-019 (historical): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L19)
+- h-020 (historical): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L20)
+- h-021 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L21)
+- h-022 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L22)
+- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L23)
+- h-027 (verify_claim): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L27)
+- h-028 (vague): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L28)
+- h-029 (vague): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L29)
+- h-033 (no_source): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L33)
+- h-034 (multi_hub): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L34)
+- h-035 (multi_hub): quality [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L35)
+- h-037 (multi_hub): mandatory_source [receipt](../../runs/holdout-m5b/C2/receipts.jsonl#L37)
 
 **C4**: 14 of 40 cases not safe-grounded-successful
-- h-006 (named_service): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L6)
-- h-007 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L7)
-- h-017 (historical): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L17)
-- h-018 (historical): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L18)
-- h-019 (historical): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L19)
-- h-020 (historical): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L20)
-- h-022 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L22)
-- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L23)
-- h-028 (vague): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L28)
-- h-029 (vague): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L29)
-- h-033 (no_source): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L33)
-- h-037 (multi_hub): mandatory_source [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L37)
-- h-038 (restricted_content): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L38)
-- h-040 (restricted_content): quality [receipt](../../runs/holdout-m5/C4/receipts.jsonl#L40)
+- h-006 (named_service): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L6)
+- h-007 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L7)
+- h-017 (historical): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L17)
+- h-018 (historical): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L18)
+- h-019 (historical): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L19)
+- h-020 (historical): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L20)
+- h-022 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L22)
+- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L23)
+- h-028 (vague): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L28)
+- h-029 (vague): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L29)
+- h-033 (no_source): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L33)
+- h-037 (multi_hub): mandatory_source [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L37)
+- h-038 (restricted_content): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L38)
+- h-040 (restricted_content): quality [receipt](../../runs/holdout-m5b/C4/receipts.jsonl#L40)
 
 **C4a-equivalent**: 14 of 40 cases not safe-grounded-successful
-- h-006 (named_service): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L6)
-- h-007 (hub_specific_name): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L7)
-- h-017 (historical): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L17)
-- h-018 (historical): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L18)
-- h-019 (historical): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L19)
-- h-020 (historical): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L20)
-- h-022 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L22)
-- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L23)
-- h-028 (vague): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L28)
-- h-029 (vague): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L29)
-- h-033 (no_source): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L33)
-- h-037 (multi_hub): mandatory_source [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L37)
-- h-038 (restricted_content): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L38)
-- h-040 (restricted_content): quality [receipt](../../runs/holdout-m5/C4a-equivalent/receipts.jsonl#L40)
+- h-006 (named_service): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L6)
+- h-007 (hub_specific_name): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L7)
+- h-017 (historical): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L17)
+- h-018 (historical): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L18)
+- h-019 (historical): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L19)
+- h-020 (historical): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L20)
+- h-022 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L22)
+- h-023 (conflicting_sources): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L23)
+- h-028 (vague): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L28)
+- h-029 (vague): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L29)
+- h-033 (no_source): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L33)
+- h-037 (multi_hub): mandatory_source [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L37)
+- h-038 (restricted_content): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L38)
+- h-040 (restricted_content): quality [receipt](../../runs/holdout-m5b/C4a-equivalent/receipts.jsonl#L40)
 
 > SYNTHETIC, NOT PRODUCTION EVIDENCE. 60 dev + 40 holdout questions support directional results and debugging only, not population estimates.

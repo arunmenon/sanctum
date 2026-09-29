@@ -1,0 +1,11 @@
+id: h-028
+family: vague
+principal: kestrel-both
+text: how many retrys do we do
+mode: explore
+entities:
+- svc.payment-auth
+- svc.identity-auth
+attributes:
+- max_retries
+expected_ambiguity: clarify

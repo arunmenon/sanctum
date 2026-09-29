@@ -1,0 +1,11 @@
+id: h-011
+family: hub_specific_name
+principal: kestrel-both
+text: 'Edge Gateway: how long do we wait on upstream before giving up?'
+mode: scoped
+name:
+  native: Edge Gateway
+  hub: skillhub
+  namespace: Platform
+attributes:
+- upstream_timeout_ms

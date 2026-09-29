@@ -1,0 +1,10 @@
+id: h-003
+family: named_service
+principal: kestrel-both
+text: what's the upstream timeout on the gateway edge service in prod
+mode: scoped
+environment: prod
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms

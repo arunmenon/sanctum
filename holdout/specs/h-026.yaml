@@ -1,0 +1,9 @@
+id: h-026
+family: verify_claim
+principal: kestrel-identity
+text: Can you confirm accounts lock after 6 failed sign in attempts?
+mode: verify
+entities:
+- svc.identity-auth
+attributes:
+- lockout_threshold

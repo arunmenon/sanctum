@@ -1,0 +1,19 @@
+manifest_version: 1
+hub_id: codehub
+owner: code-platform-owners
+evidence_kind: code
+role: implemented_behavior
+authority:                        # HLD §7.2: authority is per fact kind
+  implementation: authoritative
+  reference: non_authoritative
+search: {tool: search_code, place_filter: repo, version_filter: ref}
+fetch: {tool: get_file, id_field: path, id_argument: path, version_argument: ref}
+versions:
+  semantics: release              # versions name releases; as_of may name one
+  releases: [R40, R41, R42]
+  environment_refs: {experiment: exp-branch}
+  branch_by_environment: {prod: main, experiment: exp-branch}
+places:
+  - {prefix: "repo:payments/", groups: [payments-eng, payments-code], domain: payments}
+  - {prefix: "repo:identity/", groups: [identity-eng], domain: identity}
+  - {prefix: "repo:platform/", groups: [platform-eng], domain: platform}

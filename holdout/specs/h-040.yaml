@@ -1,0 +1,11 @@
+id: h-040
+family: restricted_content
+principal: kestrel-payments
+text: what caused the payment auth retry storm incident, postmortem details pls
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- root_cause
+fact_kinds:
+- incident

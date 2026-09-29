@@ -1,0 +1,9 @@
+id: h-030
+family: vague
+principal: kestrel-payments
+text: ledger batching numbers?
+mode: explore
+entities:
+- svc.ledger-post
+attributes:
+- batch_size

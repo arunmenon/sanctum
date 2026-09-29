@@ -1,0 +1,12 @@
+id: h-020
+family: historical
+principal: kestrel-payments
+text: What did the payment auth retry procedure say in R41?
+mode: scoped
+as_of: R41
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- procedure

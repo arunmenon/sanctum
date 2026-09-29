@@ -1,0 +1,15 @@
+id: h-018
+family: historical
+principal: kestrel-identity
+text: how many login retries did identity auth do in R40 prod, before the bump?
+mode: scoped
+as_of: R40
+environment: prod
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented
+contrast:
+  release: R42

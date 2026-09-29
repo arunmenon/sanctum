@@ -1,0 +1,12 @@
+id: h-027
+family: verify_claim
+principal: kestrel-both
+text: someone said edge gateway timeout is 1500ms in prod, is that still true?
+mode: verify
+environment: prod
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms
+fact_kinds:
+- implemented

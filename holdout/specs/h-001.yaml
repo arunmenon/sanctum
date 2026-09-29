@@ -1,0 +1,9 @@
+id: h-001
+family: named_service
+principal: kestrel-payments
+text: whats the replay window for failed ledger postings?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- replay_window_minutes

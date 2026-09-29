@@ -1,0 +1,9 @@
+id: h-021
+family: conflicting_sources
+principal: kestrel-payments
+text: does the payment auth retry code actually match the runbook?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

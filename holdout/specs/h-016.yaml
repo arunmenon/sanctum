@@ -1,0 +1,13 @@
+id: h-016
+family: same_name_two_meanings
+principal: kestrel-both
+text: What does the Identity Auth Service runbook say about retry count?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+  namespace: Identity
+attributes:
+- max_retries
+fact_kinds:
+- procedure

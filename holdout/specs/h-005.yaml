@@ -1,0 +1,12 @@
+id: h-005
+family: named_service
+principal: kestrel-identity
+text: how many times does the identity auth code retry login backend calls in prod?
+mode: scoped
+environment: prod
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

@@ -1,0 +1,9 @@
+id: h-033
+family: no_source
+principal: kestrel-both
+text: what was the fx quote lifetime back in R40, before they changed it?
+mode: scoped
+as_of: R40
+environment: prod
+entities: [svc.fx-quote]
+attributes: [quote_ttl_seconds]

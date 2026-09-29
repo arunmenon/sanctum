@@ -1,0 +1,10 @@
+id: h-014
+family: same_name_two_meanings
+principal: kestrel-payments
+text: How many retries does Auth Service allow before we fail it?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries

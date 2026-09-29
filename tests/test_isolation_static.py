@@ -17,6 +17,7 @@ RULES = {
     "sanctum_eval": {"forbid_imports": {"sanctum_stub", "sut_ref"}},
     "sanctum_hubs": {"forbid_imports": {"sanctum_eval", "sanctum_world", "sanctum_stub", "sanctum_run"}},
     "sanctum_run": {"forbid_imports": {"sanctum_world"}},
+    "sanctum_ref": {"forbid_imports": {"sanctum_eval", "sanctum_world", "sanctum_stub", "sanctum_run", "sanctum_hubs", "gen", "world"}},
 }
 FORBIDDEN_LITERALS_RUNTIME = (
     "gold/", "gold\\", "world.yaml", "filler.yaml", "world/templates", "build/world",
@@ -98,3 +99,36 @@ def test_request_ids_do_not_encode_cases():
         g = yaml.safe_load(f.read_text())
         rid = g["request"]["request_id"]
         assert g["case_id"] not in rid and g["family"] not in rid
+
+
+# sanctum_ref (M3): the SUT imports only contracts, the standard library and its pinned runtime
+# (mcp and its anyio, pydantic, pyyaml, tiktoken). It must never import evaluator, world, stub,
+# runner or hub internals, and never name gold, world, holdout, question-spec or private paths.
+import sys as _sys
+
+SANCTUM_REF_ALLOWED = {"sanctum_contracts", "sanctum_ref", "mcp", "anyio", "pydantic", "yaml", "tiktoken", "__future__"}
+FORBIDDEN_LITERALS_REF = ("gold/", "gold\\", "world.yaml", "world/", "build/world", "private/", "holdout",
+                          "questions/", "provenance.jsonl", "entity_refs.json", "tests/fixtures",
+                          "principals.json", "SANCTUM_LAB_TOKEN_SECRET")
+
+
+def test_sanctum_ref_imports_are_allowlisted():
+    stdlib = set(_sys.stdlib_module_names)
+    for f in (SRC / "sanctum_ref").rglob("*.py"):
+        extra = {name for name in _imports(f) if name not in stdlib} - SANCTUM_REF_ALLOWED
+        assert not extra, f"{f.relative_to(ROOT)} imports {extra}"
+        assert not _imports(f) & {"sanctum_eval", "sanctum_world", "sanctum_stub", "sanctum_run", "sanctum_hubs"}
+
+
+def test_sanctum_ref_names_no_evaluator_paths():
+    for f in list((SRC / "sanctum_ref").rglob("*")) + list((ROOT / "owners").rglob("*")):
+        if f.is_file() and f.suffix in {".py", ".json", ".yaml", ".md"}:
+            text = f.read_text()
+            for lit in FORBIDDEN_LITERALS_REF:
+                assert lit not in text, f"{f.relative_to(ROOT)} mentions {lit!r}"
+
+
+def test_nothing_imports_sanctum_ref_but_tools_and_tests():
+    for pkg in ("sanctum_contracts", "sanctum_eval", "sanctum_hubs", "sanctum_run", "sanctum_stub", "sanctum_world"):
+        for f in (SRC / pkg).rglob("*.py"):
+            assert "sanctum_ref" not in _imports(f), f"{f.relative_to(ROOT)} imports sanctum_ref"

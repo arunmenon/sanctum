@@ -7,7 +7,7 @@ experiment definition.** M1 adds the synthetic world: one authored ground-truth 
 deterministic renderer into per-hub corpora, a world linter, and gold derived from the
 world. M2 serves the rendered corpora as simulated hubs over MCP (token service, query-time
 ACLs, version reads, seeded failure knobs, lab admin API) and adds a runner that observes
-every hub call itself. No reference SUT exists yet (M3).
+every hub call itself. M3 adds `sanctum_ref` (C1-naive, C1-fair, C2), run out of process behind a gateway proxy.
 
 > Every result this repo produces is **SYNTHETIC — NOT PRODUCTION EVIDENCE**.
 
@@ -19,7 +19,11 @@ src/sanctum_eval/        independent evaluator: private gold model, metrics, obs
 src/sanctum_stub/        independent stub SUT with canned responses (proves the evaluator is scoreable)
 src/sanctum_hubs/        simulated hubs (M2): corpus store, FTS5 index, ACLs, versions, MCP servers,
                          token service, failure knobs, lab admin API, change feed (reads build/world/hubs only)
-src/sanctum_run/         runner (M2, evaluator side): HubGateway, SUT protocol, observed traces, run output
+src/sanctum_run/         runner (M2, evaluator side): HubGateway, SUT protocol, observed traces, run output;
+                         M3: gateway proxy (proxy.py) and out-of-process SUT launcher (process_sut.py)
+src/sanctum_ref/         reference Sanctum (M3): C1-naive, C1-fair, C2; runs as its own process, reaches
+                         hubs only through the gateway proxy (discrepancy register 16)
+owners/manifests/        owner manifests (registry): authority per fact kind, places, must-consult
 src/sanctum_world/       world schema, seeded renderer, filler, linter, gold derivation (evaluator side)
 world/world.yaml         authored ground truth: services, releases, principals, facts, hub names, planted situations
 world/filler.yaml        filler services, artifact counts per hub, noise vocabulary
@@ -38,14 +42,15 @@ docs/                    measurement plan, scenario register, capability matrix,
 tools/                   schema export, config diff, M0 fixture builder, M0 scoring, world build/lint, gold derivation
 ```
 
-Planned later (not present): `gen/`, `owners/`, `sut_ref/`.
+Planned later (not present): `gen/`, `owners/memory_seed/`.
 
 ## Boundaries (enforced by tests at M0; by runtime images from M1)
 
 | Package | May import | Must never see |
 |---|---|---|
 | `sanctum_contracts` | stdlib, pydantic, pyyaml | anything else in this repo |
-| `sanctum_stub` / future `sut_ref` | `sanctum_contracts` | `sanctum_eval`, `sanctum_world`, `gold/`, `world/`, `build/world/private`, traces |
+| `sanctum_ref` | `sanctum_contracts`, stdlib, `mcp` (with its `anyio`), pydantic, pyyaml, tiktoken | `sanctum_eval`, `sanctum_world`, `sanctum_stub`, `sanctum_run`, `sanctum_hubs`, `gold/`, `world/`, `build/world`, holdout, question specs |
+| `sanctum_stub` | `sanctum_contracts` | `sanctum_eval`, `sanctum_world`, `gold/`, `world/`, `build/world/private`, traces |
 | `sanctum_world` | `sanctum_eval` (gold model), stdlib, pydantic, pyyaml | nothing runtime-side; runtime packages must not import it |
 | `sanctum_eval` | `sanctum_contracts` | `sanctum_stub`, `sut_ref` internals |
 | `sanctum_hubs` | `sanctum_contracts`, pydantic, pyyaml, mcp | `sanctum_eval`, `sanctum_world`, `sanctum_stub`, `sanctum_run`, `private/`, `world.yaml`, `gold/` |
@@ -98,6 +103,20 @@ Linter rules: `planted_missing`, `fact_unasserted`, `coverage_gap_asserted`, `sp
 `restricted_leak`, `vocabulary_leak`, `private_id_leak`, `filler_collision` (see
 `src/sanctum_world/lint.py`). The leak scan reads only the exact identifiers listed under
 `build/world/private/`.
+
+### M3: sanctum-ref
+
+`<u>` gains `--with tiktoken==0.9.0` (discrepancy register row 9).
+
+```bash
+PYTHONPATH=src:. <u> python tools/run_lab.py --sut ref --config C2 --cases gold/scenarios --out runs/m3-c2
+PYTHONPATH=src:. <u> python tools/run_lab.py --sut ref --config C1-fair --cases gold/dev --out runs/m3-c1fair
+<u> python -m pytest -q tests/scenarios                     # EX-01..04, 06..10, FX-24 on C2; EX-09c/d
+```
+
+`--sut ref` launches `python -m sanctum_ref` as a child process with no secrets in its
+environment; `sanctum.retrieve` travels over its stdio and hub calls over two inherited pipes to
+the runner's gateway proxy. Receipts carry the `config_id`.
 
 ## M0 exit criteria (lab plan revised §10)
 

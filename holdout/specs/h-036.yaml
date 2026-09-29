@@ -1,0 +1,10 @@
+id: h-036
+family: multi_hub
+principal: kestrel-identity
+text: 'identity auth: login retry limit and the lockout threshold, both please'
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+- lockout_threshold

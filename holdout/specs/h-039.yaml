@@ -1,0 +1,11 @@
+id: h-039
+family: restricted_content
+principal: kestrel-both
+text: How many duplicate postings did the ledger replay incident cause?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- duplicate_postings
+fact_kinds:
+- incident

@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from contextlib import AsyncExitStack
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Optional
@@ -122,7 +123,11 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     token_service = TokenService(config.world_build_dir / "identity" / "principals.json", config.token_secret)
     responses, receipts, traces, scores = [], [], [], []
     async with HubGateway(config.world_build_dir, hub_ids, token_service, _failure_injector(config),
-                          config.token_mode) as gateway:
+                          config.token_mode) as gateway, AsyncExitStack() as sut_stack:
+        # An out-of-process SUT (`process_sut.ProcessSUT`) starts its process and gateway proxy here.
+        open_sut = getattr(sut, "open", None)
+        if open_sut is not None:
+            await sut_stack.enter_async_context(open_sut(gateway, config.world_build_dir))
         for gold in cases:
             request = public_request(gold)
             principal = (config.principal_aliases or {}).get(gold.principal, gold.principal)
@@ -138,7 +143,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
             receipts.append(receipt.model_dump(mode="json"))
             traces.append(trace.model_dump(mode="json"))
             scores.append(score_case(gold, response, receipt, trace))
-        anomalies = gateway.anomalies()
+        anomalies = gateway.anomalies() + list(getattr(sut, "anomalies", lambda: [])())
 
     out_dir = Path(config.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,10 @@
+id: h-031
+family: no_source
+principal: kestrel-payments
+text: what's the fx quote ttl in prod
+mode: scoped
+environment: prod
+entities:
+- svc.fx-quote
+attributes:
+- quote_ttl_seconds

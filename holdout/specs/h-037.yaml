@@ -1,0 +1,10 @@
+id: h-037
+family: multi_hub
+principal: kestrel-payments
+text: Ledger posting batch size and replay window?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+- replay_window_minutes

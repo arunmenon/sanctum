@@ -1,0 +1,13 @@
+manifest_version: 1
+hub_id: memoryhub
+owner: agent-memory-owners
+evidence_kind: memory
+role: session_history
+authority:
+  session_history: authoritative  # what happened in prior sessions, never facts about systems
+search: {tool: search_sessions}
+fetch: {tool: get_session, id_field: artifact_id, id_argument: id}
+versions:
+  semantics: none
+places:
+  - {prefix: "", groups: [payments-eng, identity-eng, platform-eng], domain: any}

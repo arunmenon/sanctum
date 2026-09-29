@@ -1,0 +1,11 @@
+id: h-034
+family: multi_hub
+principal: kestrel-payments
+text: For payment auth, what's the prod retry cap and the backoff between tries?
+mode: scoped
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+- backoff_schedule_ms

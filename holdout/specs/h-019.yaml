@@ -1,0 +1,13 @@
+id: h-019
+family: historical
+principal: kestrel-both
+text: Edge gateway upstream timeout as of R40?
+mode: scoped
+as_of: R40
+environment: prod
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms
+contrast:
+  release: R42

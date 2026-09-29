@@ -1,0 +1,11 @@
+id: h-035
+family: multi_hub
+principal: kestrel-both
+text: edgegw timeout value plus who signs off on changing it
+mode: scoped
+name:
+  native: edgegw
+  hub: memoryhub
+attributes:
+- upstream_timeout_ms
+- timeout_change_approver

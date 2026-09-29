@@ -1,0 +1,13 @@
+id: h-017
+family: historical
+principal: kestrel-payments
+text: What was the ledger posting batch size back in R40?
+mode: scoped
+as_of: R40
+environment: prod
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+contrast:
+  release: R42

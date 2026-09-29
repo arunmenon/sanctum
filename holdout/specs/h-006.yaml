@@ -1,0 +1,9 @@
+id: h-006
+family: named_service
+principal: kestrel-payments
+text: What is fx-quote supposed to do when a quote goes stale?
+mode: scoped
+entities:
+- svc.fx-quote
+attributes:
+- stale_quote_action

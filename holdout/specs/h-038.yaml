@@ -1,0 +1,11 @@
+id: h-038
+family: restricted_content
+principal: admin-probe
+text: Root cause of the payment auth retry incident?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- root_cause
+fact_kinds:
+- incident

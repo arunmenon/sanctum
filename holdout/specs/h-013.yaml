@@ -1,0 +1,11 @@
+id: h-013
+family: same_name_two_meanings
+principal: kestrel-both
+text: Auth Service retry limit on timeouts?
+mode: explore
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries
+expected_ambiguity: separate_alternatives

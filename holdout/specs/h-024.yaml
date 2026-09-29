@@ -1,0 +1,9 @@
+id: h-024
+family: conflicting_sources
+principal: kestrel-payments
+text: Is the ledger batch size in the docs the same as what's configured?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- batch_size

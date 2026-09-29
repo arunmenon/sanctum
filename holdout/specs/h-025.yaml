@@ -1,0 +1,12 @@
+id: h-025
+family: verify_claim
+principal: kestrel-payments
+text: 'Verify: payment auth retries gateway timeouts up to 3 times in prod.'
+mode: verify
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

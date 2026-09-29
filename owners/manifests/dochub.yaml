@@ -1,0 +1,13 @@
+manifest_version: 1
+hub_id: dochub
+owner: docs-owners
+evidence_kind: doc
+role: reference
+authority:
+  reference: non_authoritative    # KaaS-like: nothing authoritative by default
+search: {tool: search, place_filter: space}
+fetch: {tool: get_page, id_field: artifact_id, id_argument: page_id, version_argument: version}
+versions:
+  semantics: revision             # page revisions; space:PA keeps none (capabilities.json)
+places:
+  - {prefix: "space:", groups: [payments-eng, identity-eng, platform-eng], domain: any}

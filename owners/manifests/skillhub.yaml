@@ -1,0 +1,29 @@
+manifest_version: 1
+hub_id: skillhub
+owner: skill-stewards
+evidence_kind: skill
+role: intended_procedure
+authority:
+  procedure: authoritative        # PR-reviewed skills own "how it is supposed to work"
+search: {tool: search_skills, place_filter: path_prefix}
+fetch: {tool: get_skill, id_field: path, id_argument: path, version_argument: version}
+versions:
+  semantics: revision             # skill revisions, not releases: as_of cannot be mapped
+places:
+  - {prefix: "skills/payments/", groups: [payments-eng], domain: payments}
+  - {prefix: "skills/identity/", groups: [identity-eng], domain: identity}
+  - {prefix: "skills/platform/", groups: [platform-eng], domain: platform}
+  - {prefix: "skills/shared/", groups: [identity-eng, payments-eng], domain: shared}
+procedures:                       # HLD §9.4 grammar: allowlisted triggers and actions only
+  - procedure_id: proc-payments-procedure-must-consult
+    version: 1
+    status: accepted
+    owner: sanctum-platform
+    attested_by: payments-skill-stewards
+    trigger: {domain: payments, fact_kind_needed: procedure}
+    action: {must_consult: skillhub, selector: {path_prefix: "skills/payments/"}}
+domains:                          # words used in the Payments namespace skill names (list_tree, skill headers)
+  payments: [payment, payments, card, vault, ledger, settlement, refund, refunds, chargeback,
+             payout, invoice, billing, tax, fx, merchant, risk, authorization, checkout]
+  identity: [identity, consent, directory, mfa, password, profile, session, token, audit]
+  platform: [platform, archive, dns, flags, scheduler, metrics, queue, rate, limiter, gateway, edge]

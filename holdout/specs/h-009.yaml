@@ -1,0 +1,10 @@
+id: h-009
+family: hub_specific_name
+principal: kestrel-both
+text: edgegw upstream timout right now?
+mode: scoped
+name:
+  native: edgegw
+  hub: memoryhub
+attributes:
+- upstream_timeout_ms

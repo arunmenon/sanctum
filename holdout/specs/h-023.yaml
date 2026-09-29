@@ -1,0 +1,10 @@
+id: h-023
+family: conflicting_sources
+principal: kestrel-both
+text: 'PA-svc retries: code vs the written procedure, which number is right?'
+mode: scoped
+name:
+  native: PA-svc
+  hub: memoryhub
+attributes:
+- max_retries

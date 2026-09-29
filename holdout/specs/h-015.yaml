@@ -1,0 +1,10 @@
+id: h-015
+family: same_name_two_meanings
+principal: kestrel-identity
+text: Auth Service retries - what's the max?
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries

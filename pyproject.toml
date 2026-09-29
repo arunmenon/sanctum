@@ -9,11 +9,13 @@ dependencies = [
   # Newest mcp that installs with pydantic 2.9.2; mcp>=1.13 needs pydantic>=2.11, which
   # changes the frozen JSON schemas (discrepancy register row 10).
   "mcp==1.12.4",
+  # cl100k_base token counts for budgets (discrepancy register row 9). The encoding file is
+  # fetched once into tiktoken's cache (TIKTOKEN_CACHE_DIR to pin its location offline).
+  "tiktoken==0.9.0",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest==8.3.3"]
-# tokenizer = ["tiktoken==<pin at M3>"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]

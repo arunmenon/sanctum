@@ -1,0 +1,11 @@
+id: h-032
+family: no_source
+principal: kestrel-payments
+text: 'FX Quote skill: what do we do with stale quotes exactly?'
+mode: scoped
+name:
+  native: FX Quote
+  hub: skillhub
+  namespace: Payments
+attributes:
+- stale_quote_action

@@ -13,8 +13,9 @@ must name the bound principal, or the call is recorded `denied` with `audience_v
 In-process SUTs are trusted code (discrepancy register): Python cannot stop a SUT from
 walking object graphs to the token service. The gateway therefore watches the token service
 while a SUT call is in flight, and any issuance or exchange it did not make itself is kept as
-an anomaly (`anomalies()`) that fails the run's integrity check. From M3 the SUT runs out of
-process and reaches hubs only through an MCP gateway proxy that holds the secrets.
+an anomaly (`anomalies()`) that fails the run's integrity check. From M3 `sanctum_ref` runs
+out of process (`process_sut.ProcessSUT`) and reaches hubs only through the MCP gateway proxy
+(`proxy.GatewayProxy`), which stays in this process with the secrets.
 
 Outcome mapping:
 - token exchange refused or token service unavailable: `denied`, no hub call is made (fail
@@ -179,6 +180,25 @@ class HubGateway:
     def _audience_valid(self, hub_token: Optional[str]) -> bool:
         """Only an exchanged token is scoped to the hub; a passthrough token has `aud == sanctum`."""
         return self._token_mode is TokenMode.EXCHANGE and bool(hub_token)
+
+    async def list_hub_tools(self, hub_id: str) -> list[Any]:
+        """The hub's MCP tool definitions (for the gateway proxy's tool list)."""
+        return list((await self._sessions[hub_id].list_tools()).tools)
+
+    def caller_groups(self, request_id: str) -> Optional[list[str]]:
+        """The verified access groups of the request's bound caller token (never the principal),
+        or None when the token is invalid or the token service is down (fail closed)."""
+        caller_token, _principal = self._bindings.get(request_id, (None, None))
+        if not getattr(self._token_service, "available", True):
+            return None
+        try:
+            return list(self._token_service.verify(caller_token, CALLER_AUDIENCE).groups)
+        except TokenRejected:
+            return None
+
+    def record_refused(self, request_id: str, hub_id: str, tool: str) -> None:
+        """A call the proxy refused before it reached the gateway (binding mismatch)."""
+        self._record(request_id, hub_id, tool, "denied", False)
 
     def _denied(self, request_id: str, hub_id: str, tool: str) -> dict[str, Any]:
         self._record(request_id, hub_id, tool, "denied", False)

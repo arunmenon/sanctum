@@ -1,0 +1,9 @@
+id: h-029
+family: vague
+principal: kestrel-both
+text: timeout for the gateway thing?
+mode: explore
+entities:
+- svc.gateway-edge
+attributes:
+- upstream_timeout_ms

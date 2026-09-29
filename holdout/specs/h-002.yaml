@@ -1,0 +1,9 @@
+id: h-002
+family: named_service
+principal: kestrel-identity
+text: How many failed sign-ins before identity auth locks the account?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- lockout_threshold

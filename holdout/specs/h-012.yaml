@@ -1,0 +1,10 @@
+id: h-012
+family: hub_specific_name
+principal: kestrel-payments
+text: PA-svc backoff between attempts, what are the delays?
+mode: scoped
+name:
+  native: PA-svc
+  hub: memoryhub
+attributes:
+- backoff_schedule_ms

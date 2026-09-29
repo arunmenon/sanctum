@@ -1,0 +1,12 @@
+id: h-010
+family: hub_specific_name
+principal: kestrel-payments
+text: For the Ledger Posting skill, how old can a failed posting be and still get
+  replayed?
+mode: scoped
+name:
+  native: Ledger Posting
+  hub: skillhub
+  namespace: Payments
+attributes:
+- replay_window_minutes

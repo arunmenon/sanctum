@@ -1,0 +1,11 @@
+id: h-007
+family: hub_specific_name
+principal: kestrel-payments
+text: ledgerd batch size in prod?
+mode: scoped
+environment: prod
+name:
+  native: ledgerd
+  hub: memoryhub
+attributes:
+- batch_size

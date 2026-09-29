@@ -1,0 +1,49 @@
+case_id: h-002
+bundle_id: b-h-002
+family: named_service
+request:
+  schema_version: '1.0'
+  request_id: req-cfd7ce8984fd3206
+  query: How many failed sign-ins before identity auth locks the account?
+  mode: scoped
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-identity
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-5bf846464b
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: dochub
+      artifact_id: art-01c06c5b70
+      version: v2
+      start: 56
+      end: 57
+  - spans:
+    - source_id: memoryhub
+      artifact_id: art-dbfaac1fae
+      version: current
+      start: 87
+      end: 88
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities:
+  - ent-ecead3bb8a
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status: {}

@@ -1,0 +1,9 @@
+id: h-022
+family: conflicting_sources
+principal: kestrel-identity
+text: Are the identity login retry docs out of sync with the code?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- max_retries

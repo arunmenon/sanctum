@@ -1,0 +1,10 @@
+id: h-008
+family: hub_specific_name
+principal: kestrel-identity
+text: what's the idauth lockout threshold
+mode: scoped
+name:
+  native: idauth
+  hub: memoryhub
+attributes:
+- lockout_threshold

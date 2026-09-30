@@ -68,6 +68,13 @@ def descriptor_release(descriptors: dict[str, Any]) -> str:
     return "sha256:" + hashlib.sha256(json.dumps(descriptors, sort_keys=True).encode()).hexdigest()[:16]
 
 
+def state_sources(descriptors: dict[str, str], allowed_sources: list[str]) -> dict[str, str]:
+    """The descriptor dict sent in `state["sources"]`: pinned descriptors of the sources the gateway
+    releases. The calibration fit (tools/fit_system_one.py) builds its state with this same function,
+    so `descriptor_release` binds."""
+    return {source: text for source, text in sorted(descriptors.items()) if source in allowed_sources}
+
+
 def load_secret(variable: Optional[str], env_file: Path = ROOT / ".env") -> Optional[str]:
     """The provider key, runner side only: the process environment first, then `.env`."""
     if not variable:
@@ -128,7 +135,7 @@ class SystemOneBroker:
         round_id = str(arguments.get("round") or "d2")
         raw = arguments.get("questions")
         questions = {str(qid): q for qid, q in raw.items()} if isinstance(raw, dict) else {}
-        sources = {source: text for source, text in sorted(self.descriptors.items()) if source in self.allowed_sources}
+        sources = state_sources(self.descriptors, self.allowed_sources)
         release = descriptor_release(sources)
         # questions about a source outside the gateway's view, or malformed, are never sent
         refused = sorted(qid for qid, q in questions.items() if not isinstance(q, dict)
@@ -185,4 +192,4 @@ class SystemOneBroker:
 
 
 __all__ = ["DECIDE_TOOL", "ProfileConfig", "SystemOneBroker", "descriptor_release", "load_descriptors",
-           "load_provider", "load_secret"]
+           "load_provider", "load_secret", "state_sources"]

@@ -229,3 +229,14 @@ def test_report_section_counts_model_calls(tmp_path):
     assert "## System One model calls (reported, not gated)" in text
     assert "| C3 | local-test | test-model-1.2 | strict | 3 | ok 2, timeout 1 | 60.0 | 150.0 |" in text
     assert render_system_one([SimpleNamespace(dir=tmp_path, config_id="C2", manifest={})]) == []
+
+
+def test_broker_and_calibration_fit_agree_on_descriptor_release(server, tmp_path):
+    from tools.fit_system_one import broker_descriptors
+
+    descriptors, release = broker_descriptors()
+    result, _ = _decide(_broker(server, tmp_path), {"questions": {"d2:codehub": NOUL}})
+    assert server.behavior.requests[0]["state"]["sources"] == descriptors
+    assert result["descriptor_release"] == release
+    import hashlib
+    assert release == "sha256:" + hashlib.sha256(json.dumps(descriptors, sort_keys=True).encode()).hexdigest()[:16]

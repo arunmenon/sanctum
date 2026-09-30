@@ -16,8 +16,6 @@ them makes the SUT run shadow-only.
 """
 import argparse
 import datetime
-import hashlib
-import json
 import math
 import os
 import random
@@ -29,7 +27,9 @@ import yaml
 
 from sanctum_ref.providers.http_systemone import TEMPLATE_VERSION, d2_questions
 from sanctum_ref.providers import d2_request
-from sanctum_run.runner import DEFAULT_WORLD_BUILD, git_state, load_cases, public_request
+from sanctum_run.gateway import released_hub_ids
+from sanctum_run.runner import DEFAULT_HUBS_CONFIG, DEFAULT_WORLD_BUILD, git_state, load_cases, public_request
+from sanctum_run.system_one_broker import descriptor_release as release_of, load_descriptors, state_sources
 from sanctum_systemone import SystemOneClient, load_provider_specs
 from tools.fit_d2_standin import recalls
 from tools.measure_system_one_batches import dotenv
@@ -68,6 +68,12 @@ def choose_skip_band(held_out, tolerance):
     return best
 
 
+def broker_descriptors(include_held_back: bool = False) -> tuple[dict[str, str], str]:
+    """Exactly the descriptor dict the runner's broker sends in state, and its release id."""
+    descriptors = state_sources(load_descriptors(), released_hub_ids(DEFAULT_HUBS_CONFIG, include_held_back))
+    return descriptors, release_of(descriptors)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--provider", required=True)
@@ -81,8 +87,7 @@ if __name__ == "__main__":
         raise SystemExit("fit on dev cases only")
     spec = load_provider_specs(ROOT / "configs" / "system_one_providers.yaml")[arguments.provider]
     environment = {**dotenv(), **os.environ}
-    descriptors = yaml.safe_load((ROOT / "configs" / "d2_standin.yaml").read_text())["descriptors"]
-    descriptor_release = "sha256:" + hashlib.sha256(json.dumps(descriptors, sort_keys=True).encode()).hexdigest()[:16]
+    descriptors, descriptor_release = broker_descriptors()
     client = SystemOneClient(spec, spec.resolved_base_url(environment) or "https://api.typesafe.ai",
                              spec.requested_model(environment),
                              api_key=environment.get(spec.api_key_env) if spec.api_key_env else None)

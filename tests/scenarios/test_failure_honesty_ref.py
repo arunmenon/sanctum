@@ -19,6 +19,12 @@ CASES = [
     ("C4", "degraded", "dev", "dev-010"),
     ("C4", "skillhub_timeout", "scenarios", "sc-fx-17-1"),
     ("C2", "skillhub_timeout", "dev", "dev-044"),
+    # residual overclaims after the Codex fixes: a failed routing-selected, non-authoritative source
+    ("C4", "flaky", "dev", "dev-018"),
+    ("C4", "degraded", "dev", "dev-018"),
+    ("C4", "degraded", "dev", "dev-052"),
+    ("C5", "degraded", "dev", "dev-018"),
+    ("C5", "degraded", "dev", "dev-052"),
 ]
 
 

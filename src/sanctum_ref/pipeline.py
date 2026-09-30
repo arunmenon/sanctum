@@ -190,6 +190,13 @@ class Retriever:
         if resolution is not None:
             interpretations, status = self._interpretations(resolution, candidates, assembled, status,
                                                             required_gap, response_reasons, request)
+        if any(source.status.value in ("timeout", "error") for source in sources):
+            # a source routing chose to ask failed: what it would have added is unknown, so no
+            # answer (or interpretation) can be called complete (Ex. 9; dev-018, dev-052)
+            if status == EvidenceStatus.sufficient:
+                status = EvidenceStatus.partial
+            interpretations = [i.model_copy(update={"evidence_status": EvidenceStatus.partial})
+                               if i.evidence_status == EvidenceStatus.sufficient else i for i in interpretations]
         if assembled.truncated_relevant:
             response_reasons.append("insufficient_budget")
         if status == EvidenceStatus.insufficient and not required_gap:

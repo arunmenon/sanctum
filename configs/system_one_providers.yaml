@@ -24,9 +24,9 @@ providers:
     model: convaiinnovations/laya
     capabilities:
       primitives: [noul, choice]
-      max_questions_per_call: 10
+      max_questions_per_call: 2           # Laya truncates total input (state plus instructions) near 500 tokens (measured)
       max_options: 20
-      max_state_chars: 3000              # Laya truncated D6 states of 4-5 pairs (measured); one pair per call
+      max_state_chars: 1500              # with one question, truncation starts at about 480 state tokens (2,000-2,500 chars)
       batching: true
       reports_usage: true               # verified with local laya 0.3.22
       hosted: false
@@ -57,7 +57,7 @@ providers:
 # Run profiles (design page §5 point 7): latency is measured per profile, never a gate.
 profiles:
   strict:  {deadline_ms: 150, max_calls_per_round: 1}
-  relaxed: {deadline_ms: 60000, max_calls_per_round: 12}   # Round 3 on laya-local needs one call per pair
+  relaxed: {deadline_ms: 60000, max_calls_per_round: 24}   # Round 3 on laya-local: about one item per call (d4_max_units 20)
 
 # Round 3 per-request bounds (design page §14). D4 on laya-local costs about 90 ms per unit.
 round3:

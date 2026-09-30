@@ -38,6 +38,7 @@ ROUND3_INSTRUCTIONS = {
 D2_INSTRUCTIONS = ("Answer true if searching the source named in the question is likely to return evidence "
                    "necessary to answer the query in the state, judged from the source's description.")
 BROKER_TOOL = "system_one.decide"
+ROUND3_MAX_CALLS = 24
 
 
 def d2_questions(requests: list[DecisionRequest]) -> dict[str, dict[str, Any]]:
@@ -211,7 +212,10 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
     template = TEMPLATES[round_name]
     questions = {qid: {"type": "noul", "instructions": ROUND3_INSTRUCTIONS[round_name]} for qid in items}
     payload = {"round": round_name, "query": query, "questions": questions,
-               "items": {qid: {"refs": refs} for qid, refs in items.items()}, "max_calls": adapter._max_calls}
+               "items": {qid: {"refs": refs} for qid, refs in items.items()},
+               # Round 3 may need about one call per item on small-context providers; the broker
+               # still caps calls by the run profile
+               "max_calls": ROUND3_MAX_CALLS}
     outcome = await adapter._transport.send(port, payload, deadline_ms)
     digest = request_hash(round_name, query, questions)
     judgements: dict[str, ItemJudgement] = {}

@@ -1,0 +1,35 @@
+binding:
+  provider: typesafe-jev
+  model: jev-1.13.0
+  model_revision: null
+  decision: d4
+  template: d4-noul-v1
+  descriptor_release: none
+  decoding: provider default
+platt:
+  a: 0.8255
+  b: -1.5157
+bands:
+  use: 1.0
+  skip: 0.0
+provenance:
+  fitted_on: dev
+  cases: 60
+  points: 361
+  positives: 127
+  folds: 5
+  max_false_rate: 0.2
+  http_calls: 60
+  usage:
+    input_tokens: 72627
+    output_tokens: 7878
+  held_out:
+    brier_calibrated: 0.2028
+    ece_calibrated: 0.1038
+    brier_raw: 0.3148
+    ece_raw: 0.3301
+    promoted_at_band: 0
+    false_promotions_at_band: 0
+  label: sanctum_eval.calibration_labels (d4)
+  fitted_at: '2026-09-30'
+  git_commit: 63e721670ffd932e9b9ae2465eddef7574b9e997

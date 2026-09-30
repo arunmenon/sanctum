@@ -1,0 +1,38 @@
+binding:
+  provider: laya-local
+  model: laya-rl-agent
+  model_revision: 55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851
+  decision: d4
+  template: d4-noul-v1
+  descriptor_release: none
+  decoding: provider default
+platt:
+  a: 0.9818
+  b: -0.9265
+bands:
+  use: 1.0
+  skip: 0.0
+provenance:
+  fitted_on: dev
+  cases: 60
+  points: 361
+  positives: 127
+  folds: 5
+  max_false_rate: 0.2
+  http_calls: 197
+  usage:
+    input_tokens: 111160
+    output_tokens: 0
+    state_tokens: 48435
+    state_tokens_dropped: 0
+    truncated: 0
+  held_out:
+    brier_calibrated: 0.1915
+    ece_calibrated: 0.0759
+    brier_raw: 0.2202
+    ece_raw: 0.1817
+    promoted_at_band: 0
+    false_promotions_at_band: 0
+  label: sanctum_eval.calibration_labels (d4)
+  fitted_at: '2026-09-30'
+  git_commit: 63e721670ffd932e9b9ae2465eddef7574b9e997

@@ -214,3 +214,10 @@ def test_configured_key_value_appears_in_no_file():
         if not path.is_file() or path.name == ".env" or ".git" in path.parts or path.stat().st_size > 20_000_000:
             continue
         assert needle not in path.read_bytes(), f"provider key found in {path.relative_to(ROOT)}"
+
+
+def test_bad_choice_is_invalid():
+    spec = SPECS["local-test"]
+    with SystemOneTestServer(ServerBehavior(invalid="bad_choice")) as server:
+        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"c": CHOICE, "n": NOUL}, 5, max_calls=1)
+    assert outcome.invalid_ids == ["c"] and set(outcome.answers) == {"n"}

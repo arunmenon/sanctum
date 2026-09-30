@@ -53,3 +53,8 @@ providers:
       primitives: [noul]
       data_classes_allowed: [synthetic, internal]
       conformance: supported
+
+# Run profiles (design page §5 point 7): latency is measured per profile, never a gate.
+profiles:
+  strict:  {deadline_ms: 150, max_calls_per_round: 1}
+  relaxed: {deadline_ms: 60000, max_calls_per_round: 3}

@@ -4,7 +4,7 @@ It speaks the wire protocol (design page §3) over real HTTP on localhost, answe
 deterministically from a hash of (state, question id), and can be told to misbehave so the
 adapter and the conformance checks can be exercised without live calls:
 `delay_ms`, `fail_times` (5xx before succeeding), `invalid` (wrong type / unknown id / bad
-probability), `model_sequence` (resolved model per call), `require_key`, and declared limits
+probability / bad choice / not JSON), `model_sequence` (resolved model per call), `require_key`, and declared limits
 (`max_questions_per_call`, `max_options`) that are rejected with 422, never truncated."""
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ class ServerBehavior:
     model_sequence: list[str] = field(default_factory=lambda: ["test-model-1"])
     delay_ms: int = 0
     fail_times: int = 0
-    invalid: Optional[str] = None           # wrong_type | unknown_id | bad_probability | not_json
+    invalid: Optional[str] = None           # wrong_type | unknown_id | bad_probability | bad_choice | not_json
     require_key: Optional[str] = None
     max_questions_per_call: int = 3
     max_options: int = 5
@@ -101,6 +101,10 @@ class SystemOneTestServer:
                 if behavior.invalid == "bad_probability" and answers:
                     first = next(iter(answers))
                     answers[first] = {"type": "noul", "noul": 1.7}
+                if behavior.invalid == "bad_choice":
+                    for qid, question in questions.items():
+                        if question.get("type") == "choice":
+                            answers[qid] = {**answers[qid], "choice": "not-an-offered-option"}
                 usage = {"input_tokens": 10 * len(questions) + 50, "output_tokens": 5 * len(questions)}
                 return self._send(200, {"model": model, "answers": answers, "usage": usage})
 

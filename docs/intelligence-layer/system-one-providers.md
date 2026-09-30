@@ -220,14 +220,27 @@ Every call resolved `jev-latest` to `jev-1.13.0`; cold calls (new connection) to
 
 ## 13. Local Laya on CPU (`laya-local`)
 
-| Item | Rule |
+| Item | Rule or measured value |
 |---|---|
 | Endpoint | Unsloth Decision API at `http://localhost:8888/v1/systemone`; same adapter, no key |
-| Pinning | Model and runtime version pinned and recorded like any provider |
+| Pinning | Responses report only `laya-rl-agent`; the checkpoint revision (from `/health`) is recorded in the calibration binding and provenance and is pinned by the running server, not checked per call |
 | Confidence | Laya and Jev compute `confidence` differently: bands use calibrated `noul` only, calibration is per provider and never transferred |
-| Oversized input | The runtime is reported to truncate oversized inputs silently, so declared context (`max_state_chars`) and option budgets are enforced and over-limit payloads are refused rather than trusting a truncated answer |
-| Vendor claims | RAM, latency and checkpoint claims come from vendor documentation and are **unverified** here until measured |
-| Status | `experimental` until it passes the conformance checks |
+| Truncation | Laya reports `usage.truncated`, `state_tokens_dropped` and `truncated_questions`. A truncated state voids the whole call (`truncated`); a truncated question voids that decision. `max_state_chars` remains a backstop for providers that report nothing |
+| Choice temperature | The runtime warns that choice temperature is clamped for 11 or more options; D2 uses `noul` only |
+| Status | Live conformance passes against Laya 0.3.22; still `experimental` pending a second run |
+
+Measured once (replacing vendor claims), Laya 0.3.22 English checkpoint `55cf4c4e` on an Apple M1 Pro (10 cores, 16 GB):
+
+| Measure | Value |
+|---|---|
+| Server resident memory | about 1.9 GB |
+| Latency per call, warm | about 0.2 to 0.34 s for 1 question, 0.58 s for 5, 0.98 s for 10, 1.82 s for 20 (about 90 ms per added question) |
+| Input tokens | about 140 per question; batching does not lower cost per question on CPU |
+| D2 round latency in runs (relaxed) | p50 about 530 to 760 ms, p95 up to 1.7 s |
+| Calibration (dev, held-out) | Brier 0.144 (raw 0.174), ECE 0.029 (raw 0.166); skip band 0.09 |
+| Effect on routing | No confident skips on dev or scenarios: Laya arms equal C2 and C4 exactly |
+
+Full comparison with Jev: [Laya vs Jev report](../reports/system-one-laya-dev.md).
 
 ## Where this is referenced
 

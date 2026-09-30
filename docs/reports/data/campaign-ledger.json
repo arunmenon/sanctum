@@ -1,4 +1,16 @@
 {
+ "ceiling": {
+  "history": [
+   "470/420000/45000",
+   "600/560000/60000",
+   "800/760000/80000 (owner, before rows 6-10 and the D6 challenge rows)"
+  ],
+  "typesafe-jev": {
+   "calls": 800,
+   "input_tokens": 760000,
+   "output_tokens": 80000
+  }
+ },
  "rows": [
   {
    "calls": 28,
@@ -6,7 +18,8 @@
    "output_tokens": 2248,
    "provider": "typesafe-jev",
    "row": "1",
-   "template": "d6-noul-v1"
+   "template": "d6-noul-v1",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 25,
@@ -14,7 +27,8 @@
    "output_tokens": 2135,
    "provider": "typesafe-jev",
    "row": "2",
-   "template": "d6-noul-v2-relations"
+   "template": "d6-noul-v2-relations",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 83,
@@ -22,7 +36,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "1",
-   "template": "d6-noul-v1"
+   "template": "d6-noul-v1",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 64,
@@ -30,7 +45,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "2",
-   "template": "d6-noul-v2-relations"
+   "template": "d6-noul-v2-relations",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 11,
@@ -38,7 +54,8 @@
    "output_tokens": 876,
    "provider": "typesafe-jev",
    "row": "3",
-   "template": "d6-noul-v3-excerpts"
+   "template": "d6-noul-v3-excerpts",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 32,
@@ -46,7 +63,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "3",
-   "template": "d6-noul-v3-excerpts"
+   "template": "d6-noul-v3-excerpts",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 26,
@@ -55,7 +73,8 @@
    "output_tokens": 3874,
    "provider": "typesafe-jev",
    "row": "4",
-   "template": "d6-decomp-v1"
+   "template": "d6-decomp-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 22,
@@ -64,7 +83,8 @@
    "output_tokens": 4159,
    "provider": "typesafe-jev",
    "row": "5",
-   "template": "d6-choice-v1"
+   "template": "d6-choice-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 194,
@@ -73,7 +93,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "4",
-   "template": "d6-decomp-v1"
+   "template": "d6-decomp-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 91,
@@ -82,7 +103,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "5",
-   "template": "d6-choice-v1"
+   "template": "d6-choice-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 28,
@@ -90,7 +112,8 @@
    "output_tokens": 2248,
    "provider": "typesafe-jev",
    "row": "3r",
-   "template": "d6-noul-v3-excerpts"
+   "template": "d6-noul-v3-excerpts",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 32,
@@ -98,7 +121,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "3r",
-   "template": "d6-noul-v3-excerpts-compact"
+   "template": "d6-noul-v3-excerpts-compact",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 57,
@@ -106,7 +130,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "3r",
-   "template": "d6-noul-v3-excerpts-compact-150"
+   "template": "d6-noul-v3-excerpts-compact-150",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 27,
@@ -114,7 +139,8 @@
    "output_tokens": 4992,
    "provider": "typesafe-jev",
    "row": "4",
-   "template": "d6-decomp-v1"
+   "template": "d6-decomp-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 25,
@@ -122,7 +148,8 @@
    "output_tokens": 5357,
    "provider": "typesafe-jev",
    "row": "5",
-   "template": "d6-choice-v1"
+   "template": "d6-choice-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 168,
@@ -130,7 +157,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "4",
-   "template": "d6-decomp-v1"
+   "template": "d6-decomp-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 82,
@@ -138,7 +166,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "5",
-   "template": "d6-choice-v1"
+   "template": "d6-choice-v1",
+   "world_manifest": "9f813169 (invalid)"
   },
   {
    "calls": 0,
@@ -146,7 +175,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "6-7",
-   "template": "d2-noul-v1"
+   "template": "d2-noul-v1",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 0,
@@ -154,7 +184,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "6-7",
-   "template": "d2-noul-v2-loss"
+   "template": "d2-noul-v2-loss",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 0,
@@ -162,7 +193,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "6-7",
-   "template": "d2-descriptors-v2"
+   "template": "d2-descriptors-v2",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 240,
@@ -170,7 +202,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "6-7",
-   "template": "d2-noul-v1"
+   "template": "d2-noul-v1",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 240,
@@ -178,7 +211,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "6-7",
-   "template": "d2-noul-v2-loss"
+   "template": "d2-noul-v2-loss",
+   "world_manifest": "452b57d9"
   },
   {
    "calls": 240,
@@ -186,7 +220,8 @@
    "output_tokens": 0,
    "provider": "laya-local",
    "row": "6-7",
-   "template": "d2-descriptors-v2"
+   "template": "d2-descriptors-v2",
+   "world_manifest": "452b57d9"
   }
  ]
 }

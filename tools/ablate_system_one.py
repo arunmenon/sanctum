@@ -45,7 +45,8 @@ from tools.measure_system_one_batches import dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "docs" / "reports" / "data" / "campaign-ledger.json"
-CAMPAIGN = {"typesafe-jev": {"calls": 470, "input_tokens": 420_000, "output_tokens": 45_000}}   # owner ceiling
+# owner ceiling (raised twice: 470/420k/45k, then 600/560k/60k, now 800/760k/80k), pre-dispatch enforced
+CAMPAIGN = {"typesafe-jev": {"calls": 800, "input_tokens": 760_000, "output_tokens": 80_000}}
 FLAGGED_SEED = 20260930
 
 
@@ -233,10 +234,12 @@ def collect_d2(arguments, template):
 
 
 # ---- evaluation -------------------------------------------------------------------------------------
-def nested_with_bands(decision, raw, labels, flagged, tolerance):
-    """nested_cv with the decision's band rule; for D6 promotions are counted on candidates only."""
-    records = records_from_fit(raw, labels, source_of=(lambda key: key[1]) if decision == "d2" else None)
-    calibrators = ("platt", "platt_l2", "intercept_only", "source_intercepts") if decision == "d2" else \
+def nested_with_bands(decision, raw, labels, flagged, tolerance, sources=None):
+    """nested_cv with the decision's band rule; for D6 promotions are counted on candidates only.
+    `sources` ({key: source_id}) enables per-source intercepts (D2 keys carry the source already)."""
+    source_of = (lambda key: key[1]) if decision == "d2" else ((lambda key: sources.get(key, "")) if sources else None)
+    records = records_from_fit(raw, labels, source_of=source_of)
+    calibrators = ("platt", "platt_l2", "intercept_only", "source_intercepts") if source_of else \
         ("platt", "platt_l2", "intercept_only")
     parts = group_folds(records, 5, 20260930)
     usable = [k for k, held in enumerate(parts)
@@ -288,6 +291,7 @@ def main():
     parser.add_argument("--tolerance", type=float, default=None, help="default: 0.2 for d6/d4, 0.05 for d2")
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--scratch", type=Path, required=True, help="kept run directories and caches")
+    parser.add_argument("--expect-world", default=None, help="required world manifest prefix; checked before any call")
     parser.add_argument("--out", type=Path, required=True)
     arguments = parser.parse_args()
     if any(part in str(arguments.cases.resolve()) for part in ("holdout", "acceptance")):
@@ -305,6 +309,10 @@ def main():
     set_campaign_budget(campaign)
     arguments.scratch.mkdir(parents=True, exist_ok=True)
     run_dir = arguments.scratch / f"row{arguments.row}-{arguments.provider}-{template.id}"
+    import hashlib
+    world_manifest = hashlib.sha256((arguments.world_build / "manifest.json").read_bytes()).hexdigest()[:16]
+    if arguments.expect_world and not world_manifest.startswith(arguments.expect_world):
+        raise SystemExit(f"world manifest {world_manifest} is not the expected {arguments.expect_world}; no call made")
     failure = None
     try:
         if arguments.decision == "d2":
@@ -318,7 +326,8 @@ def main():
         raise SystemExit("collection failed:\n" + "\n".join(leaf_errors(error)))
     finally:
         record({"row": arguments.row, "provider": arguments.provider, "template": template.id,
-                **campaign.summary(), **({"note": f"failed: {type(failure).__name__}"} if failure else {})})
+                "world_manifest": world_manifest, **campaign.summary(),
+                **({"note": f"failed: {type(failure).__name__}"} if failure else {})})
     keys = sorted(k for k in items if k in labels)
     flagged = {k: items[k]["rule_flagged"] for k in keys}
     signal_names = sorted({name for k in keys for name, value in items[k]["signals"].items() if isinstance(value, (int, float))})
@@ -335,14 +344,20 @@ def main():
         per_signal[name] = entry
     report = {
         "row": arguments.row, "provider": arguments.provider, "decision": arguments.decision, "template": template.id,
+        "world_manifest": world_manifest,
         "diagnostic": template.diagnostic, "state": template.state, "models": models,
         "items_answered": len(items), "items_labelled": len(keys), "items_unavailable": unavailable,
         "model_call_outcomes": outcomes, "campaign_row": campaign.summary(), "ceilings": {"calls": calls, "input_tokens": input_tokens},
         "tolerance": tolerance, "signals": per_signal, "git_commit": git_state()["git_commit"],
     }
+    sources = {k: (items[k].get("refs") or [{}])[0].get("source_id", "") for k in keys} if arguments.decision == "d4" else None
     if "p" in signal_names and not template.diagnostic and any(labels[k] for k in keys):
         raw = {k: items[k]["signals"]["p"] for k in keys if "p" in items[k]["signals"]}
-        report["nested_cv"] = nested_with_bands(arguments.decision, raw, labels, flagged, tolerance)
+        report["nested_cv"] = nested_with_bands(arguments.decision, raw, labels, flagged, tolerance, sources)
+    if arguments.decision in ("d2", "d4") and any(labels[k] for k in keys):
+        # source-prior-only control: every raw p = 0.5, so only per-source intercepts can separate
+        report["control_source_prior"] = nested_with_bands(arguments.decision, {k: 0.5 for k in keys}, labels,
+                                                           flagged, tolerance, sources)
     if relation_types and "choice" in {n for k in keys for n in items[k]["signals"]}:
         typed = [(items[k]["signals"].get("choice"), relation_types.get(k)) for k in keys if relation_types.get(k)]
         report["relation_type_accuracy"] = {"n": len(typed), "correct": sum(1 for c, t in typed if c == t),

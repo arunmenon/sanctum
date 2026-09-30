@@ -1,0 +1,9 @@
+id: a-002
+family: named_service
+principal: kestrel-both
+text: after how many failed sign ins does identity lock an acount?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- lockout_threshold

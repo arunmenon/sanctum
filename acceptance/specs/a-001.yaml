@@ -1,0 +1,9 @@
+id: a-001
+family: multi_hub
+principal: kestrel-both
+text: who has to sign off if we change the edge gateway upstream timeout?
+mode: scoped
+entities:
+- svc.gateway-edge
+attributes:
+- timeout_change_approver

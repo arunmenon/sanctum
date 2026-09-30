@@ -1,0 +1,15 @@
+id: a-018
+family: historical
+principal: kestrel-codeonly
+text: What was payment auth's retry limit in R40, compared to now?
+mode: scoped
+as_of: R40
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented
+contrast:
+  release: R42

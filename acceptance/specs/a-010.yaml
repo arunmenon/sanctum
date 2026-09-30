@@ -1,0 +1,13 @@
+id: a-010
+family: hub_specific_name
+principal: kestrel-both
+text: 'Payments Auth Service skill: what''s the retry max we''re supposed to follow?'
+mode: scoped
+name:
+  native: Auth Service
+  hub: skillhub
+  namespace: Payments
+attributes:
+- max_retries
+fact_kinds:
+- procedure

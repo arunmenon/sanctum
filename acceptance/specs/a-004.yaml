@@ -1,0 +1,12 @@
+id: a-004
+family: named_service
+principal: kestrel-codeonly
+text: what MAX_RETRIES does payment auth ship with in prod right now
+mode: scoped
+environment: prod
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

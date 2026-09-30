@@ -1,0 +1,11 @@
+id: a-016
+family: no_source
+principal: kestrel-codeonly
+text: What does the payment auth runbook say the retry limit should be?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- procedure

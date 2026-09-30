@@ -1,0 +1,11 @@
+id: a-008
+family: named_service
+principal: kestrel-identity
+text: per the runbook, how many times should login backend calls be retried?
+mode: scoped
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+fact_kinds:
+- procedure

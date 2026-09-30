@@ -1,0 +1,11 @@
+id: a-019
+family: conflicting_sources
+principal: kestrel-identity
+text: Back in R41, did the login retry code agree with the procedure?
+mode: scoped
+as_of: R41
+environment: prod
+entities:
+- svc.identity-auth
+attributes:
+- max_retries

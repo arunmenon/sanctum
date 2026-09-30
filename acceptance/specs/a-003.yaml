@@ -1,0 +1,12 @@
+id: a-003
+family: named_service
+principal: kestrel-both
+text: How many login retries is identity auth actually running with in prod?
+mode: scoped
+environment: prod
+entities:
+- svc.identity-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

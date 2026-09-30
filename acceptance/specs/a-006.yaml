@@ -1,0 +1,12 @@
+id: a-006
+family: named_service
+principal: kestrel-both
+text: On the experiment branch, how many retries does payment auth do?
+mode: scoped
+environment: experiment
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- implemented

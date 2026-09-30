@@ -1,0 +1,7 @@
+id: a-014
+family: hub_specific_name
+principal: kestrel-payments
+text: Edge Gateway skill - what upstream timeout are we running with?
+mode: scoped
+name: {native: Edge Gateway, hub: skillhub, namespace: Platform}
+attributes: [upstream_timeout_ms]

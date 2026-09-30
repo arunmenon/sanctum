@@ -1,0 +1,11 @@
+id: a-009
+family: named_service
+principal: kestrel-payments
+text: how far back can we replay failed ledger postings?
+mode: scoped
+entities:
+- svc.ledger-post
+attributes:
+- replay_window_minutes
+fact_kinds:
+- procedure

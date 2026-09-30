@@ -1,0 +1,10 @@
+id: a-013
+family: hub_specific_name
+principal: kestrel-identity
+text: how many retries does idauth do
+mode: scoped
+name:
+  native: idauth
+  hub: memoryhub
+attributes:
+- max_retries

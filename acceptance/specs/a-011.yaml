@@ -1,0 +1,13 @@
+id: a-011
+family: same_name_two_meanings
+principal: kestrel-both
+text: what does the Auth Service skill say about retrying timeouts?
+mode: explore
+name:
+  native: Auth Service
+  hub: skillhub
+attributes:
+- max_retries
+fact_kinds:
+- procedure
+expected_ambiguity: separate_alternatives

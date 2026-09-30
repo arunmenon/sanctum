@@ -1,0 +1,9 @@
+id: a-020
+family: conflicting_sources
+principal: admin-probe
+text: 'payment auth retries: code says one thing, runbook another? which is it'
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries

@@ -1,0 +1,12 @@
+id: a-005
+family: named_service
+principal: kestrel-codeonly
+text: ledger posting batch size in the prod config?
+mode: scoped
+environment: prod
+entities:
+- svc.ledger-post
+attributes:
+- batch_size
+fact_kinds:
+- implemented

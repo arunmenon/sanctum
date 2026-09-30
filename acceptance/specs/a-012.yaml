@@ -1,0 +1,10 @@
+id: a-012
+family: hub_specific_name
+principal: kestrel-payments
+text: ledgerd replay window?
+mode: scoped
+name:
+  native: ledgerd
+  hub: memoryhub
+attributes:
+- replay_window_minutes

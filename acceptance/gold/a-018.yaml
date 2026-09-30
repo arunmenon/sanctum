@@ -1,0 +1,88 @@
+case_id: a-018
+bundle_id: b-a-018
+family: historical
+request:
+  schema_version: '1.0'
+  request_id: req-a84f11d7812ff4ed
+  query: What was payment auth's retry limit in R40, compared to now?
+  mode: scoped
+  as_of: R40
+  environment: prod
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-codeonly
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-ecead3bb8a
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: codehub
+      artifact_id: art-7623f130c9
+      version: R40
+      start: 261
+      end: 262
+  - spans:
+    - source_id: codehub
+      artifact_id: art-8522875cbb
+      version: R40
+      start: 105
+      end: 106
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations:
+- source_id: codehub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+relations:
+- relation_id: r1
+  relation_type: version_difference
+  witness_a:
+    spans:
+    - source_id: codehub
+      artifact_id: art-7623f130c9
+      version: R40
+      start: 261
+      end: 262
+  witness_b:
+    spans:
+    - source_id: codehub
+      artifact_id: art-7623f130c9
+      version: R42
+      start: 261
+      end: 262
+- relation_id: r2
+  relation_type: version_difference
+  witness_a:
+    spans:
+    - source_id: codehub
+      artifact_id: art-8522875cbb
+      version: R40
+      start: 105
+      end: 106
+  witness_b:
+    spans:
+    - source_id: codehub
+      artifact_id: art-8522875cbb
+      version: R42
+      start: 105
+      end: 106
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities:
+  - ent-5bf846464b
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status:
+    codehub: called

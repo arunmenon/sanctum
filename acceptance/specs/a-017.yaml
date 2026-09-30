@@ -1,0 +1,10 @@
+id: a-017
+family: no_source
+principal: kestrel-payments
+text: 'fx quote: how long is a quote valid and what happens when it goes stale?'
+mode: scoped
+entities:
+- svc.fx-quote
+attributes:
+- quote_ttl_seconds
+- stale_quote_action

@@ -1,0 +1,12 @@
+id: a-007
+family: named_service
+principal: kestrel-payments
+text: What's the documented retry procedure for payment auth when the gateway times
+  out?
+mode: scoped
+entities:
+- svc.payment-auth
+attributes:
+- max_retries
+fact_kinds:
+- procedure

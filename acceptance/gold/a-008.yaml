@@ -1,0 +1,60 @@
+case_id: a-008
+bundle_id: b-a-008
+family: named_service
+request:
+  schema_version: '1.0'
+  request_id: req-f5297731ab2309b6
+  query: per the runbook, how many times should login backend calls be retried?
+  mode: scoped
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-identity
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-5bf846464b
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: dochub
+      artifact_id: art-c2de08042b
+      version: v2
+      start: 73
+      end: 74
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-b95c7dc76a
+      version: v1
+      start: 240
+      end: 241
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-bde7c60201
+      version: v2
+      start: 136
+      end: 137
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations:
+- source_id: skillhub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+relations: []
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities:
+  - ent-ecead3bb8a
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status:
+    skillhub: called

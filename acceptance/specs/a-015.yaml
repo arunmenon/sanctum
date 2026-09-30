@@ -1,0 +1,10 @@
+id: a-015
+family: no_source
+principal: kestrel-codeonly
+text: What's the fx quote TTL set to in prod?
+mode: scoped
+environment: prod
+entities:
+- svc.fx-quote
+attributes:
+- quote_ttl_seconds

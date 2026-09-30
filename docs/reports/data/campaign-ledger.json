@@ -331,6 +331,33 @@
    "row": "8-9 probe",
    "template": "d4-score-v1-excerpts",
    "world_manifest": "n/a"
+  },
+  {
+   "calls": 22,
+   "input_tokens": 45081,
+   "output_tokens": 2192,
+   "provider": "typesafe-jev",
+   "row": "9r",
+   "template": "d4-score-v1-excerpts",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 32,
+   "input_tokens": 18603,
+   "output_tokens": 1991,
+   "provider": "typesafe-jev",
+   "row": "10",
+   "template": "d2-noul-v1 (order/context/repeat)",
+   "world_manifest": "n/a (direct D2 state)"
+  },
+  {
+   "calls": 60,
+   "input_tokens": 14647,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "10",
+   "template": "d2-noul-v1 (order/context/repeat)",
+   "world_manifest": "n/a (direct D2 state)"
   }
  ]
 }

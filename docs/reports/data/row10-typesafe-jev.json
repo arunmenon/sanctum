@@ -1,0 +1,56 @@
+{
+ "batched_provider": true,
+ "campaign_row": {
+  "calls": 32,
+  "input_tokens": 18603,
+  "output_tokens": 1991
+ },
+ "cases": [
+  "dev-001",
+  "dev-002",
+  "dev-003",
+  "dev-004",
+  "dev-005"
+ ],
+ "comparisons": {
+  "batched_vs_single": {
+   "auc_single": null,
+   "auc_sorted": null,
+   "labelled": 12,
+   "max_abs_diff": 0.02,
+   "mean_abs_diff": 0.0083,
+   "n": 12,
+   "positives": 0
+  },
+  "short_vs_long_context": {
+   "auc_long_context": 0.6944,
+   "auc_sorted": 0.75,
+   "labelled": 20,
+   "max_abs_diff": 0.35,
+   "mean_abs_diff": 0.132,
+   "n": 20,
+   "positives": 2
+  },
+  "sorted_vs_repeat": {
+   "auc_repeat": 0.75,
+   "auc_sorted": 0.75,
+   "labelled": 20,
+   "max_abs_diff": 0.03,
+   "mean_abs_diff": 0.0115,
+   "n": 20,
+   "positives": 2
+  },
+  "sorted_vs_reversed": {
+   "auc_reversed": 0.75,
+   "auc_sorted": 0.75,
+   "labelled": 20,
+   "max_abs_diff": 0.04,
+   "mean_abs_diff": 0.0145,
+   "n": 20,
+   "positives": 2
+  }
+ },
+ "git_commit": "55b181da20248d8bf6bd56018b93c11072a7c05c",
+ "provider": "typesafe-jev",
+ "truncated_calls": 0
+}

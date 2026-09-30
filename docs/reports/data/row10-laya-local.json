@@ -1,0 +1,56 @@
+{
+ "batched_provider": false,
+ "campaign_row": {
+  "calls": 60,
+  "input_tokens": 14647,
+  "output_tokens": 0
+ },
+ "cases": [
+  "dev-001",
+  "dev-002",
+  "dev-003",
+  "dev-004",
+  "dev-005"
+ ],
+ "comparisons": {
+  "batched_vs_single": {
+   "auc_single": null,
+   "auc_sorted": null,
+   "labelled": 0,
+   "max_abs_diff": null,
+   "mean_abs_diff": null,
+   "n": 0,
+   "positives": 0
+  },
+  "short_vs_long_context": {
+   "auc_long_context": 0.8611,
+   "auc_sorted": 0.5278,
+   "labelled": 20,
+   "max_abs_diff": 0.4052,
+   "mean_abs_diff": 0.1082,
+   "n": 20,
+   "positives": 2
+  },
+  "sorted_vs_repeat": {
+   "auc_repeat": 0.5278,
+   "auc_sorted": 0.5278,
+   "labelled": 20,
+   "max_abs_diff": 0.0,
+   "mean_abs_diff": 0.0,
+   "n": 20,
+   "positives": 2
+  },
+  "sorted_vs_reversed": {
+   "auc_reversed": null,
+   "auc_sorted": null,
+   "labelled": 0,
+   "max_abs_diff": null,
+   "mean_abs_diff": null,
+   "n": 0,
+   "positives": 0
+  }
+ },
+ "git_commit": "55b181da20248d8bf6bd56018b93c11072a7c05c",
+ "provider": "laya-local",
+ "truncated_calls": 0
+}

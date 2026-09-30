@@ -118,6 +118,9 @@ class DirectTransport:
                                        payload.get("max_calls", 3))
 
 
+ROUND3_DECISIONS = frozenset({"d6", "d4"})
+
+
 class Calibration:
     def __init__(self, path: Path):
         data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
@@ -132,9 +135,15 @@ class Calibration:
     def matches(self, provider: str, model: Optional[str], descriptor_release: Optional[str],
                 template: str = TEMPLATE_VERSION) -> bool:
         binding = self.binding
+        bound = binding.get("descriptor_release")
+        if binding.get("decision") in ROUND3_DECISIONS:
+            # design §8: a Round 3 binding names its state layout; "none" is the v1 pointer layout
+            # (the broker reports "none" for it) and matches no other layout
+            layout_ok = (bound or "none") == (descriptor_release or "none")
+        else:
+            layout_ok = bound in (None, "none", descriptor_release)
         return (binding.get("provider") == provider and binding.get("model") == model
-                and binding.get("template") == template
-                and binding.get("descriptor_release") in (None, "none", descriptor_release))
+                and binding.get("template") == template and layout_ok)
 
     def apply(self, p_raw: float) -> float:
         p = min(max(p_raw, 1e-6), 1 - 1e-6)

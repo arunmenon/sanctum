@@ -119,3 +119,17 @@ def test_name_visibility_checks_the_terms_own_permission_before_places():
     assert entity_visible(Store(), REGISTRY, "ent-1", code_reader) is True             # places, as before
     assert entity_visible(Store(), REGISTRY, "ent-1", code_reader, skill_term) is False
     assert entity_visible(Store(), REGISTRY, "ent-1", code_reader, catalog_term) is True
+
+
+def test_round3_binding_none_matches_only_the_v1_layout(tmp_path):
+    """Design §8: a Round 3 binding with descriptor_release "none" was fitted on the v1 pointer
+    layout and must not apply to answers read on any other layout."""
+    from sanctum_ref.providers.http_systemone import Calibration
+    binding = {"provider": "p", "model": "m", "decision": "d6", "template": "t", "descriptor_release": "none"}
+    path = tmp_path / "c.yaml"
+    path.write_text(yaml.safe_dump({"binding": binding, "platt": {"a": 1.0, "b": 0.0},
+                                    "bands": {"use": 0.6, "skip": 0.0}}))
+    calibration = Calibration(path)
+    assert calibration.matches("p", "m", "none", "t") and calibration.matches("p", "m", None, "t")
+    assert not calibration.matches("p", "m", "r3-state-v2", "t")
+    assert not calibration.matches("p", "m", "r3-state-v2-compact-150", "t")

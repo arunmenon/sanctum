@@ -1,0 +1,52 @@
+{
+ "rows": [
+  {
+   "calls": 28,
+   "input_tokens": 33107,
+   "output_tokens": 2248,
+   "provider": "typesafe-jev",
+   "row": "1",
+   "template": "d6-noul-v1"
+  },
+  {
+   "calls": 25,
+   "input_tokens": 39435,
+   "output_tokens": 2135,
+   "provider": "typesafe-jev",
+   "row": "2",
+   "template": "d6-noul-v2-relations"
+  },
+  {
+   "calls": 83,
+   "input_tokens": 29828,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "1",
+   "template": "d6-noul-v1"
+  },
+  {
+   "calls": 64,
+   "input_tokens": 30776,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "2",
+   "template": "d6-noul-v2-relations"
+  },
+  {
+   "calls": 11,
+   "input_tokens": 25035,
+   "output_tokens": 876,
+   "provider": "typesafe-jev",
+   "row": "3",
+   "template": "d6-noul-v3-excerpts"
+  },
+  {
+   "calls": 32,
+   "input_tokens": 16216,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "3",
+   "template": "d6-noul-v3-excerpts"
+  }
+ ]
+}

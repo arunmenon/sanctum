@@ -108,13 +108,25 @@ def _d6_pairs(receipt: Optional[dict], response: dict) -> list[tuple[str, str]]:
     return list(dict.fromkeys(pairs))
 
 
+def _item_and_refs(value: dict) -> tuple[str, list[dict]]:
+    """A Round 3 decision value's question id and REFs: {"item", "refs": [...]} (the SUT's
+    receipts), or the earlier {"pair", "a", "b"} / {"unit", "ref"} shape."""
+    if "item" in value and isinstance(value.get("refs"), list):
+        return str(value["item"]), [ref for ref in value["refs"] if isinstance(ref, dict)]
+    if "pair" in value and isinstance(value.get("a"), dict) and isinstance(value.get("b"), dict):
+        return str(value["pair"]), [value["a"], value["b"]]
+    if "unit" in value and isinstance(value.get("ref"), dict):
+        return str(value["unit"]), [value["ref"]]
+    return "", []
+
+
 def labels_from_run(decision: str, run_dir: Path, cases_dir: Path) -> dict[tuple[str, str], int]:
     """(case_id, key) -> 0/1 for a dev run.
 
     Preferred source: the receipt decisions of a shadow-collect run, whose values carry REF
-    provenance ({"pair": "d6:<a>|<b>", "a": REF, "b": REF} or {"unit": "d4:<ev>", "ref": REF}); the
-    key is then that question id. Fallback for runs without them: the response's evidence units,
-    keyed "a|b" (d6, from flagged conflicts) or by evidence id (d4)."""
+    provenance ({"item": "d6:<a>|<b>" or "d4:<ev>", "refs": [REF, ...]}), so pairs and units the
+    rules did not pack are labelled too. Fallback for runs without them: the response's evidence
+    units. Keys are "a|b" for d6 and the evidence id for d4 in both cases."""
     if decision not in DECISIONS:
         raise ValueError(f"labels exist for {DECISIONS}, not {decision!r}")
     golds = {gold.request.request_id: gold for gold in (load_gold(p) for p in sorted(Path(cases_dir).glob("*.yaml")))}
@@ -127,11 +139,12 @@ def labels_from_run(decision: str, run_dir: Path, cases_dir: Path) -> dict[tuple
             value = item.get("value")
             if not isinstance(value, dict):
                 continue
-            if decision == "d6" and str(value.get("pair", "")).startswith("d6:") and "a" in value and "b" in value:
-                labels[(gold.case_id, value["pair"])] = d6_pair_label(gold, value["a"], value["b"])
+            item, refs = _item_and_refs(value)
+            if decision == "d6" and item.startswith("d6:") and len(refs) == 2:
+                labels[(gold.case_id, item[3:])] = d6_pair_label(gold, refs[0], refs[1])
                 labelled_from_refs.add(request_id)
-            elif decision == "d4" and str(value.get("unit", "")).startswith("d4:") and "ref" in value:
-                labels[(gold.case_id, value["unit"])] = d4_unit_label(gold, value["ref"])
+            elif decision == "d4" and item.startswith("d4:") and len(refs) == 1:
+                labels[(gold.case_id, item[3:])] = d4_unit_label(gold, refs[0])
                 labelled_from_refs.add(request_id)
     for response in _read_jsonl(Path(run_dir) / "responses.jsonl"):
         gold = golds.get(response["request_id"])

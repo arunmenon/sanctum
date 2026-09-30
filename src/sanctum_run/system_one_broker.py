@@ -145,13 +145,16 @@ class SystemOneBroker:
         questions = {str(qid): q for qid, q in raw.items()} if isinstance(raw, dict) else {}
         refused = sorted(qid for qid, q in questions.items()
                          if not isinstance(q, dict) or q.get("type") not in QUESTION_TYPES)
+        pointers_sha256 = None
         if round_id in ROUND3:
             # evidence text reaches the model only through the broker's own reads of refs the bound
             # caller may read and this request fetched; the SUT supplies refs, never text
             items, bad = self._round3_items(gateway, handle, round_id, questions, arguments.get("items"))
             refused = sorted(set(refused) | set(bad))
             state = {"query": query, "items": {qid: items[qid] for qid in sorted(items) if qid not in refused}}
-            release = "none"
+            release = "none"          # Round 3 calibration binds on the template (agreed with the SUT side)
+            pointers = {qid: (arguments.get("items") or {}).get(qid, {}).get("refs") for qid in state["items"]}
+            pointers_sha256 = hashlib.sha256(json.dumps(pointers, sort_keys=True).encode()).hexdigest()
         else:
             sources = state_sources(self.descriptors, self.allowed_sources)
             release = descriptor_release(sources)
@@ -191,7 +194,7 @@ class SystemOneBroker:
             questions=sorted(questions), outcome="ok" if outcome.unavailable_reason is None else "unavailable",
             reason=None if outcome.unavailable_reason is None else str(outcome.unavailable_reason.value),
             elapsed_ms=float(outcome.latency_ms), usage=outcome.usage, calls=outcome.calls,
-            invalid_ids=list(outcome.invalid_ids)))
+            invalid_ids=list(outcome.invalid_ids), pointers_sha256=pointers_sha256))
         self._store(request_id, round_id, outcome, exchanges, release)
         return outcome.model_dump(mode="json")
 

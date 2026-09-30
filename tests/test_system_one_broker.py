@@ -289,3 +289,49 @@ def test_round3_sends_only_broker_read_text_of_fetched_readable_refs(scenario_wo
     assert set(first) == {"source_id", "version", "environment", "text"}
     assert sent["state"]["query"] == "retry limit"
     assert [call.round for call in out["trace"].model_calls] == ["d6"]
+
+
+async def _round3_refusals(world, broker, out):
+    tokens = TokenService(world / "identity" / "principals.json", "broker-test-secret")
+    caller = tokens.issue_caller_token(PRINCIPAL)
+    async with HubGateway(world, released_hub_ids(DEFAULT_HUBS_CONFIG), tokens) as gateway:
+        proxy = await GatewayProxy.create(gateway, world)
+        gateway.system_one = broker
+        handle = gateway.handle("req-4", caller)
+        proxy.bind("req-4", caller, handle, query="retry limit")
+        with gateway.sut_call("req-4"):
+            found = await handle.call("codehub", "search_code", {"query": "retry"})
+            item = found["results"][0]
+            row = gateway.stores["codehub"].at_version(item["artifact_id"], item["version"])
+            base = {"source_id": "codehub", "artifact_id": row.artifact_id, "version": row.version, "start": 0, "end": 40}
+            identity_row = next(r for r in gateway.stores["codehub"].rows() if r.acl == ["identity-eng"])
+            unreadable = {**base, "artifact_id": identity_row.artifact_id, "version": identity_row.version}
+            out["unreadable"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d4", "questions": {"d4:e9": NOUL}, "items": {"d4:e9": {"refs": [unreadable]}}}, "req-4", caller)
+            out["requests_after_unreadable"] = len(broker_requests(out))
+            out["bounds"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d4", "questions": {"d4:e1": NOUL, "d4:e2": NOUL},
+                "items": {"d4:e1": {"refs": [{**base, "end": len(row.text) + 1}]},
+                          "d4:e2": {"refs": [{**base, "start": 30, "end": 10}]}}}, "req-4", caller)
+            # a "text" field supplied with the pointer is ignored: the model sees the store's text
+            out["injected"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d4", "questions": {"d4:e3": NOUL},
+                "items": {"d4:e3": {"refs": [{**base, "text": "SUT SUPPLIED TEXT"}]}}}, "req-4", caller)
+            out["row_text"] = row.text
+        proxy.unbind("req-4", handle)
+        out["trace"] = gateway.trace("req-4")
+
+
+def broker_requests(out):
+    return out["server"].behavior.requests
+
+
+def test_round3_pointer_refusals_and_store_text(scenario_world, server, tmp_path):  # noqa: F811
+    out = {"server": server}
+    anyio.run(_round3_refusals, scenario_world, _broker(server, tmp_path), out)
+    assert out["unreadable"]["invalid_ids"] == ["d4:e9"] and out["requests_after_unreadable"] == 0   # no HTTP call
+    assert set(out["bounds"]["invalid_ids"]) == {"d4:e1", "d4:e2"}                                     # span bounds
+    [sent] = server.behavior.requests
+    [text_item] = sent["state"]["items"]["d4:e3"]
+    assert text_item["text"] == out["row_text"][0:40] and "SUT SUPPLIED TEXT" not in json.dumps(sent)
+    assert all(call.pointers_sha256 for call in out["trace"].model_calls if call.questions == ["d4:e3"])

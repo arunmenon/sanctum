@@ -124,14 +124,15 @@ def test_ref_labels(case):
 
 def test_labels_from_run_prefers_receipt_refs(case, tmp_path):
     gold, response, receipt, _ = case("m0-001")
-    decision = {"status": "answered", "target": "D6", "disposition": "preserve_candidate", "provider": "local-test",
-                "policy_version": "d6-noul-v1", "latency_ms": 1, "cost": 0.0,
-                "value": {"pair": "d6:ev-a1|ev-b1", "p_raw": 0.8, "rule_flagged": True, "a": REF_A, "b": REF_B}}
-    unit = {**decision, "target": "D4", "value": {"unit": "d4:ev-a1", "p_raw": 0.4, "rules_packed": True, "ref": REF_A}}
+    decision = {"status": "answered", "target": "d6:ev-a1|ev-b9", "disposition": "preserve_candidate",
+                "provider": "local-test", "policy_version": "d6-noul-v1", "latency_ms": 1, "cost": 0.0,
+                "value": {"item": "d6:ev-a1|ev-b9", "p_raw": 0.8, "shadow": True, "refs": [REF_A, REF_B]}}
+    # ev-b9 and ev-u7 were never packed (absent from responses.jsonl) yet still get labels from their refs
+    unit = {**decision, "target": "d4:ev-u7", "value": {"item": "d4:ev-u7", "p_raw": 0.4, "refs": [REF_A]}}
     (tmp_path / "responses.jsonl").write_text(json.dumps(response) + "\n")
     (tmp_path / "receipts.jsonl").write_text(json.dumps({**receipt, "decisions": [decision, unit]}) + "\n")
     cases = tmp_path / "cases"
     cases.mkdir()
     (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
-    assert labels_from_run("d6", tmp_path, cases) == {("m0-001", "d6:ev-a1|ev-b1"): 1}
-    assert set(labels_from_run("d4", tmp_path, cases)) == {("m0-001", "d4:ev-a1")}
+    assert labels_from_run("d6", tmp_path, cases) == {("m0-001", "ev-a1|ev-b9"): 1}
+    assert set(labels_from_run("d4", tmp_path, cases)) == {("m0-001", "ev-u7")}

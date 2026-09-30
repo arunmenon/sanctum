@@ -153,6 +153,7 @@ The SUT asks; the broker decides what may be sent. The broker binds each call in
 
 - Fitted on **dev only**. Calibration fitting and band (threshold) selection are separated by cross-validation over dev splits.
 - A calibration is bound to: provider, **resolved model version** (and checkpoint revision where the provider reports only a family), **template id**, **state layout** (D2: descriptor release over the exact descriptor dict sent), memory release, and decoding settings. A change to any of these invalidates it.
+- **Layout is part of the binding.** A Round 3 binding names the exact state layout the broker reports for the template; a binding whose layout is `none` matches only the v1 (pointer) layout, never any other. A calibration fitted on one excerpt layout must not bind to a different one.
 - **Shadow-only rule:** with no usable calibration, the provider runs shadow-only: answers are logged, every candidate is preserved. Shadow comes from the absence of a usable binding: a fit whose band does not meet the tolerance is written to `configs/calibration/rejected/`, and a use band outside (0, 1) is refused; there is no never-promote sentinel.
 - Bands are reported with nested case-grouped cross-validation (`sanctum_eval.calibration.nested_cv`): inner folds choose the calibrator and band, outer folds report; denominators and Wilson intervals accompany every rate.
 - Campaigns have a hard ceiling enforced before every HTTP attempt (calls, input and output tokens; retries count; usage recorded once per exchange).

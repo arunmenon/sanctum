@@ -4,7 +4,7 @@
    "470/420000/45000",
    "600/560000/60000",
    "800/760000/80000 (owner, before rows 6-10 and the D6 challenge rows)",
-   "1000/950000/100000 (owner: D6 challenge rows on Jev, completing Jev rows 8-9)"
+   "1000/950000/100000 (owner: completing paired Jev D4 rows and running the Jev D6 challenge rows)"
   ],
   "typesafe-jev": {
    "calls": 1000,
@@ -431,6 +431,33 @@
    "row": "9c",
    "template": "d4-score-v1-excerpts",
    "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 11,
+   "input_tokens": 18371,
+   "output_tokens": 1523,
+   "provider": "typesafe-jev",
+   "row": "c1",
+   "template": "d6-noul-v1",
+   "world_manifest": "15304c65481ba2bf"
+  },
+  {
+   "calls": 11,
+   "input_tokens": 24461,
+   "output_tokens": 1523,
+   "provider": "typesafe-jev",
+   "row": "c2",
+   "template": "d6-noul-v2-relations",
+   "world_manifest": "15304c65481ba2bf"
+  },
+  {
+   "calls": 11,
+   "input_tokens": 36040,
+   "output_tokens": 1523,
+   "provider": "typesafe-jev",
+   "row": "c3",
+   "template": "d6-noul-v3-excerpts",
+   "world_manifest": "15304c65481ba2bf"
   }
  ]
 }

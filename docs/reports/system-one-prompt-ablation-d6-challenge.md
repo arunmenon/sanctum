@@ -1,6 +1,6 @@
-# Prompt campaign, D6 rows 1 to 5 on the challenge world (Laya, shadow)
+# Prompt campaign, D6 rows on the challenge world (shadow)
 
-> SYNTHETIC, NOT PRODUCTION EVIDENCE. **Measured once**, shadow-only, on the challenge overlay only. Numbers only; no conclusion about the model is drawn here.
+> SYNTHETIC, NOT PRODUCTION EVIDENCE. **Measured once**, shadow-only, on the challenge overlay only. Numbers only; no conclusion about either model is drawn here.
 
 ## Setup
 
@@ -8,31 +8,38 @@
 |---|---|
 | World | `build/world-challenge` (overlay `world/challenge-d6.yaml`), manifest `15304c65481ba2bf`, checked before every call and recorded in every ledger row |
 | Cases | `gold/challenge-d6` (12 questions); 11 requests produced D6 questions |
-| Pairs judged | 58 per complete row, all candidate pairs (the strict same-subject rule dropped them; up to 6 per request); 0 rule-flagged pairs; 22 positive under the evaluator-side labels |
-| Provider | Laya only (`laya-local`, one pair per call). Jev was not run: about 6k input tokens remained under the 800 / 760k / 80k ceiling after row 10, below one row (about 1,200 to 2,200 input tokens per pair) |
-| Band check | nested case-grouped CV (`sanctum_eval.calibration.nested_cv`), use band chosen on inner folds at a 0.2 false-promotion tolerance (unchanged), 5 outer folds |
-| Data | `docs/reports/data/challenge-c{1..5}-laya-local-*.json` |
+| Items | 58 judged (case, pair) items per complete row, all candidate pairs (the strict same-subject rule dropped them; up to 6 per request); 0 rule-flagged |
+| Labels (owner ruling) | primary: slice scope, a pair is positive when it witnesses any relation in the slice (26 of 58 positive). Secondary: case scope, positive only for a relation of that case's gold (22 of 58). 16 of the slice's 20 distinct positive pairs are exposed as candidates (m3-data, `8ff0127`) |
+| Band check | nested case-grouped CV (`sanctum_eval.calibration.nested_cv`), use band chosen on inner folds at a 0.2 false-promotion tolerance (unchanged), 5 outer folds, slice-scope labels |
+| Laya | all 5 rows; relabelled offline to slice scope from the kept run dirs (no new calls) |
+| Jev | rows c1 to c3; c4 and c5 were not run (4,164 input tokens remained under the 1,000 / 950k / 100k ceiling after c3) |
+| Data | `docs/reports/data/challenge-c*-{laya-local,typesafe-jev}-*.json`; each item carries `label` (slice) and `label_case` |
 
 ## Results (`noul` rows)
 
-| Row | Template (state) | Pairs answered / 58 (pos) | Raw ROC-AUC | Raw PR-AUC (base rate) | Raw Brier | Outer AUC mean (sd) | Outer Brier mean (sd) | Calibrators selected | Use band per outer fold | Promotions (false), Wilson 95% false rate | Calls, input tokens |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| c1 | `d6-noul-v1` (v1) | 58 (22) | 0.327 | 0.355 (0.379) | 0.301 | 0.673 (0.143) | 0.230 (0.025) | platt_l2 x5 | 0.50, 0.57, 0.52, 0.53, 0.66 | 3 (2), 0.208 to 0.939 | 58, 17,899 |
-| c2 | `d6-noul-v2-relations` (v1) | 58 (22) | 0.774 | 0.722 (0.379) | 0.231 | 0.788 (0.149) | 0.191 (0.039) | platt_l2, intercept_only x2, platt x2 | 0.63, 0.50, 0.79, 0.50, 0.59 | 10 (2), 0.057 to 0.510 | 58, 24,627 |
-| c3 | `d6-noul-v3-excerpts-compact-150` | 34 (14) | 0.568 | 0.468 (0.412) | 0.313 | 0.633 (0.300) | 0.257 (0.036) | platt_l2 x4, intercept_only | 1.0, 1.0, 1.0, 0.58, 1.0 | 1 (1), 0.207 to 1.000 | 47 (24 pairs truncated), 22,320 |
+| Row | Provider | Template (state) | Items answered / 58 | Raw ROC-AUC, slice (26 pos) | Raw PR-AUC, slice (base 0.448) | Raw Brier, slice | Raw ROC-AUC, case (22 pos) | Outer AUC mean (sd) | Outer Brier mean (sd) | Calibrators selected | Use band per outer fold | Promotions (false), Wilson 95% false rate | Calls, input / output tokens |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| c1 | Jev | `d6-noul-v1` (v1) | 58 | 0.581 | 0.505 | 0.250 | 0.568 | 0.621 (0.199) | 0.256 (0.033) | platt_l2 x2, intercept_only x3 | 1.0, 1.0, 1.0, 1.0, 0.57 | 6 (5), 0.437 to 0.970 | 11, 18,371 / 1,523 |
+| c2 | Jev | `d6-noul-v2-relations` (v1) | 58 | 0.521 | 0.513 | 0.358 | 0.521 | 0.554 (0.158) | 0.263 (0.036) | platt_l2 x4, intercept_only | 1.0 in all folds | 0 | 11, 24,461 / 1,523 |
+| c3 | Jev | `d6-noul-v3-excerpts` (v2) | 58 | 0.593 | 0.587 | 0.357 | 0.600 | 0.611 (0.070) | 0.249 (0.039) | intercept_only x5 | 1.0, 0.61, 0.57, 0.63, 0.66 | 4 (2), 0.150 to 0.850 | 11, 36,040 / 1,523 |
+| c1 | Laya | `d6-noul-v1` (v1) | 58 | 0.335 | 0.406 | 0.307 | 0.327 | 0.622 (0.157) | 0.237 (0.024) | platt, platt_l2 x4 | 0.61, 0.67, 0.57, 0.65, 0.68 | 2 (0), 0.000 to 0.658 | 58, 17,899 / 0 |
+| c2 | Laya | `d6-noul-v2-relations` (v1) | 58 | 0.730 | 0.717 | 0.227 | 0.774 | 0.742 (0.194) | 0.208 (0.045) | intercept_only x5 | 0.63, 0.70, 0.68, 0.60, 0.53 | 9 (2), 0.063 to 0.547 | 58, 24,627 / 0 |
+| c3 | Laya | `d6-noul-v3-excerpts-compact-150` | 34 (18 pos slice, 14 case) | 0.566 | 0.585 (0.529) | 0.273 | 0.568 | 0.658 (0.317) | 0.279 (0.042) | platt_l2 x4, intercept_only | 0.68, 1.0, 0.72, 1.0, 1.0 | 0 | 47 (24 items truncated), 22,320 / 0 |
 
-## Diagnostic rows (not band-eligible)
+## Diagnostic rows (not band-eligible; Laya only)
 
-| Row | Template | Signal | Pairs (pos) | Raw ROC-AUC | Raw PR-AUC | Raw Brier | Calls, input tokens |
-|---|---|---|---|---|---|---|---|
-| c4 | `d6-decomp-v1` | same_subject | 58 (22) | 0.801 | 0.750 | 0.206 | 116, 37,074 |
-| c4 | `d6-decomp-v1` | values_differ | 58 (22) | 0.607 | 0.543 | 0.289 | (same calls) |
-| c4 | `d6-decomp-v1` | product (diagnostic) | 58 (22) | 0.785 | 0.712 | 0.198 | (same calls) |
-| c5 | `d6-choice-v1` | 1 - p(no_conflict) | 58 (22) | 0.386 | 0.322 | 0.440 | 58, 23,525 |
-| c5 | `d6-choice-v1` | relation type correct on positives | 0 of 22 (Wilson 0.000 to 0.149) | | | | |
+| Row | Template | Signal | Items | Raw ROC-AUC, slice | Raw PR-AUC, slice | Raw Brier, slice | Raw ROC-AUC, case | Calls, input tokens |
+|---|---|---|---|---|---|---|---|---|
+| c4 | `d6-decomp-v1` | same_subject | 58 | 0.776 | 0.755 | 0.206 | 0.801 | 116, 37,074 |
+| c4 | `d6-decomp-v1` | values_differ | 58 | 0.576 | 0.583 | 0.275 | 0.607 | (same calls) |
+| c4 | `d6-decomp-v1` | product (diagnostic) | 58 | 0.757 | 0.743 | 0.224 | 0.786 | (same calls) |
+| c5 | `d6-choice-v1` | 1 - p(no_conflict) | 58 | 0.368 | 0.380 | 0.396 | 0.386 | 58, 23,525 |
+| c5 | `d6-choice-v1` | relation type correct on case-scope positives | 0 of 22 (Wilson 0.000 to 0.149) | | | | | |
 
 ## Denominators and notes
 
-- The gold description gives 20 positive pairs, 16 of them exposed as candidates; the tool's labels mark 22 of the 58 judged pairs positive and none rule-flagged. The labelling on the overlay has not been reconciled against the gold count; the numbers above use the tool's labels as they are.
-- c3 lost 24 of 58 pairs to Laya input truncation (4 of 11 requests had a truncated answer); those pairs keep the rules-only result and are excluded from its denominators.
-- Promotion counts are summed over outer folds; each fold has 6 to 14 pairs, so the per-fold bands rest on few positives.
+- The 58 items include pairs judged in two cases; 4 repeated pairs change label between cases under case scope and not under slice scope (m3-data, `8ff0127`).
+- Limit (owner decision): `MAX_CANDIDATE_PAIRS` stays at 6 and the SUT is not tuned to this slice, so 4 of the 20 distinct positive pairs are never exposed as candidates and cannot be promoted by any variant.
+- Laya c3 lost 24 of 58 items to input truncation; those items keep the rules-only result and are excluded from its denominators.
+- Promotion counts are summed over outer folds of 6 to 14 items each, so the per-fold bands rest on few positives.
+- The Laya nested-CV columns were recomputed under slice scope; the case-scope nested CV is kept in each file as `nested_cv_case_scope`.

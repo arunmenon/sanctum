@@ -177,7 +177,10 @@ def collect_round3(arguments, template, run_dir: Path):
             items[(case_id, item.split(":", 1)[1])] = {
                 "signals": signals(template, value.get("answers") or {}, item),
                 "rule_flagged": bool(value.get("rule_flagged")), "refs": value.get("refs")}
-    labels = labels_from_run(arguments.decision, result.out_dir, arguments.cases)
+    labels = labels_from_run(arguments.decision, result.out_dir, arguments.cases, scope=arguments.label_scope)
+    if arguments.decision == "d6":       # the other scope, reported as a secondary column
+        other = "case" if arguments.label_scope == "slice" else "slice"
+        arguments.secondary_labels = (other, labels_from_run("d6", result.out_dir, arguments.cases, scope=other))
     relation_types = relation_types_from_run(result.out_dir, arguments.cases) if arguments.decision == "d6" else {}
     return items, labels, relation_types, sorted(map(str, models)), outcomes, unavailable
 
@@ -292,6 +295,8 @@ def main():
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--scratch", type=Path, required=True, help="kept run directories and caches")
     parser.add_argument("--expect-world", default=None, help="required world manifest prefix; checked before any call")
+    parser.add_argument("--label-scope", choices=["case", "slice"], default="case",
+                        help="d6/d4 labels: case-relative (default) or any relation in the cases dir")
     parser.add_argument("--out", type=Path, required=True)
     arguments = parser.parse_args()
     if any(part in str(arguments.cases.resolve()) for part in ("holdout", "acceptance")):
@@ -341,6 +346,11 @@ def main():
                                              if name in items[k]["signals"] and flagged[k]], probability)
             entry["candidates"] = summary([(items[k]["signals"][name], labels[k]) for k in keys
                                            if name in items[k]["signals"] and not flagged[k]], probability)
+        secondary = getattr(arguments, "secondary_labels", None)
+        if secondary:
+            scope, other_labels = secondary
+            entry[f"all_{scope}_scope"] = summary([(items[k]["signals"][name], other_labels[k]) for k in keys
+                                                   if name in items[k]["signals"] and k in other_labels], probability)
         per_signal[name] = entry
     report = {
         "row": arguments.row, "provider": arguments.provider, "decision": arguments.decision, "template": template.id,
@@ -362,7 +372,11 @@ def main():
         typed = [(items[k]["signals"].get("choice"), relation_types.get(k)) for k in keys if relation_types.get(k)]
         report["relation_type_accuracy"] = {"n": len(typed), "correct": sum(1 for c, t in typed if c == t),
                                             "wilson95": wilson(sum(1 for c, t in typed if c == t), len(typed))}
-    report["items"] = {f"{k[0]}\t{k[1]}": {"label": labels[k], **items[k]} for k in keys}
+    report["label_scope"] = arguments.label_scope
+    secondary = getattr(arguments, "secondary_labels", None)
+    report["items"] = {f"{k[0]}\t{k[1]}": {"label": labels[k], **items[k],
+                                          **({f"label_{secondary[0]}": secondary[1].get(k)} if secondary else {})}
+                       for k in keys}
     arguments.out.parent.mkdir(parents=True, exist_ok=True)
     arguments.out.write_text(json.dumps(rounded(report), indent=1, sort_keys=True) + "\n")
     print(json.dumps(rounded({k: report[k] for k in ("row", "provider", "template", "items_answered", "items_labelled",

@@ -57,6 +57,20 @@ def platt(points, steps=3000, rate=0.3):
     return a, b
 
 
+def brier(pairs) -> float:
+    return sum((p - y) ** 2 for p, y in pairs) / len(pairs)
+
+
+def ece(pairs, bins: int = 10) -> float:
+    total = 0.0
+    for index in range(bins):
+        members = [(p, y) for p, y in pairs if index / bins <= p < (index + 1) / bins or (index == bins - 1 and p == 1.0)]
+        if members:
+            total += len(members) / len(pairs) * abs(sum(p for p, _ in members) / len(members)
+                                                    - sum(y for _, y in members) / len(members))
+    return total
+
+
 def choose_skip_band(held_out, tolerance):
     """Largest skip band whose held-out harmful skips (useful sources skipped) stay within tolerance."""
     best = 0.0
@@ -126,11 +140,12 @@ if __name__ == "__main__":
     case_ids = sorted({case_id for case_id, _ in keys})
     random.Random(20260930).shuffle(case_ids)
     folds = [set(case_ids[i::arguments.folds]) for i in range(arguments.folds)]
-    held_out = []
+    held_out, raw_held_out = [], []
     for fold in folds:
         train = [(logit(raw[k]), labels[k]) for k in keys if k[0] not in fold]
         a, b = platt(train)
         held_out += [(1 / (1 + math.exp(-(a * logit(raw[k]) + b))), labels[k]) for k in keys if k[0] in fold]
+        raw_held_out += [(raw[k], labels[k]) for k in keys if k[0] in fold]
     skip = choose_skip_band(held_out, arguments.harm_tolerance)
     a, b = platt([(logit(raw[k]), labels[k]) for k in keys])
     out = ROOT / "configs" / "calibration" / f"{arguments.provider}@{model}.yaml"
@@ -143,7 +158,12 @@ if __name__ == "__main__":
         "provenance": {"fitted_on": "dev", "cases": len(case_ids), "points": len(keys),
                        "positives": sum(labels[k] for k in keys), "folds": arguments.folds,
                        "harm_tolerance": arguments.harm_tolerance, "http_calls": calls, "usage": usage,
+                       "held_out": {"brier_calibrated": round(brier(held_out), 4), "ece_calibrated": round(ece(held_out), 4),
+                                    "brier_raw": round(brier(raw_held_out), 4), "ece_raw": round(ece(raw_held_out), 4),
+                                    "skipped_at_band": sum(1 for p, _ in held_out if p < skip),
+                                    "harmful_skips_at_band": sum(y for p, y in held_out if p < skip)},
                        "label": "recall drop when the hub is removed (C1-fair runs)",
                        "fitted_at": datetime.date.today().isoformat(), "git_commit": git_state()["git_commit"]},
     }, sort_keys=False), encoding="utf-8")
     print(f"wrote {out}: platt a={a:.3f} b={b:.3f}, skip band {skip}, {calls} calls, usage {usage}")
+    print(f"held-out Brier {brier(held_out):.4f} (raw {brier(raw_held_out):.4f}), ECE {ece(held_out):.4f} (raw {ece(raw_held_out):.4f})")

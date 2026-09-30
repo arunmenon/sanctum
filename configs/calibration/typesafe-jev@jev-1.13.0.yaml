@@ -1,0 +1,33 @@
+binding:
+  provider: typesafe-jev
+  model: jev-1.13.0
+  template: d2-noul-v1
+  descriptor_release: sha256:da6dfe982c5156d9
+  decoding: provider default
+platt:
+  a: 0.9746
+  b: -2.2356
+bands:
+  use: 0.7
+  skip: 0.07
+provenance:
+  fitted_on: dev
+  cases: 51
+  points: 204
+  positives: 35
+  folds: 5
+  harm_tolerance: 0.05
+  http_calls: 60
+  usage:
+    input_tokens: 38046
+    output_tokens: 5100
+  held_out:
+    brier_calibrated: 0.1316
+    ece_calibrated: 0.0412
+    brier_raw: 0.3013
+    ece_raw: 0.4076
+    skipped_at_band: 62
+    harmful_skips_at_band: 0
+  label: recall drop when the hub is removed (C1-fair runs)
+  fitted_at: '2026-09-30'
+  git_commit: c1fbb450677222bd7eb3fbe5871d62769039321c

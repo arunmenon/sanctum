@@ -38,7 +38,8 @@ def answer(state: Any, qid: str, question: dict[str, Any]) -> dict[str, Any]:
     kind = question.get("type")
     if kind == "noul":
         return {"type": "noul", "noul": round(_unit(seed), 6)}
-    options = list((question.get("criteria") or {}).keys())
+    criteria = question.get("criteria") or {}
+    options = [str(level) for level in range(len(criteria))] if isinstance(criteria, list) else list(criteria.keys())
     weights = [(_unit(seed + option) + 0.01) for option in options]
     total = sum(weights)
     probabilities = {option: round(weight / total, 6) for option, weight in zip(options, weights)}

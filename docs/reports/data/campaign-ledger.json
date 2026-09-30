@@ -276,6 +276,61 @@
    "row": "6-7",
    "template": "d2-descriptors-v2",
    "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 51,
+   "input_tokens": 109092,
+   "output_tokens": 6423,
+   "provider": "typesafe-jev",
+   "row": "8-9",
+   "template": "d4-noul-v2-support-excerpts",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 51,
+   "input_tokens": 109303,
+   "output_tokens": 0,
+   "provider": "typesafe-jev",
+   "row": "8-9",
+   "template": "d4-score-v1-excerpts",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 361,
+   "input_tokens": 70389,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "8-9",
+   "template": "d4-noul-v1",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 361,
+   "input_tokens": 105189,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "8-9",
+   "template": "d4-noul-v2-support-compact-150",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "8-9",
+   "template": "d4-score-v1-compact-150",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 1,
+   "input_tokens": 150,
+   "note": "one probe call: provider returned 422 (score criteria must be a list)",
+   "output_tokens": 0,
+   "provider": "typesafe-jev",
+   "row": "8-9 probe",
+   "template": "d4-score-v1-excerpts",
+   "world_manifest": "n/a"
   }
  ]
 }

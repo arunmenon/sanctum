@@ -1,0 +1,30 @@
+{
+ "campaign_row": {
+  "calls": 51,
+  "input_tokens": 109303,
+  "output_tokens": 0
+ },
+ "ceilings": {
+  "calls": 70,
+  "input_tokens": 110000
+ },
+ "decision": "d4",
+ "diagnostic": true,
+ "git_commit": "eb2df1c8c675cb1325c30dde914a22090542077d",
+ "items": {},
+ "items_answered": 0,
+ "items_labelled": 0,
+ "items_unavailable": 361,
+ "model_call_outcomes": {
+  "error": 51,
+  "over_budget": 9
+ },
+ "models": [],
+ "provider": "typesafe-jev",
+ "row": "8-9",
+ "signals": {},
+ "state": "excerpts",
+ "template": "d4-score-v1-excerpts",
+ "tolerance": 0.2,
+ "world_manifest": "452b57d9686b9582"
+}

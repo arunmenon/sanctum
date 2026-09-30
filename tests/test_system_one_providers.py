@@ -345,3 +345,12 @@ def test_diagnostic_templates_never_drive_decisions(tmp_path):
             judgements, results, calibration = anyio.run(decide_items, adapter, "d6", {"d6:a|b": [ref, ref]}, "q", None, 3000)
         assert calibration is None and all(j.p is None for j in judgements.values())
         assert results[0].value["template"] == template_id and results[0].value["diagnostic"] is True
+
+
+def test_score_criteria_go_on_the_wire_as_an_ordered_list():
+    """The hosted protocol takes score levels as a list (index = level); choice keeps a dict."""
+    from sanctum_ref.providers.templates import DEFAULT_TEMPLATES, TemplateRegistry
+    registry = TemplateRegistry(DEFAULT_TEMPLATES)
+    score = registry.templates["d4-score-v1"].questions("d4:x")["d4:x"]["criteria"]
+    assert isinstance(score, list) and len(score) == 4 and score[0].startswith("No substantive")
+    assert isinstance(registry.templates["d6-choice-v1"].questions("d6:a|b")["d6:a|b"]["criteria"], dict)

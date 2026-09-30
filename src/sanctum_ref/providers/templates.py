@@ -32,7 +32,11 @@ class Template:
                     for name, text in self.subquestions.items()}
         question: dict[str, Any] = {"type": self.type, "instructions": self.instructions.format(**fields)}
         if self.criteria:
-            question["criteria"] = dict(self.criteria)
+            if self.type == "score":
+                # the wire protocol takes score levels as a list ordered by level (index = level)
+                question["criteria"] = [self.criteria[level] for level in sorted(self.criteria, key=int)]
+            else:
+                question["criteria"] = dict(self.criteria)
         return {qid: question}
 
 

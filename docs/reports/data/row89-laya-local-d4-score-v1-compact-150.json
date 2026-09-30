@@ -1,0 +1,29 @@
+{
+ "campaign_row": {
+  "calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0
+ },
+ "ceilings": {
+  "calls": 5000,
+  "input_tokens": 10000000
+ },
+ "decision": "d4",
+ "diagnostic": true,
+ "git_commit": "d52d0b5e54dd3f5bc9ab252d8624797a69d593b3",
+ "items": {},
+ "items_answered": 0,
+ "items_labelled": 0,
+ "items_unavailable": 361,
+ "model_call_outcomes": {
+  "invalid_output": 60
+ },
+ "models": [],
+ "provider": "laya-local",
+ "row": "8-9",
+ "signals": {},
+ "state": "excerpts-compact-150",
+ "template": "d4-score-v1-compact-150",
+ "tolerance": 0.2,
+ "world_manifest": "452b57d9686b9582"
+}

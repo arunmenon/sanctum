@@ -22,7 +22,7 @@ class ServerBehavior:
     model_sequence: list[str] = field(default_factory=lambda: ["test-model-1"])
     delay_ms: int = 0
     fail_times: int = 0
-    invalid: Optional[str] = None           # wrong_type | unknown_id | bad_probability | bad_choice | not_json
+    invalid: Optional[str] = None           # wrong_type | unknown_id | bad_probability | bad_choice | not_json | truncated_state | truncated_question
     require_key: Optional[str] = None
     max_questions_per_call: int = 3
     max_options: int = 5
@@ -106,6 +106,10 @@ class SystemOneTestServer:
                         if question.get("type") == "choice":
                             answers[qid] = {**answers[qid], "choice": "not-an-offered-option"}
                 usage = {"input_tokens": 10 * len(questions) + 50, "output_tokens": 5 * len(questions)}
+                if behavior.invalid == "truncated_state":
+                    usage.update({"truncated": True, "state_tokens_dropped": 40})
+                if behavior.invalid == "truncated_question" and questions:
+                    usage["truncated_questions"] = [next(iter(questions))]
                 return self._send(200, {"model": model, "answers": answers, "usage": usage})
 
         self._httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)

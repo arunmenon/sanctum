@@ -1,0 +1,37 @@
+binding:
+  provider: laya-local
+  model: laya-rl-agent
+  model_revision: 55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851
+  template: d2-noul-v1
+  descriptor_release: sha256:da6dfe982c5156d9
+  decoding: provider default
+platt:
+  a: 0.4281
+  b: -1.265
+bands:
+  use: 0.7
+  skip: 0.09
+provenance:
+  fitted_on: dev
+  cases: 51
+  points: 204
+  positives: 35
+  folds: 5
+  harm_tolerance: 0.05
+  http_calls: 60
+  usage:
+    input_tokens: 60592
+    output_tokens: 0
+    state_tokens: 11413
+    state_tokens_dropped: 0
+    truncated: 0
+  held_out:
+    brier_calibrated: 0.1435
+    ece_calibrated: 0.029
+    brier_raw: 0.1738
+    ece_raw: 0.1655
+    skipped_at_band: 8
+    harmful_skips_at_band: 0
+  label: recall drop when the hub is removed (C1-fair runs)
+  fitted_at: '2026-09-30'
+  git_commit: 66a89ff9ead1f319521e4cc40dca6e4c080a5127

@@ -96,6 +96,8 @@ if __name__ == "__main__":
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--harm-tolerance", type=float, default=0.05)
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
+    parser.add_argument("--model-revision", default=None,
+                        help="checkpoint revision when the provider reports only a model family (Laya: /health revisions)")
     arguments = parser.parse_args()
     if "holdout" in str(arguments.cases.resolve()) or "acceptance" in str(arguments.cases.resolve()):
         raise SystemExit("fit on dev cases only")
@@ -149,9 +151,13 @@ if __name__ == "__main__":
     skip = choose_skip_band(held_out, arguments.harm_tolerance)
     a, b = platt([(logit(raw[k]), labels[k]) for k in keys])
     out = ROOT / "configs" / "calibration" / f"{arguments.provider}@{model}.yaml"
+    # The SUT finds a calibration by <provider>@<resolved model>. When a provider reports only a
+    # model family (Laya: "laya-rl-agent"), the checkpoint revision is recorded in the binding and
+    # is pinned by the running server, not verified per call: refit after any checkpoint change.
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(yaml.safe_dump({
-        "binding": {"provider": arguments.provider, "model": model, "template": TEMPLATE_VERSION,
+        "binding": {"provider": arguments.provider, "model": model, "model_revision": arguments.model_revision,
+                    "template": TEMPLATE_VERSION,
                     "descriptor_release": descriptor_release, "decoding": "provider default"},
         "platt": {"a": round(a, 4), "b": round(b, 4)},
         "bands": {"use": USE_BAND, "skip": skip},

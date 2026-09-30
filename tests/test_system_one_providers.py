@@ -237,3 +237,15 @@ def test_broker_result_translation():
     mixed_versions = outcome_from_broker({"provider": "p", "model": ["m-1", "m-2"], "answers": {"d2:a": {"type": "noul", "noul": 0.4}}})
     assert mixed_versions.unavailable_reason == "invalid_output"
     assert outcome_from_broker({"error": {"code": "x"}}).unavailable_reason == "not_configured"
+
+
+def test_truncated_reads_are_never_trusted():
+    """Laya reports truncation in usage; a truncated state voids the call, a truncated question
+    voids that decision (design page §13)."""
+    spec = SPECS["local-test"]
+    with SystemOneTestServer(ServerBehavior(invalid="truncated_state")) as server:
+        whole = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"a": NOUL, "b": NOUL}, 5, max_calls=1)
+    assert whole.unavailable_reason == "truncated" and not whole.answers
+    with SystemOneTestServer(ServerBehavior(invalid="truncated_question")) as server:
+        one = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"a": NOUL, "b": NOUL}, 5, max_calls=1)
+    assert one.unavailable_reason is None and one.invalid_ids == ["a"] and set(one.answers) == {"b"}

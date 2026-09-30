@@ -27,6 +27,7 @@ class UnavailableReason(StrEnum):
     DATA_CLASS_REFUSED = "data_class_refused"
     NOT_CONFIGURED = "not_configured"
     OVER_BUDGET = "over_budget"
+    TRUNCATED = "truncated"                                # the provider dropped part of the state
 
 
 class _Model(BaseModel):
@@ -128,6 +129,19 @@ def validate_answers(asked: dict[str, dict[str, Any]], response: Any) -> tuple[d
     return valid, invalid
 
 
+def truncation(response: Any) -> tuple[bool, list[str]]:
+    """(state truncated, truncated question ids) from provider usage metadata. Laya reports
+    `usage.truncated`, `state_tokens_dropped` and `truncated_questions`; a provider that reports
+    nothing is guarded by the declared `max_state_chars` budget instead."""
+    usage = response.get("usage") if isinstance(response, dict) else None
+    if not isinstance(usage, dict):
+        return False, []
+    dropped = usage.get("state_tokens_dropped")
+    state = bool(usage.get("truncated")) or (isinstance(dropped, (int, float)) and dropped > 0)
+    questions = usage.get("truncated_questions")
+    return state, [str(q) for q in questions] if isinstance(questions, list) else []
+
+
 class CallOutcome(BaseModel):
     model_config = ConfigDict(extra="forbid")
     provider: str
@@ -182,7 +196,15 @@ class SystemOneClient:
             if reason is not None:
                 outcome.unavailable_reason = reason
                 break
+            truncated_state, truncated_ids = truncation(response)
+            if truncated_state:
+                outcome.unavailable_reason = UnavailableReason.TRUNCATED   # never trust a truncated read
+                outcome.answers.clear()
+                break
             valid, invalid = validate_answers(batch, response)
+            for qid in truncated_ids:
+                if valid.pop(qid, None) is not None:
+                    invalid.append(qid)
             outcome.answers.update(valid)
             outcome.invalid_ids.extend(invalid)
             outcome.model = outcome.model or response.get("model")

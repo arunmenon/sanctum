@@ -30,6 +30,7 @@ from sanctum_hubs.interfaces import FailureInjector, NoFailures
 from sanctum_hubs.tokens import TokenService
 
 from .gateway import HubGateway, TokenMode, released_hub_ids
+from .process_sut import SUTTimeout
 from .sut import SUTContext, SystemUnderTest
 from .system_one_broker import DEFAULT_DESCRIPTORS as DEFAULT_SYSTEM_ONE_DESCRIPTORS
 from .system_one_broker import DEFAULT_PROVIDERS as DEFAULT_SYSTEM_ONE_PROVIDERS
@@ -126,6 +127,22 @@ def _failure_injector(config: RunConfig) -> FailureInjector:
                                  config.time_scale)
 
 
+SYSTEM_ONE_ROUNDS_PER_REQUEST = 3     # D2, then a Round 3 decision (D6 or D4), plus slack
+
+
+def failed_case_score(gold: GoldCase, reason: str) -> CaseScore:
+    """A case whose SUT call failed: no response to score, so nothing is credited and the reason
+    is a failed gate."""
+    return CaseScore(case_id=gold.case_id, recall=0.0 if gold.answerable else None,
+                     complete_support=False if gold.answerable else None,
+                     harmful_omission=True if gold.answerable else None, silent_omission=True,
+                     conflict_witnesses=0.0 if gold.relations else None, false_conflicts=0,
+                     ambiguity_handled=False if gold.interpretation_policy.value != "unique" else None,
+                     false_ambiguity=None, mandatory={}, status={"all": False}, wrong_entity=[], leaks=[],
+                     within_budget=True, receipt_honest=False, precision=None, sources_attempted=0, tokens_used=0,
+                     gates_failed=[reason], safe_grounded_success=False)
+
+
 def _system_one_broker(config: RunConfig, hub_ids: list[str]) -> SystemOneBroker:
     spec, profile = load_provider(config.system_one_provider, config.system_one_profile,
                                   config.system_one_providers_path)
@@ -165,10 +182,14 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     token_service = TokenService(config.world_build_dir / "identity" / "principals.json", config.token_secret)
     responses, receipts, traces, scores = [], [], [], []
     aligned_responses, aligned_receipts = [], []
+    sut_failures: list[dict] = []
     async with HubGateway(config.world_build_dir, hub_ids, token_service, _failure_injector(config),
                           config.token_mode) as gateway, AsyncExitStack() as sut_stack:
         if config.system_one_provider is not None:
             gateway.system_one = _system_one_broker(config, hub_ids)
+            if hasattr(sut, "extra_timeout_seconds"):
+                # each request may run a few System One rounds, each up to the profile deadline
+                sut.extra_timeout_seconds = SYSTEM_ONE_ROUNDS_PER_REQUEST * gateway.system_one.profile.deadline_ms / 1000.0
         # An out-of-process SUT (`process_sut.ProcessSUT`) starts its process and gateway proxy here.
         open_sut = getattr(sut, "open", None)
         if open_sut is not None:
@@ -182,8 +203,16 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
             context = SUTContext(caller_token=caller_token,
                                  gateway=gateway.handle(request.request_id, caller_token))
             started = time.perf_counter()
-            with gateway.sut_call(request.request_id):
-                response, receipt = await sut.retrieve(request, context)
+            try:
+                with gateway.sut_call(request.request_id):
+                    response, receipt = await sut.retrieve(request, context)
+            except SUTTimeout as error:
+                # one slow request fails its case, not the run (register row 24)
+                gateway.release(context.gateway)
+                sut_failures.append({"request_id": request.request_id, "case_id": gold.case_id,
+                                     "kind": "sut_timeout", "message": str(error)})
+                scores.append(failed_case_score(gold, "sut_timeout"))
+                continue
             elapsed_ms = round((time.perf_counter() - started) * 1000.0, 3)
             gateway.release(context.gateway)       # the invocation ends with the case
             trace = gateway.trace(request.request_id).model_copy(update={"elapsed_ms": elapsed_ms})
@@ -210,6 +239,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
         "metrics_revision": METRICS_REVISION,
         "hubs": hub_ids,
         "cases": [gold.case_id for gold in cases],
+        "sut_failures": len(sut_failures),
         "budget_tokens": config.budget_tokens,
         "system_one": _system_one_manifest(config, traces),
         "entity_alignment": None if config.entity_alignment is None else {
@@ -222,6 +252,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     _write_jsonl(out_dir / "traces.jsonl", traces)
     _write_jsonl(out_dir / "scores.jsonl", [asdict(score) for score in scores])
     _write_jsonl(out_dir / "anomalies.jsonl", anomalies)
+    _write_jsonl(out_dir / "sut_failures.jsonl", sut_failures)
     if config.entity_alignment is not None:
         # raw SUT outputs above stay as emitted; scoring used these aligned copies
         (out_dir / "entity_alignment.json").write_text(

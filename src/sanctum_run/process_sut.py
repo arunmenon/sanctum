@@ -45,6 +45,11 @@ class SUTProcessError(RuntimeError):
     """The SUT process failed a call or returned something that is not a response."""
 
 
+class SUTTimeout(SUTProcessError):
+    """One request outlived its deadline plus grace. The runner records the case as failed and
+    goes on; it never takes the whole run down (register row 24)."""
+
+
 def child_environment() -> dict[str, str]:
     environment = {name: os.environ[name] for name in PASSTHROUGH_ENVIRONMENT if name in os.environ}
     environment["PYTHONPATH"] = str(ROOT / "src")
@@ -68,6 +73,9 @@ class ProcessSUT:
     """Use via the runner: `run_cases` enters `open(gateway, world_build_dir)` before the cases."""
 
     def __init__(self, arguments: list[str], module: str = "sanctum_ref"):
+        # extra seconds per request for runner-side System One rounds (set by the runner from the
+        # provider profile); a slow model round is not a hung SUT
+        self.extra_timeout_seconds = 0.0
         self._command = [sys.executable, "-m", module, *arguments]
         self._proxy: Optional[GatewayProxy] = None
         self._session: Optional[ClientSession] = None
@@ -121,10 +129,14 @@ class ProcessSUT:
             params = types.CallToolRequestParams.model_validate({
                 "name": RETRIEVE_TOOL, "arguments": request.model_dump(mode="json"),
                 "_meta": {META_CALLER_TOKEN: context.caller_token, META_REQUEST_ID: request.request_id}})
-            with anyio.fail_after(request.deadline_ms / 1000.0 + RETRIEVE_GRACE_SECONDS):
-                result = await self._session.send_request(
-                    types.ClientRequest(types.CallToolRequest(method="tools/call", params=params)),
-                    types.CallToolResult)
+            limit = request.deadline_ms / 1000.0 + RETRIEVE_GRACE_SECONDS + self.extra_timeout_seconds
+            try:
+                with anyio.fail_after(limit):
+                    result = await self._session.send_request(
+                        types.ClientRequest(types.CallToolRequest(method="tools/call", params=params)),
+                        types.CallToolResult)
+            except TimeoutError:
+                raise SUTTimeout(f"request {request.request_id} gave no result within {limit:.1f}s") from None
         finally:
             self._proxy.unbind(request.request_id, context.gateway)
         return parse_retrieve_result(result)

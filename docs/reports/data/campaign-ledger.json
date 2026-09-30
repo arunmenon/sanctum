@@ -47,6 +47,42 @@
    "provider": "laya-local",
    "row": "3",
    "template": "d6-noul-v3-excerpts"
+  },
+  {
+   "calls": 26,
+   "input_tokens": 49522,
+   "note": "world build changed mid-campaign; results not comparable with rows 1-3",
+   "output_tokens": 3874,
+   "provider": "typesafe-jev",
+   "row": "4",
+   "template": "d6-decomp-v1"
+  },
+  {
+   "calls": 22,
+   "input_tokens": 31733,
+   "note": "world build changed mid-campaign; results not comparable with rows 1-3",
+   "output_tokens": 4159,
+   "provider": "typesafe-jev",
+   "row": "5",
+   "template": "d6-choice-v1"
+  },
+  {
+   "calls": 194,
+   "input_tokens": 75016,
+   "note": "world build changed mid-campaign; results not comparable with rows 1-3",
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "4",
+   "template": "d6-decomp-v1"
+  },
+  {
+   "calls": 91,
+   "input_tokens": 42055,
+   "note": "world build changed mid-campaign; results not comparable with rows 1-3",
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "5",
+   "template": "d6-choice-v1"
   }
  ]
 }

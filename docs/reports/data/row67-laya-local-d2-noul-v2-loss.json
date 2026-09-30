@@ -8,9 +8,101 @@
   "calls": 5000,
   "input_tokens": 10000000
  },
+ "control_source_prior": {
+  "diagnostic": {
+   "isotonic": {
+    "auc": 0.5,
+    "brier": 0.1716,
+    "log_loss": 2.3703,
+    "n": 204
+   }
+  },
+  "folds": [
+   {
+    "band": 0.1,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 1,
+    "judgments": 44,
+    "n": 44,
+    "positives": 9,
+    "skipped": 11
+   },
+   {
+    "band": 0.08,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 4,
+    "skipped": 10
+   },
+   {
+    "band": 0.05,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 7,
+    "skipped": 0
+   },
+   {
+    "band": 0.1,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 10,
+    "skipped": 10
+   },
+   {
+    "band": 0.05,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 5,
+    "skipped": 0
+   }
+  ],
+  "summary": {
+   "auc": {
+    "folds": 5,
+    "mean": 0.7305,
+    "sd": 0.0636
+   },
+   "brier": {
+    "folds": 5,
+    "mean": 0.1327,
+    "sd": 0.0295
+   },
+   "calibrators_selected": [
+    "source_intercepts",
+    "source_intercepts",
+    "source_intercepts",
+    "source_intercepts",
+    "source_intercepts"
+   ],
+   "log_loss": {
+    "folds": 5,
+    "mean": 0.4189,
+    "sd": 0.0711
+   },
+   "n": 204,
+   "positives": 35
+  },
+  "totals": {
+   "harmful_skip_rate_wilson95": [
+    0.0057,
+    0.1619
+   ],
+   "harmful_skips": 1,
+   "judgments": 204,
+   "skipped": 31
+  }
+ },
  "decision": "d2",
  "diagnostic": false,
- "git_commit": "699e4142485665b0b809461ac66344520f096256",
+ "git_commit": "2fa5e8360e276d556d8baeaa520e39f8720d2fa5",
  "items": {
   "dev-001\tcodehub": {
    "label": 0,
@@ -1557,5 +1649,6 @@
  },
  "state": "d2",
  "template": "d2-noul-v2-loss",
- "tolerance": 0.05
+ "tolerance": 0.05,
+ "world_manifest": "452b57d9686b9582"
 }

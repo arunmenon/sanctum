@@ -222,6 +222,60 @@
    "row": "6-7",
    "template": "d2-descriptors-v2",
    "world_manifest": "452b57d9"
+  },
+  {
+   "calls": 60,
+   "input_tokens": 38046,
+   "output_tokens": 5100,
+   "provider": "typesafe-jev",
+   "row": "6-7",
+   "template": "d2-noul-v1",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 60,
+   "input_tokens": 58446,
+   "output_tokens": 5100,
+   "provider": "typesafe-jev",
+   "row": "6-7",
+   "template": "d2-noul-v2-loss",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 60,
+   "input_tokens": 36426,
+   "output_tokens": 5100,
+   "provider": "typesafe-jev",
+   "row": "6-7",
+   "template": "d2-descriptors-v2",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 240,
+   "input_tokens": 60592,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-noul-v1",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 240,
+   "input_tokens": 80992,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-noul-v2-loss",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 240,
+   "input_tokens": 53872,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-descriptors-v2",
+   "world_manifest": "452b57d9686b9582"
   }
  ]
 }

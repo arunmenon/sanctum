@@ -1,12 +1,12 @@
 {
  "campaign_row": {
-  "calls": 240,
-  "input_tokens": 60592,
-  "output_tokens": 0
+  "calls": 60,
+  "input_tokens": 58446,
+  "output_tokens": 5100
  },
  "ceilings": {
-  "calls": 5000,
-  "input_tokens": 10000000
+  "calls": 70,
+  "input_tokens": 60000
  },
  "control_source_prior": {
   "diagnostic": {
@@ -108,1428 +108,1428 @@
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5058
+    "p": 0.8
    }
   },
   "dev-001\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3015
+    "p": 0.19
    }
   },
   "dev-001\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3372
+    "p": 0.17
    }
   },
   "dev-001\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4917
+    "p": 0.16
    }
   },
   "dev-002\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2285
+    "p": 0.57
    }
   },
   "dev-002\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1648
+    "p": 0.4
    }
   },
   "dev-002\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1618
+    "p": 0.16
    }
   },
   "dev-002\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.173
+    "p": 0.44
    }
   },
   "dev-003\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1309
+    "p": 0.55
    }
   },
   "dev-003\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1515
+    "p": 0.38
    }
   },
   "dev-003\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.0921
+    "p": 0.17
    }
   },
   "dev-003\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.15
+    "p": 0.32
    }
   },
   "dev-004\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2272
+    "p": 0.68
    }
   },
   "dev-004\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1801
+    "p": 0.38
    }
   },
   "dev-004\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.221
+    "p": 0.18
    }
   },
   "dev-004\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2291
+    "p": 0.41
    }
   },
   "dev-005\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4859
+    "p": 0.51
    }
   },
   "dev-005\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4879
+    "p": 0.66
    }
   },
   "dev-005\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3551
+    "p": 0.14
    }
   },
   "dev-005\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3716
+    "p": 0.34
    }
   },
   "dev-006\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3726
+    "p": 0.78
    }
   },
   "dev-006\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2139
+    "p": 0.26
    }
   },
   "dev-006\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2252
+    "p": 0.26
    }
   },
   "dev-006\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3221
+    "p": 0.19
    }
   },
   "dev-007\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5394
+    "p": 0.5
    }
   },
   "dev-007\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3214
+    "p": 0.31
    }
   },
   "dev-007\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3993
+    "p": 0.16
    }
   },
   "dev-007\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5809
+    "p": 0.25
    }
   },
   "dev-008\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5051
+    "p": 0.62
    }
   },
   "dev-008\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3046
+    "p": 0.47
    }
   },
   "dev-008\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3222
+    "p": 0.15
    }
   },
   "dev-008\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3605
+    "p": 0.7
    }
   },
   "dev-009\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4238
+    "p": 0.72
    }
   },
   "dev-009\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2292
+    "p": 0.29
    }
   },
   "dev-009\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2905
+    "p": 0.17
    }
   },
   "dev-009\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4585
+    "p": 0.24
    }
   },
   "dev-010\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1891
+    "p": 0.78
    }
   },
   "dev-010\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1707
+    "p": 0.27
    }
   },
   "dev-010\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1542
+    "p": 0.18
    }
   },
   "dev-010\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1911
+    "p": 0.24
    }
   },
   "dev-011\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.6241
+    "p": 0.59
    }
   },
   "dev-011\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5376
+    "p": 0.41
    }
   },
   "dev-011\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4974
+    "p": 0.16
    }
   },
   "dev-011\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5058
+    "p": 0.43
    }
   },
   "dev-012\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3226
+    "p": 0.77
    }
   },
   "dev-012\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1911
+    "p": 0.18
    }
   },
   "dev-012\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.295
+    "p": 0.14
    }
   },
   "dev-012\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3705
+    "p": 0.14
    }
   },
   "dev-013\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1408
+    "p": 0.59
    }
   },
   "dev-013\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1441
+    "p": 0.33
    }
   },
   "dev-013\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1222
+    "p": 0.17
    }
   },
   "dev-013\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1462
+    "p": 0.35
    }
   },
   "dev-014\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2729
+    "p": 0.71
    }
   },
   "dev-014\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.245
+    "p": 0.29
    }
   },
   "dev-014\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1824
+    "p": 0.15
    }
   },
   "dev-014\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2759
+    "p": 0.18
    }
   },
   "dev-015\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3733
+    "p": 0.33
    }
   },
   "dev-015\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3411
+    "p": 0.35
    }
   },
   "dev-015\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2737
+    "p": 0.14
    }
   },
   "dev-015\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3085
+    "p": 0.32
    }
   },
   "dev-016\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5132
+    "p": 0.42
    }
   },
   "dev-016\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3716
+    "p": 0.3
    }
   },
   "dev-016\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4496
+    "p": 0.14
    }
   },
   "dev-016\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.494
+    "p": 0.64
    }
   },
   "dev-017\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3547
+    "p": 0.64
    }
   },
   "dev-017\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2907
+    "p": 0.58
    }
   },
   "dev-017\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2323
+    "p": 0.15
    }
   },
   "dev-017\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2796
+    "p": 0.4
    }
   },
   "dev-018\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1918
+    "p": 0.6
    }
   },
   "dev-018\tdochub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1549
+    "p": 0.45
    }
   },
   "dev-018\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1302
+    "p": 0.23
    }
   },
   "dev-018\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.153
+    "p": 0.5
    }
   },
   "dev-019\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4078
+    "p": 0.58
    }
   },
   "dev-019\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3076
+    "p": 0.37
    }
   },
   "dev-019\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3228
+    "p": 0.15
    }
   },
   "dev-019\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4697
+    "p": 0.38
    }
   },
   "dev-020\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3773
+    "p": 0.59
    }
   },
   "dev-020\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2619
+    "p": 0.32
    }
   },
   "dev-020\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3428
+    "p": 0.17
    }
   },
   "dev-020\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4505
+    "p": 0.4
    }
   },
   "dev-021\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.542
+    "p": 0.51
    }
   },
   "dev-021\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3789
+    "p": 0.38
    }
   },
   "dev-021\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.441
+    "p": 0.13
    }
   },
   "dev-021\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.476
+    "p": 0.52
    }
   },
   "dev-022\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.341
+    "p": 0.62
    }
   },
   "dev-022\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2456
+    "p": 0.27
    }
   },
   "dev-022\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3258
+    "p": 0.17
    }
   },
   "dev-022\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3178
+    "p": 0.34
    }
   },
   "dev-023\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3766
+    "p": 0.45
    }
   },
   "dev-023\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3989
+    "p": 0.54
    }
   },
   "dev-023\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3213
+    "p": 0.13
    }
   },
   "dev-023\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3693
+    "p": 0.4
    }
   },
   "dev-024\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2442
+    "p": 0.69
    }
   },
   "dev-024\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2025
+    "p": 0.39
    }
   },
   "dev-024\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2357
+    "p": 0.23
    }
   },
   "dev-024\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2411
+    "p": 0.48
    }
   },
   "dev-025\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3551
+    "p": 0.69
    }
   },
   "dev-025\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2575
+    "p": 0.32
    }
   },
   "dev-025\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2508
+    "p": 0.16
    }
   },
   "dev-025\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2858
+    "p": 0.31
    }
   },
   "dev-026\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5225
+    "p": 0.83
    }
   },
   "dev-026\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.198
+    "p": 0.18
    }
   },
   "dev-026\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2763
+    "p": 0.14
    }
   },
   "dev-026\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2726
+    "p": 0.13
    }
   },
   "dev-027\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5114
+    "p": 0.69
    }
   },
   "dev-027\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4454
+    "p": 0.31
    }
   },
   "dev-027\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.486
+    "p": 0.22
    }
   },
   "dev-027\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4373
+    "p": 0.29
    }
   },
   "dev-028\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5069
+    "p": 0.76
    }
   },
   "dev-028\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2105
+    "p": 0.28
    }
   },
   "dev-028\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2671
+    "p": 0.25
    }
   },
   "dev-028\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3333
+    "p": 0.21
    }
   },
   "dev-029\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.599
+    "p": 0.7
    }
   },
   "dev-029\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.435
+    "p": 0.29
    }
   },
   "dev-029\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4488
+    "p": 0.21
    }
   },
   "dev-029\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.424
+    "p": 0.32
    }
   },
   "dev-030\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3691
+    "p": 0.79
    }
   },
   "dev-030\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2181
+    "p": 0.32
    }
   },
   "dev-030\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2315
+    "p": 0.17
    }
   },
   "dev-030\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.235
+    "p": 0.74
    }
   },
   "dev-031\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3679
+    "p": 0.83
    }
   },
   "dev-031\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.254
+    "p": 0.52
    }
   },
   "dev-031\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2804
+    "p": 0.16
    }
   },
   "dev-031\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3399
+    "p": 0.54
    }
   },
   "dev-032\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4602
+    "p": 0.71
    }
   },
   "dev-032\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2773
+    "p": 0.35
    }
   },
   "dev-032\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3241
+    "p": 0.17
    }
   },
   "dev-032\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3204
+    "p": 0.64
    }
   },
   "dev-033\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.8187
+    "p": 0.81
    }
   },
   "dev-033\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.7108
+    "p": 0.54
    }
   },
   "dev-033\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.8053
+    "p": 0.16
    }
   },
   "dev-033\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.7815
+    "p": 0.4
    }
   },
   "dev-034\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4533
+    "p": 0.81
    }
   },
   "dev-034\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2549
+    "p": 0.66
    }
   },
   "dev-034\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2972
+    "p": 0.17
    }
   },
   "dev-034\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3149
+    "p": 0.32
    }
   },
   "dev-035\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5213
+    "p": 0.82
    }
   },
   "dev-035\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2443
+    "p": 0.34
    }
   },
   "dev-035\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2835
+    "p": 0.15
    }
   },
   "dev-035\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3845
+    "p": 0.77
    }
   },
   "dev-036\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.6923
+    "p": 0.7
    }
   },
   "dev-036\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.6015
+    "p": 0.35
    }
   },
   "dev-036\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.6326
+    "p": 0.19
    }
   },
   "dev-036\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.6302
+    "p": 0.6
    }
   },
   "dev-037\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4752
+    "p": 0.73
    }
   },
   "dev-037\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3194
+    "p": 0.36
    }
   },
   "dev-037\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3744
+    "p": 0.22
    }
   },
   "dev-037\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4525
+    "p": 0.37
    }
   },
   "dev-038\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2595
+    "p": 0.71
    }
   },
   "dev-038\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1742
+    "p": 0.31
    }
   },
   "dev-038\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2087
+    "p": 0.18
    }
   },
   "dev-038\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2135
+    "p": 0.18
    }
   },
   "dev-039\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5723
+    "p": 0.7
    }
   },
   "dev-039\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2569
+    "p": 0.3
    }
   },
   "dev-039\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3698
+    "p": 0.16
    }
   },
   "dev-039\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4877
+    "p": 0.3
    }
   },
   "dev-040\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3096
+    "p": 0.79
    }
   },
   "dev-040\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2015
+    "p": 0.19
    }
   },
   "dev-040\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2461
+    "p": 0.16
    }
   },
   "dev-040\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2577
+    "p": 0.16
    }
   },
   "dev-041\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3081
+    "p": 0.54
    }
   },
   "dev-041\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2311
+    "p": 0.34
    }
   },
   "dev-041\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3276
+    "p": 0.36
    }
   },
   "dev-041\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4268
+    "p": 0.33
    }
   },
   "dev-042\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4568
+    "p": 0.49
    }
   },
   "dev-042\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3986
+    "p": 0.38
    }
   },
   "dev-042\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.388
+    "p": 0.22
    }
   },
   "dev-042\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3567
+    "p": 0.44
    }
   },
   "dev-043\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1099
+    "p": 0.51
    }
   },
   "dev-043\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.0813
+    "p": 0.24
    }
   },
   "dev-043\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.0863
+    "p": 0.26
    }
   },
   "dev-043\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1141
+    "p": 0.21
    }
   },
   "dev-044\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.5088
+    "p": 0.53
    }
   },
   "dev-044\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4537
+    "p": 0.41
    }
   },
   "dev-044\tmemoryhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4697
+    "p": 0.19
    }
   },
   "dev-044\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4479
+    "p": 0.46
    }
   },
   "dev-051\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2273
+    "p": 0.43
    }
   },
   "dev-051\tdochub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2012
+    "p": 0.46
    }
   },
   "dev-051\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1836
+    "p": 0.24
    }
   },
   "dev-051\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2193
+    "p": 0.47
    }
   },
   "dev-052\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2673
+    "p": 0.7
    }
   },
   "dev-052\tdochub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2841
+    "p": 0.41
    }
   },
   "dev-052\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1458
+    "p": 0.19
    }
   },
   "dev-052\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1708
+    "p": 0.49
    }
   },
   "dev-053\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4666
+    "p": 0.61
    }
   },
   "dev-053\tdochub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.226
+    "p": 0.43
    }
   },
   "dev-053\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2981
+    "p": 0.35
    }
   },
   "dev-053\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3969
+    "p": 0.5
    }
   },
   "dev-054\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2093
+    "p": 0.61
    }
   },
   "dev-054\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1898
+    "p": 0.43
    }
   },
   "dev-054\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1944
+    "p": 0.19
    }
   },
   "dev-054\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2305
+    "p": 0.46
    }
   },
   "dev-055\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.4524
+    "p": 0.54
    }
   },
   "dev-055\tdochub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2309
+    "p": 0.28
    }
   },
   "dev-055\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3236
+    "p": 0.17
    }
   },
   "dev-055\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.3
+    "p": 0.68
    }
   },
   "dev-056\tcodehub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1858
+    "p": 0.63
    }
   },
   "dev-056\tdochub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1996
+    "p": 0.35
    }
   },
   "dev-056\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1715
+    "p": 0.23
    }
   },
   "dev-056\tskillhub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1939
+    "p": 0.45
    }
   },
   "dev-058\tcodehub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1714
+    "p": 0.59
    }
   },
   "dev-058\tdochub": {
    "label": 1,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1071
+    "p": 0.26
    }
   },
   "dev-058\tmemoryhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.1065
+    "p": 0.34
    }
   },
   "dev-058\tskillhub": {
    "label": 0,
    "rule_flagged": false,
    "signals": {
-    "p": 0.2085
+    "p": 0.21
    }
   }
  },
@@ -1540,115 +1540,115 @@
   "ok": 60
  },
  "models": [
-  "laya-rl-agent"
+  "jev-1.13.0"
  ],
  "nested_cv": {
   "diagnostic": {
    "isotonic": {
-    "auc": 0.4969,
-    "brier": 0.1484,
-    "log_loss": 0.4864,
+    "auc": 0.7128,
+    "brier": 0.135,
+    "log_loss": 0.5737,
     "n": 204
    }
   },
   "folds": [
    {
-    "band": 0.04,
+    "band": 0.11,
     "calibrator": "source_intercepts",
-    "harmful_skips": 1,
+    "harmful_skips": 2,
     "judgments": 44,
     "n": 44,
     "positives": 9,
-    "skipped": 10
+    "skipped": 19
    },
    {
-    "band": 0.05,
-    "calibrator": "source_intercepts",
+    "band": 0.07,
+    "calibrator": "intercept_only",
     "harmful_skips": 0,
     "judgments": 40,
     "n": 40,
     "positives": 4,
-    "skipped": 3
+    "skipped": 11
    },
    {
-    "band": 0.04,
-    "calibrator": "source_intercepts",
+    "band": 0.07,
+    "calibrator": "intercept_only",
     "harmful_skips": 0,
     "judgments": 40,
     "n": 40,
     "positives": 7,
-    "skipped": 1
+    "skipped": 8
    },
    {
-    "band": 0.04,
-    "calibrator": "source_intercepts",
+    "band": 0.08,
+    "calibrator": "intercept_only",
     "harmful_skips": 0,
     "judgments": 40,
     "n": 40,
     "positives": 10,
-    "skipped": 6
+    "skipped": 17
    },
    {
-    "band": 0.04,
-    "calibrator": "source_intercepts",
+    "band": 0.07,
+    "calibrator": "intercept_only",
     "harmful_skips": 0,
     "judgments": 40,
     "n": 40,
     "positives": 5,
-    "skipped": 1
+    "skipped": 11
    }
   ],
   "summary": {
    "auc": {
     "folds": 5,
-    "mean": 0.7258,
-    "sd": 0.0625
+    "mean": 0.7455,
+    "sd": 0.0468
    },
    "brier": {
     "folds": 5,
-    "mean": 0.1362,
-    "sd": 0.0334
+    "mean": 0.1303,
+    "sd": 0.03
    },
    "calibrators_selected": [
     "source_intercepts",
-    "source_intercepts",
-    "source_intercepts",
-    "source_intercepts",
-    "source_intercepts"
+    "intercept_only",
+    "intercept_only",
+    "intercept_only",
+    "intercept_only"
    ],
    "log_loss": {
     "folds": 5,
-    "mean": 0.4279,
-    "sd": 0.0817
+    "mean": 0.4121,
+    "sd": 0.076
    },
    "n": 204,
    "positives": 35
   },
   "totals": {
    "harmful_skip_rate_wilson95": [
-    0.0085,
-    0.2267
+    0.0083,
+    0.1039
    ],
-   "harmful_skips": 1,
+   "harmful_skips": 2,
    "judgments": 204,
-   "skipped": 21
+   "skipped": 66
   }
  },
- "provider": "laya-local",
+ "provider": "typesafe-jev",
  "row": "6-7",
  "signals": {
   "p": {
    "all": {
-    "brier_raw": 0.1738,
+    "brier_raw": 0.1813,
     "n": 204,
     "positives": 35,
-    "pr_auc": 0.2576,
-    "roc_auc": 0.5751
+    "pr_auc": 0.3945,
+    "roc_auc": 0.7598
    }
   }
  },
  "state": "d2",
- "template": "d2-noul-v1",
+ "template": "d2-noul-v2-loss",
  "tolerance": 0.05,
  "world_manifest": "452b57d9686b9582"
 }

@@ -110,6 +110,8 @@ def round3_fit(arguments, spec, environment):
         (scratch / "no-calibration").mkdir()                     # shadow-only by construction
         sut_arguments = ["--config", "C4", "--round3", decision, "--round3-provider", arguments.provider,
                          "--calibration-dir", str(scratch / "no-calibration")]
+        if arguments.template:
+            sut_arguments += ["--round3-template", arguments.template]
         if arguments.memory_release:
             sut_arguments += ["--memory-release", arguments.memory_release]
         result = run(ProcessSUT(sut_arguments), RunConfig(
@@ -149,6 +151,7 @@ if __name__ == "__main__":
     parser.add_argument("--harm-tolerance", type=float, default=0.05)
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--decision", default="d2", choices=["d2", "d6", "d4"])
+    parser.add_argument("--template", default=None, help="template id (configs/system_one_templates.yaml); default per decision")
     parser.add_argument("--max-input-tokens", type=int, default=200_000,
                         help="hard campaign ceiling, enforced before each HTTP attempt")
     parser.add_argument("--max-output-tokens", type=int, default=None)
@@ -184,7 +187,10 @@ if __name__ == "__main__":
             raw_held_out += [(raw[k], labels[k]) for k in keys if k[0] in fold]
         use = choose_use_band(held_out, arguments.max_false_rate)
         a, b = platt([(logit(raw[k]), labels[k]) for k in keys])
-        from sanctum_ref.providers.http_systemone import TEMPLATES
+        from sanctum_ref.providers.templates import DEFAULT_TEMPLATES, TemplateRegistry
+        template = TemplateRegistry(DEFAULT_TEMPLATES).resolve(arguments.decision, arguments.provider, arguments.template)
+        if template.diagnostic:
+            raise SystemExit(f"{template.id} is a diagnostic template: it is never calibrated into bands")
         out = ROOT / "configs" / "calibration" / f"{arguments.provider}@{model}.{arguments.decision}.yaml"
         if use >= 1.0:
             # no band met the tolerance: record the fit, but leave no live binding, so the SUT runs
@@ -193,7 +199,7 @@ if __name__ == "__main__":
             out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(yaml.safe_dump({
             "binding": {"provider": arguments.provider, "model": model, "model_revision": arguments.model_revision,
-                        "decision": arguments.decision, "template": TEMPLATES[arguments.decision],
+                        "decision": arguments.decision, "template": template.id,
                         "descriptor_release": "none", "decoding": "provider default"},
             "platt": {"a": round(a, 4), "b": round(b, 4)},
             "bands": {"use": use, "skip": 0.0},

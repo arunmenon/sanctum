@@ -1,0 +1,21 @@
+# D2 descriptors, version 2 (docs/reviews/system-one-prompt-review-full.md §3). Hypotheses to
+# validate against the exposed hub capabilities, not authority declarations. Tested separately
+# from the d2-noul-v2-loss rubric (template d2-descriptors-v2).
+descriptors:
+  codehub: >-
+    Source code and configuration in service repositories.
+    Supports implemented behavior, deployed constants, branches
+    and available releases. Does not by itself establish intended
+    policy or procedure.
+  skillhub: >-
+    Reviewed skills, runbooks and checklists in domain namespaces.
+    Supports intended procedures and operational steps.
+    Does not by itself establish what the deployed code implements.
+  dochub: >-
+    Reference pages in team spaces, including service descriptions,
+    design notes, policies and approval requirements.
+    Authority depends on the owning page and fact kind.
+  memoryhub: >-
+    The caller's permitted agent session notes and prior discussions.
+    Supports session context and recorded observations.
+    Does not by itself establish current implementation or policy.

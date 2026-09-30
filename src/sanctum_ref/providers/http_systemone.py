@@ -26,6 +26,7 @@ from sanctum_contracts import DecisionRequest, DecisionResult
 from sanctum_systemone import CallOutcome, ProviderSpec, SystemOneClient
 
 from .interface import POLICY_VERSION, TARGET, unavailable
+from .templates import DEFAULT_TEMPLATES, Template, TemplateRegistry
 
 TEMPLATE_VERSION = "d2-noul-v1"
 TEMPLATES = {"d2": TEMPLATE_VERSION, "d6": "d6-noul-v1", "d4": "d4-noul-v1"}
@@ -41,10 +42,13 @@ BROKER_TOOL = "system_one.decide"
 ROUND3_MAX_CALLS = 24
 
 
-def d2_questions(requests: list[DecisionRequest]) -> dict[str, dict[str, Any]]:
-    return {f"d2:{request.candidate_ids[0]}": {
-        "type": "noul",
-        "instructions": f"{D2_INSTRUCTIONS} Source: {request.candidate_ids[0]}."} for request in requests}
+def d2_questions(requests: list[DecisionRequest], template: Optional[Template] = None) -> dict[str, dict[str, Any]]:
+    template = template or TemplateRegistry(DEFAULT_TEMPLATES).resolve("d2")
+    questions: dict[str, dict[str, Any]] = {}
+    for request in requests:
+        source = request.candidate_ids[0]
+        questions.update(template.questions(f"d2:{source}", source=source))
+    return questions
 
 
 def request_hash(round_name: str, query: str, questions: dict[str, Any]) -> str:
@@ -138,12 +142,18 @@ class Calibration:
 
 
 class SystemOneHttpAdapter:
-    def __init__(self, spec: ProviderSpec, calibration_dir: Path, transport=None, max_calls_per_round: int = 3):
+    def __init__(self, spec: ProviderSpec, calibration_dir: Path, transport=None, max_calls_per_round: int = 3,
+                 templates: Optional[TemplateRegistry] = None, template_ids: Optional[dict[str, str]] = None):
         self.name = spec.name
         self.capabilities = spec.capabilities
         self._calibration_dir = Path(calibration_dir)
         self._transport = transport or BrokerTransport()
         self._max_calls = max_calls_per_round
+        self._templates = templates or TemplateRegistry(DEFAULT_TEMPLATES)
+        self._template_ids = dict(template_ids or {})
+
+    def template(self, decision: str) -> Template:
+        return self._templates.resolve(decision, self.name, self._template_ids.get(decision))
 
     def _calibration(self, model: Optional[str], decision: str = "d2") -> Optional[Calibration]:
         suffix = "" if decision == "d2" else f".{decision}"
@@ -159,8 +169,9 @@ class SystemOneHttpAdapter:
         if not requests:
             return []
         query = requests[0].bounded_state["query"]
-        questions = d2_questions(requests)
-        payload = {"round": "d2", "query": query, "questions": questions,
+        template = self.template("d2")
+        questions = d2_questions(requests, template)
+        payload = {"round": "d2", "query": query, "questions": questions, "template": template.id,
                    "candidate_source_ids": [request.candidate_ids[0] for request in requests],
                    "max_calls": self._max_calls}
         outcome = await self._transport.send(port, payload, deadline_ms)
@@ -169,7 +180,8 @@ class SystemOneHttpAdapter:
             return [unavailable(self.name, started, outcome.model) for _ in requests]
         calibration = self._calibration(outcome.model)
         descriptor_release = outcome.descriptor_release
-        shadow = calibration is None or not calibration.matches(self.name, outcome.model, descriptor_release)
+        shadow = (template.diagnostic or calibration is None
+                  or not calibration.matches(self.name, outcome.model, descriptor_release, template.id))
         results = []
         for request in requests:
             source_id = request.candidate_ids[0]
@@ -180,7 +192,7 @@ class SystemOneHttpAdapter:
             p_raw = answer["noul"]
             value = {"source": source_id, "p_raw": round(p_raw, 4), "call": True, "shadow": shadow,
                      "request_hash": digest, "usage": outcome.usage, "calls": outcome.calls,
-                     "template": TEMPLATE_VERSION}
+                     "template": template.id}
             if shadow:
                 disposition = "preserve_candidate"
             else:
@@ -210,13 +222,20 @@ class ItemJudgement:
 
 async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: dict[str, list[dict[str, Any]]],
                        query: str, port: Any, deadline_ms: int) -> tuple[dict[str, ItemJudgement], list[DecisionResult], Optional[Calibration]]:
-    """A Round 3 round (design page §14): one `noul` per item; items carry provenance refs only and
-    the broker reads the text. Returns judgements, receipt DecisionResults and the calibration used."""
+    """A Round 3 round (design page §14): the resolved template's question(s) per item; items carry
+    provenance refs only and the broker reads the text. Returns judgements, receipt DecisionResults
+    and the calibration used. Diagnostic templates and templates without a matching calibration
+    are shadow-only: recorded, never applied."""
     started = time.monotonic()
-    template = TEMPLATES[round_name]
-    questions = {qid: {"type": "noul", "instructions": ROUND3_INSTRUCTIONS[round_name]} for qid in items}
-    payload = {"round": round_name, "query": query, "questions": questions,
-               "items": {qid: {"refs": refs} for qid, refs in items.items()},
+    template = adapter.template(round_name)
+    questions: dict[str, dict[str, Any]] = {}
+    item_payload: dict[str, dict[str, Any]] = {}
+    for qid, refs in items.items():
+        for question_id, question in template.questions(qid).items():
+            questions[question_id] = question
+            item_payload[question_id] = {"refs": refs}
+    payload = {"round": round_name, "query": query, "questions": questions, "items": item_payload,
+               "template": template.id, "state_kind": template.state,
                # Round 3 may need about one call per item on small-context providers; the broker
                # still caps calls by the run profile
                "max_calls": ROUND3_MAX_CALLS}
@@ -224,31 +243,38 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
     digest = request_hash(round_name, query, questions)
     judgements: dict[str, ItemJudgement] = {}
     results: list[DecisionResult] = []
-    calibration = None if outcome.unavailable_reason else adapter._calibration(outcome.model, round_name)
-    shadow = calibration is None or not calibration.matches(adapter.name, outcome.model,
-                                                            outcome.descriptor_release, template)
+    calibration = None if outcome.unavailable_reason or template.diagnostic else adapter._calibration(outcome.model, round_name)
+    shadow = (template.diagnostic or calibration is None
+              or not calibration.matches(adapter.name, outcome.model, outcome.descriptor_release, template.id))
     for qid, refs in items.items():
-        answer = None if outcome.unavailable_reason else outcome.answers.get(qid)
-        if answer is None:
+        own = [question_id for question_id in questions if question_id == qid or question_id.startswith(qid + "#")]
+        answers = {} if outcome.unavailable_reason else {q: outcome.answers[q] for q in own if q in outcome.answers}
+        if len(answers) != len(own):                   # any missing part: the item is unavailable
             judgements[qid] = ItemJudgement(qid, None, None, True)
             result = unavailable(adapter.name, started, outcome.model)
             results.append(result.model_copy(update={"target": f"{round_name}:{qid}"}))
             continue
-        p_raw = answer["noul"]
-        p = None if shadow else calibration.apply(p_raw)
-        judgements[qid] = ItemJudgement(qid, p_raw, p, shadow)
-        value = {"item": qid, "p_raw": round(p_raw, 4), "shadow": shadow, "refs": refs,
-                 "request_hash": digest, "usage": outcome.usage, "calls": outcome.calls, "template": template}
+        single = answers.get(qid)
+        p_raw = single["noul"] if single is not None and single.get("type") == "noul" else None
+        p = None if shadow or p_raw is None else calibration.apply(p_raw)
+        judgements[qid] = ItemJudgement(qid, None if template.diagnostic else p_raw, p, shadow)
+        value = {"item": qid, "shadow": shadow, "refs": refs, "request_hash": digest, "usage": outcome.usage,
+                 "calls": outcome.calls, "template": template.id, "diagnostic": template.diagnostic,
+                 "answers": answers}
+        if p_raw is not None:
+            value["p_raw"] = round(p_raw, 4)
+            if template.polarity == "negative":
+                value["p_signal"] = round(1 - p_raw, 4)          # diagnostic signal only
+        if p is not None:
+            value["p"] = round(p, 4)
         # the evaluator's label reader (sanctum_eval.calibration_labels) keys on these names
         if round_name == "d6":
             value.update({"pair": qid, "a": refs[0], "b": refs[1]})
         elif round_name == "d4":
             value.update({"unit": qid, "ref": refs[0]})
-        if p is not None:
-            value["p"] = round(p, 4)
         results.append(DecisionResult(
-            status="answered", value=value, target=f"{round_name}: {ROUND3_INSTRUCTIONS[round_name]}",
-            distribution={"true": round(p_raw, 4), "false": round(1 - p_raw, 4)},
+            status="answered", value=value, target=f"{round_name}: template {template.id}",
+            distribution=None if p_raw is None else {"true": round(p_raw, 4), "false": round(1 - p_raw, 4)},
             calibration=None if shadow else {"method": "platt_on_logit", "binding": f"{adapter.name}@{outcome.model}.{round_name}"},
             disposition="use" if (p is not None and p >= calibration.use) else "preserve_candidate",
             provider=adapter.name, model_version=outcome.model, policy_version=POLICY_VERSION,

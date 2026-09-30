@@ -21,7 +21,8 @@ def provider_names(specs_path: Path) -> list[str]:
 
 
 def build_provider(name: str, params_path: Path, specs_path: Path | None = None,
-                   calibration_dir: Path | None = None):
+                   calibration_dir: Path | None = None, template_ids: dict | None = None,
+                   templates_path: Path | None = None):
     if name == "rules":
         return RulesProvider()
     if name == "standin":
@@ -32,4 +33,7 @@ def build_provider(name: str, params_path: Path, specs_path: Path | None = None,
     spec = specs.get(name)
     if spec is None or spec.kind != "http":
         raise ValueError(f"unknown decision provider {name!r}")
-    return SystemOneHttpAdapter(spec, calibration_dir or Path("configs/calibration"))
+    from .templates import DEFAULT_TEMPLATES, TemplateRegistry
+    return SystemOneHttpAdapter(spec, calibration_dir or Path("configs/calibration"),
+                                templates=TemplateRegistry(templates_path or DEFAULT_TEMPLATES),
+                                template_ids=template_ids)

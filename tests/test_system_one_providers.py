@@ -307,3 +307,41 @@ def test_shadow_comes_from_a_missing_binding_not_a_sentinel(tmp_path):
     assert all(r.value["shadow"] and r.value["call"] and "p" not in r.value for r in sentinel)
     assert not list((ROOT / "configs" / "calibration").glob("*.yaml")) or all(
         yaml.safe_load(p.read_text())["bands"]["use"] < 1.0 for p in (ROOT / "configs" / "calibration").glob("*.yaml"))
+
+
+def test_templates_are_versioned_and_defaults_unchanged():
+    """Review B: named, versioned templates; the default ids keep the exact texts the existing
+    calibrations were fitted with; diagnostics are never live."""
+    from sanctum_ref.providers.http_systemone import D2_INSTRUCTIONS, ROUND3_INSTRUCTIONS, d2_questions
+    from sanctum_ref.providers.templates import DEFAULT_TEMPLATES, TemplateRegistry
+    registry = TemplateRegistry(DEFAULT_TEMPLATES)
+    assert registry.resolve("d2").questions("d2:codehub", source="codehub")["d2:codehub"]["instructions"] == \
+        f"{D2_INSTRUCTIONS} Source: codehub."
+    assert registry.resolve("d6").instructions == ROUND3_INSTRUCTIONS["d6"]
+    assert registry.resolve("d4").instructions == ROUND3_INSTRUCTIONS["d4"]
+    assert list(d2_questions([d2_request("dochub", "q", 3000)])) == ["d2:dochub"]
+    for name in ("d6-noul-v2-relations", "d6-noul-v3-excerpts", "d6-laya-positive-v1", "d2-noul-v2-loss",
+                 "d2-descriptors-v2", "d4-noul-v2-support"):
+        assert not registry.templates[name].diagnostic
+    for name in ("d6-laya-negative-v1", "d6-decomp-v1", "d6-choice-v1", "d4-score-v1"):
+        assert registry.templates[name].diagnostic
+    assert set(registry.resolve("d6", template_id="d6-decomp-v1").questions("d6:a|b")) == {"d6:a|b#same_subject", "d6:a|b#values_differ"}
+    assert "no_conflict" in registry.resolve("d6", template_id="d6-choice-v1").questions("d6:a|b")["d6:a|b"]["criteria"]
+
+
+def test_diagnostic_templates_never_drive_decisions(tmp_path):
+    from sanctum_ref.providers.http_systemone import decide_items
+    from sanctum_ref.providers.templates import DEFAULT_TEMPLATES, TemplateRegistry
+    (tmp_path / "local-test@test-model-1.d6.yaml").write_text(yaml.safe_dump({
+        "binding": {"provider": "local-test", "model": "test-model-1", "template": "d6-laya-negative-v1"},
+        "platt": {"a": 1.0, "b": 0.0}, "bands": {"use": 0.5, "skip": 0.0}}))
+    ref = {"source_id": "codehub", "artifact_id": "a", "version": "R42", "start": 0, "end": 5}
+    for template_id in ("d6-laya-negative-v1", "d6-decomp-v1", "d6-choice-v1"):
+        with SystemOneTestServer() as server:
+            adapter = SystemOneHttpAdapter(SPECS["local-test"], tmp_path,
+                                           transport=DirectTransport(SystemOneClient(SPECS["local-test"], server.base_url, "test-model-1"),
+                                                                     lambda p: {"query": p["query"]}),
+                                           templates=TemplateRegistry(DEFAULT_TEMPLATES), template_ids={"d6": template_id})
+            judgements, results, calibration = anyio.run(decide_items, adapter, "d6", {"d6:a|b": [ref, ref]}, "q", None, 3000)
+        assert calibration is None and all(j.p is None for j in judgements.values())
+        assert results[0].value["template"] == template_id and results[0].value["diagnostic"] is True

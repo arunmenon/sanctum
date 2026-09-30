@@ -30,7 +30,8 @@ from sanctum_ref.providers.http_systemone import TEMPLATE_VERSION, d2_questions
 from sanctum_ref.providers import d2_request
 from sanctum_run.gateway import released_hub_ids
 from sanctum_run.runner import DEFAULT_HUBS_CONFIG, DEFAULT_WORLD_BUILD, git_state, load_cases, public_request
-from sanctum_run.system_one_broker import descriptor_release as release_of, load_descriptors, state_sources
+from sanctum_run.round3_state import STATE_V1
+from sanctum_run.system_one_broker import STATE_KINDS, descriptor_release as release_of, load_descriptors, state_sources
 from sanctum_systemone import CampaignBudget, SystemOneClient, load_provider_specs, set_campaign_budget
 from tools.fit_d2_standin import recalls
 from tools.measure_system_one_batches import dotenv
@@ -87,6 +88,13 @@ def broker_descriptors(include_held_back: bool = False) -> tuple[dict[str, str],
     """Exactly the descriptor dict the runner's broker sends in state, and its release id."""
     descriptors = state_sources(load_descriptors(), released_hub_ids(DEFAULT_HUBS_CONFIG, include_held_back))
     return descriptors, release_of(descriptors)
+
+
+def round3_release(state_kind) -> str:
+    """The release the broker reports for a Round 3 state kind (it reports "none" for the v1 slices),
+    so a binding names the exact state layout its answers were fitted on."""
+    layout = STATE_KINDS.get(state_kind or "refs", STATE_V1)
+    return "none" if layout == STATE_V1 else layout
 
 
 def choose_use_band(held_out, max_false_rate):
@@ -200,7 +208,7 @@ if __name__ == "__main__":
         out.write_text(yaml.safe_dump({
             "binding": {"provider": arguments.provider, "model": model, "model_revision": arguments.model_revision,
                         "decision": arguments.decision, "template": template.id,
-                        "descriptor_release": "none", "decoding": "provider default"},
+                        "descriptor_release": round3_release(template.state), "decoding": "provider default"},
             "platt": {"a": round(a, 4), "b": round(b, 4)},
             "bands": {"use": use, "skip": 0.0},
             "provenance": {"fitted_on": "dev", "cases": len(case_ids), "points": len(keys),

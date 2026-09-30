@@ -45,8 +45,8 @@ from tools.measure_system_one_batches import dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "docs" / "reports" / "data" / "campaign-ledger.json"
-# owner ceiling (raised twice: 470/420k/45k, then 600/560k/60k, then 800/760k/80k, now 1000/950k/100k), pre-dispatch enforced
-CAMPAIGN = {"typesafe-jev": {"calls": 1000, "input_tokens": 950_000, "output_tokens": 100_000}}
+# owner ceiling (raised twice: 470/420k/45k, then 600/560k/60k, then 800/760k/80k, then 1000/950k/100k, now 1100/1030k/110k), pre-dispatch enforced
+CAMPAIGN = {"typesafe-jev": {"calls": 1100, "input_tokens": 1_030_000, "output_tokens": 110_000}}
 FLAGGED_SEED = 20260930
 
 

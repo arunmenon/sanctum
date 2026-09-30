@@ -1,0 +1,42 @@
+binding:
+  provider: laya-local
+  model: laya-rl-agent
+  model_revision: 55cf4c4ebb4ebe31b2550e8bdf3bd21b99753851
+  decision: d4
+  template: d4-noul-v2-support-compact-150
+  descriptor_release: r3-state-v2-compact-150
+  decoding: provider default
+platt:
+  a: 1.3968
+  b: -0.672
+bands:
+  use: 0.59
+  skip: 0.0
+provenance:
+  fitted_on: dev
+  cases: 60
+  points: 361
+  positives: 127
+  folds: 5
+  max_false_rate: 0.2
+  http_calls: 361
+  usage:
+    input_tokens: 105189
+    output_tokens: 0
+    state_tokens: 58626
+    state_tokens_dropped: 0
+    truncated: 0
+  held_out:
+    brier_calibrated: 0.1577
+    ece_calibrated: 0.066
+    brier_raw: 0.1763
+    ece_raw: 0.1584
+    promoted_at_band: 82
+    false_promotions_at_band: 14
+  label: sanctum_eval.calibration_labels (d4)
+  fitted_at: '2026-09-30'
+  git_commit: 5b07d840e00dee2a2e67073998d3209853037d62
+  binding_note: descriptor_release rewritten from 'none' to the layout the fit's collect
+    run used (template d4-noul-v2-support-compact-150, broker state kind excerpts-compact-150);
+    the fit tool wrote 'none' for every Round 3 fit before round3_release, which the
+    SUT treats as any layout

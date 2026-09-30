@@ -34,7 +34,9 @@ def test_budget_stress_config_is_predeclared():
     assert config["budgets"] == [1000, 2000, 4000] and config["prefix_k"] == [1000, 2000, 4000]
     assert arm_arguments("C4+D4", "local-test") == ["--sut", "ref", "--config", "C4", "--round3", "d4",
                                                     "--round3-provider", "local-test",
-                                                    "--system-one-provider", "local-test"]
+                                                    "--system-one-provider", "local-test",
+                                                    "--system-one-profile", "strict"]
+    assert arm_arguments("C4+D4", "p", "relaxed")[-2:] == ["--system-one-profile", "relaxed"]
     assert arm_arguments("C4", "x") == ["--sut", "ref", "--config", "C4"]
 
 

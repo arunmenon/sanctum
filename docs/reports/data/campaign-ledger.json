@@ -4,12 +4,13 @@
    "470/420000/45000",
    "600/560000/60000",
    "800/760000/80000 (owner, before rows 6-10 and the D6 challenge rows)",
-   "1000/950000/100000 (owner: completing paired Jev D4 rows and running the Jev D6 challenge rows)"
+   "1000/950000/100000 (owner: completing paired Jev D4 rows and running the Jev D6 challenge rows)",
+   "1100/1030000/110000 (owner: Jev diagnostics c4-c5 on the challenge slice so its near-chance result is interpretable)"
   ],
   "typesafe-jev": {
-   "calls": 1000,
-   "input_tokens": 950000,
-   "output_tokens": 100000
+   "calls": 1100,
+   "input_tokens": 1030000,
+   "output_tokens": 110000
   }
  },
  "rows": [

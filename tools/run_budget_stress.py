@@ -25,21 +25,22 @@ from tools.run_failures import combine_cases  # noqa: E402
 CONFIG = ROOT / "configs" / "budget_stress.yaml"
 
 
-def arm_arguments(arm: str, provider: str) -> list[str]:
+def arm_arguments(arm: str, provider: str, profile: str = "strict") -> list[str]:
     base, _, round3 = arm.partition("+")
     arguments = ["--sut", "ref", "--config", base]
     if round3:
-        arguments += ["--round3", round3.lower(), "--round3-provider", provider, "--system-one-provider", provider]
+        arguments += ["--round3", round3.lower(), "--round3-provider", provider, "--system-one-provider", provider,
+                      "--system-one-profile", profile]
     return arguments
 
 
 def run_stress(config: dict, cases_dir: Path, out_root: Path, seed: int, provider: str,
-               run_one: Callable[[list[str], Path], int]) -> list[tuple[str, int, Path]]:
+               run_one: Callable[[list[str], Path], int], profile: str = "strict") -> list[tuple[str, int, Path]]:
     runs = []
     for budget in config["budgets"]:
         for arm in config["arms"]:
             run_dir = out_root / f"{arm.replace('+', '_')}__{budget}"
-            code = run_one([*arm_arguments(arm, provider), "--cases", str(cases_dir), "--seed", str(seed),
+            code = run_one([*arm_arguments(arm, provider, profile), "--cases", str(cases_dir), "--seed", str(seed),
                             "--budget-tokens", str(budget), "--out", str(run_dir)], run_dir)
             if code not in (0, 1) or not (run_dir / "manifest.json").exists():
                 raise SystemExit(f"run_budget_stress: {arm} at {budget} did not produce a run (exit {code})")
@@ -70,11 +71,13 @@ if __name__ == "__main__":
     parser.add_argument("--provider", required=True)
     parser.add_argument("--out", type=Path, default=ROOT / "runs" / "budget-stress")
     parser.add_argument("--seed", type=int, default=20260930)
+    parser.add_argument("--system-one-profile", default="strict", choices=["strict", "relaxed"],
+                        help="System One profile for the D4 arm (strict: 150 ms, 1 call; relaxed: 60 s, 24 calls)")
     arguments = parser.parse_args()
     config = yaml.safe_load(CONFIG.read_text())
     cases_dir = combine_cases([ROOT / c for c in config["cases"]], arguments.out / "_cases")
     runs = run_stress(config, cases_dir, arguments.out, arguments.seed, arguments.provider,
                       lambda args, _: subprocess.run([sys.executable, str(ROOT / "tools" / "run_lab.py"), *args],
-                                                     cwd=ROOT).returncode)
+                                                     cwd=ROOT).returncode, arguments.system_one_profile)
     (arguments.out / "budget-stress.md").write_text(render(config, runs, cases_dir), encoding="utf-8")
     print(f"wrote {arguments.out / 'budget-stress.md'}")

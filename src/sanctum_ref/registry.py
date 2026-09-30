@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -28,6 +28,9 @@ class SearchSpec(_Model):
     tool: str
     place_filter: Optional[str] = None
     version_filter: Optional[str] = None
+    # how the hub applies filter values: "equality" (default) or "prefix" (a value also matches
+    # everything under it). Two selectors combine as prefixes only when the adapter declares it.
+    filter_semantics: Literal["equality", "prefix"] = "equality"
 
 
 class FetchSpec(_Model):

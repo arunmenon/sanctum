@@ -265,8 +265,16 @@
           "type": "string"
         },
         "source_version": {
-          "title": "Source Version",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The hub's version of the artifact; null when the hub read none",
+          "title": "Source Version"
         },
         "span": {
           "$ref": "#/$defs/Span"

@@ -109,11 +109,38 @@ def test_split_and_merge_on_declared_limits():
 def test_one_retry_only_within_deadline():
     spec = SPECS["local-test"]
     with SystemOneTestServer(ServerBehavior(fail_times=1)) as server:
-        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"q": NOUL}, 5, max_calls=1)
+        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"q": NOUL}, 5, max_calls=2)
         assert outcome.unavailable_reason is None and outcome.calls == 2
     with SystemOneTestServer(ServerBehavior(fail_times=2)) as server:
-        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"q": NOUL}, 5, max_calls=1)
+        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"q": NOUL}, 5, max_calls=3)
         assert outcome.unavailable_reason == "error" and outcome.calls == 2          # never a third attempt
+
+
+def test_max_calls_bounds_http_attempts_including_retries():
+    """Holistic review: a one-call limit produced two HTTP attempts. The limit counts retries."""
+    spec = SPECS["local-test"]
+    with SystemOneTestServer(ServerBehavior(fail_times=1)) as server:
+        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"q": NOUL}, 5, max_calls=1)
+        assert outcome.unavailable_reason == "error" and outcome.calls == 1
+        assert len(server.behavior.requests) == 1
+    with SystemOneTestServer(ServerBehavior(fail_times=1)) as server:     # a retry uses the second batch's call
+        questions = {f"q{i}": NOUL for i in range(6)}                     # two batches of 3
+        outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, questions, 5, max_calls=2)
+        assert outcome.calls == 2 and len(server.behavior.requests) == 2
+        assert outcome.unavailable_reason == "over_budget"
+
+
+def test_choice_probabilities_must_sum_to_one_and_scores_stay_in_declared_levels():
+    """Holistic review: answers outside the declared distribution or levels are invalid."""
+    good_choice = {"type": "choice", "choice": "a", "probabilities": {"a": 0.5, "b": 0.3, "c": 0.2}}
+    loose_choice = {"type": "choice", "choice": "a", "probabilities": {"a": 0.9, "b": 0.9}}
+    valid, invalid = validate_answers({"c1": CHOICE, "c2": CHOICE}, {"answers": {"c1": good_choice, "c2": loose_choice}})
+    assert set(valid) == {"c1"} and invalid == ["c2"]
+    listed = {"type": "score", "instructions": "Rate it.", "criteria": ["none", "some", "most", "all"]}
+    answers = {"s1": {"type": "score", "score": 2.4}, "s2": {"type": "score", "score": 3.5},
+               "s3": {"type": "score", "score": 3.0}, "s4": {"type": "score", "score": 0.5}}
+    valid, invalid = validate_answers({"s1": listed, "s2": listed, "s3": SCORE, "s4": SCORE}, {"answers": answers})
+    assert set(valid) == {"s1", "s3"} and sorted(invalid) == ["s2", "s4"]
 
 
 @pytest.mark.parametrize("invalid", ["wrong_type", "unknown_id", "bad_probability", "not_json"])
@@ -276,7 +303,7 @@ def test_campaign_budget_is_enforced_before_dispatch():
     try:
         with SystemOneTestServer(ServerBehavior(fail_times=1)) as server:
             client = SystemOneClient(spec, server.base_url, spec.model)
-            first = client.decide({}, {"q": NOUL}, 5, max_calls=1)          # 503 then ok: 2 attempts
+            first = client.decide({}, {"q": NOUL}, 5, max_calls=2)          # 503 then ok: 2 attempts
             second = client.decide({}, {"q": NOUL}, 5, max_calls=1)         # third attempt
             third = client.decide({}, {"q": NOUL}, 5, max_calls=1)          # refused before dispatch
             sent = len(server.behavior.requests)

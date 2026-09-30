@@ -67,9 +67,17 @@ class Candidate:
         return self.unit.text
 
 
+def artifact_version(artifact: dict[str, Any]) -> Optional[str]:
+    """The hub's version as a string, or None when the hub returned none (no version read);
+    never the string "None"."""
+    version = artifact.get("version")
+    return None if version is None else str(version)
+
+
 def native_ref(artifact: dict[str, Any]) -> str:
     place = artifact.get("path") or artifact.get("location") or artifact.get("title") or artifact["artifact_id"]
-    return f"{place}@{artifact.get('version')}"
+    version = artifact_version(artifact)
+    return place if version is None else f"{place}@{version}"
 
 
 def applicability(manifest: HubManifest, artifact: dict[str, Any]) -> Applicability:
@@ -88,7 +96,7 @@ def evidence_unit(manifest: HubManifest, artifact: dict[str, Any], evidence_id: 
                       if manifest.authoritative_for(kind)), None)
     return EvidenceUnit(
         evidence_id=evidence_id, source_id=manifest.hub_id, artifact_id=artifact["artifact_id"],
-        source_version=str(artifact.get("version")), native_ref=native_ref(artifact),
+        source_version=artifact_version(artifact), native_ref=native_ref(artifact),
         span=Span(start=0, end=len(text)), content_hash="sha256:" + hashlib.sha256(text.encode()).hexdigest(),
         text=text, kind=manifest.evidence_kind, role=manifest.role,
         applicability=applicability(manifest, artifact), retrieved_at=retrieved_at,

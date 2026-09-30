@@ -194,7 +194,8 @@ def apply_memory(base: list[SourcePlan], resolution, store, registry: Registry, 
                                       invalidated_places, query)
             for key, value in memory_plan.selectors.items():
                 if key in plan.selectors:
-                    narrowed = compatible(plan.selectors[key], value)
+                    narrowed = compatible(plan.selectors[key], value,
+                                          prefix=plan.manifest.search.filter_semantics == "prefix")
                     if narrowed is None:
                         reasons.append("procedure_conflict")   # never a filter union, never a guess
                         continue

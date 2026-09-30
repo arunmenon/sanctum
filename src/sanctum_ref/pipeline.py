@@ -195,12 +195,14 @@ class Retriever:
                 target="D4", disposition="use", provider=self.round3_provider.name,
                 model_version=next((d.model_version for d in decisions if d.model_version), None),
                 policy_version=POLICY_VERSION, latency_ms=0, cost=0)]
-        sources, response_reasons, required_gap = self._sources(plans, outcomes,
-                                                                intent.detected_fact_kinds or intent.fact_kinds,
-                                                                self._fetch_gaps)
+        needed_kinds = intent.detected_fact_kinds or intent.fact_kinds
+        sources, response_reasons, required_gap, gap_sources = self._sources(
+            plans, outcomes, needed_kinds, self._fetch_gaps)
         response_reasons += memory_reasons
         resolved = resolution is not None and bool(resolution.interpretations)
-        status = self._status(assembled, intent.vague, required_gap, lexical_coverage=not resolved)
+        gap_covered = self._gap_covered(assembled, gap_sources, needed_kinds)
+        status = self._status(assembled, intent.vague, required_gap, lexical_coverage=not resolved,
+                              gap_covered=gap_covered)
         if resolved and status != EvidenceStatus.insufficient:
             # the entity is covered, but is what was asked about it covered? (HLD §10 Ex8) Only
             # when nothing returned mentions any of the non-name subject words is it not.
@@ -211,7 +213,7 @@ class Retriever:
         interpretations = []
         if resolution is not None:
             interpretations, status = self._interpretations(resolution, candidates, assembled, status,
-                                                            required_gap, response_reasons, request)
+                                                            required_gap, response_reasons, request, gap_covered)
         if any(source.status.value in ("timeout", "error") for source in sources):
             # a source routing chose to ask failed: what it would have added is unknown, so no
             # answer (or interpretation) can be called complete (Ex. 9; dev-018, dev-052)
@@ -319,7 +321,7 @@ class Retriever:
         return list(results.values()), []
 
     def _interpretations(self, resolution, candidates, assembled, status, required_gap,
-                         reasons: list[str], request: RetrieveRequest):
+                         reasons: list[str], request: RetrieveRequest, gap_covered: bool = True):
         """One interpretation per resolved meaning, each with only the evidence its own plans
         found (no blending), its own conflicts and status (HLD §9.2)."""
         if resolution.unresolved and not resolution.interpretations:
@@ -338,7 +340,7 @@ class Retriever:
             evidence_ids = [unit.evidence_id for unit in assembled.evidence if index in found_by.get(unit.content_hash, set())]
             conflict_ids = [c.conflict_id for c in assembled.conflicts if c.a in evidence_ids and c.b in evidence_ids]
             relevant = {item for item in assembled.relevant_ids} & set(evidence_ids)
-            branch_status = EvidenceStatus.insufficient if not relevant else (
+            branch_status = EvidenceStatus.insufficient if not relevant or (required_gap and not gap_covered) else (
                 EvidenceStatus.partial if required_gap else EvidenceStatus.sufficient)
             out.append(Interpretation(interpretation_id=f"in-{index + 1}", entity_ref=interpretation.entity_ref,
                                       resolution_origin=interpretation.origin, evidence_ids=evidence_ids,
@@ -439,12 +441,13 @@ class Retriever:
     @staticmethod
     def _sources(plans: list[SourcePlan], outcomes: dict[str, str],
                  needed_kinds: frozenset[str] = frozenset(),
-                 fetch_gaps: set[str] = frozenset()) -> tuple[list[SourceOutcome], list[str], bool]:
+                 fetch_gaps: set[str] = frozenset()) -> tuple[list[SourceOutcome], list[str], bool, set[str]]:
         """One outcome per source; per-interpretation plans for the same source are merged.
 
         A called source that is authoritative for a kind of fact the question needs is required
         for that fact (HLD §10 Ex9d): if it times out or errors, that is a visible gap
-        (`required_source_unavailable`), never a `sufficient` answer from other sources."""
+        (`required_source_unavailable`), never a `sufficient` answer from other sources.
+        Also returns the missing required sources."""
         merged: dict[str, SourcePlan] = {}
         for plan in plans:
             current = merged.get(plan.hub_id)
@@ -457,7 +460,7 @@ class Retriever:
                 current.call, current.status, current.reasons = True, plan.status, list(plan.reasons)
             elif plan.call == current.call:
                 current.reasons = sorted(set(current.reasons) | set(plan.reasons))
-        sources, reasons, required_gap = [], [], False
+        sources, reasons, required_gap, gap_sources = [], [], False, set()
         for plan in (merged[hub_id] for hub_id in sorted(merged)):
             status, source_reasons = plan.status, list(plan.reasons)
             if plan.call:
@@ -477,17 +480,37 @@ class Retriever:
             if gap:
                 required_gap = True
                 reasons.append(gap)
+                gap_sources.add(plan.hub_id)
             sources.append(SourceOutcome(source_id=plan.hub_id, status=status, reasons=sorted(set(source_reasons))))
-        return sources, reasons, required_gap
+        return sources, reasons, required_gap, gap_sources
+
+    def _gap_covered(self, assembled, gap_sources: set[str], needed_kinds: frozenset[str]) -> bool:
+        """Whether obtainable evidence for the requested facts remains after a required source
+        is missing (Ex. 9 / Q16): a packed relevant unit from another source that declares
+        authority (at any level) for one of the requested fact kinds. With no requested kinds
+        known, any packed relevant evidence counts, as before."""
+        if not gap_sources or not needed_kinds:
+            return True
+        relevant = set(assembled.relevant_ids)
+        for unit in assembled.evidence:
+            if unit.evidence_id not in relevant or unit.source_id in gap_sources:
+                continue
+            manifest = self.registry.manifest(unit.source_id)
+            if manifest is not None and any(kind in manifest.authority for kind in needed_kinds):
+                return True
+        return False
 
     @staticmethod
-    def _status(assembled, vague: bool, required_gap: bool, lexical_coverage: bool = True) -> EvidenceStatus:
+    def _status(assembled, vague: bool, required_gap: bool, lexical_coverage: bool = True,
+                gap_covered: bool = True) -> EvidenceStatus:
+        # Ex. 9 / Q16: a missing must-consult source leaves the answer insufficient when no
+        # obtainable evidence for the requested facts remains; partial when some does
         # a large share of the subject that no source returned anything about (the asked-for
         # attribute of a service nobody documents, HLD §10 Ex8): the question is not covered.
         # With a resolved entity the pool is narrowed to its places, where this lexical signal
         # misfires, so it applies only to unresolved questions.
         uncovered = lexical_coverage and assembled.uncovered_share >= UNCOVERED_SHARE
-        if not assembled.relevant_packed or uncovered:
+        if not assembled.relevant_packed or uncovered or (required_gap and not gap_covered):
             return EvidenceStatus.insufficient
         if required_gap or vague or assembled.truncated_relevant:
             return EvidenceStatus.partial

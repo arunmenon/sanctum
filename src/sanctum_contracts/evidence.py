@@ -39,7 +39,7 @@ class EvidenceUnit(Strict):
     evidence_id: str
     source_id: str
     artifact_id: str
-    source_version: str
+    source_version: Optional[str] = Field(description="The hub's version of the artifact; null when the hub read none")
     native_ref: str
     span: Span
     content_hash: str

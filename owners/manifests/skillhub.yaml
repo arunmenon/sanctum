@@ -5,7 +5,7 @@ evidence_kind: skill
 role: intended_procedure
 authority:
   procedure: authoritative        # PR-reviewed skills own "how it is supposed to work"
-search: {tool: search_skills, place_filter: path_prefix}
+search: {tool: search_skills, place_filter: path_prefix, filter_semantics: prefix}
 fetch: {tool: get_skill, id_field: path, id_argument: path, version_argument: version}
 versions:
   semantics: revision             # skill revisions, not releases: as_of cannot be mapped

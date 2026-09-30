@@ -6,8 +6,9 @@
   `duplicates` and in `omitted`, each with its own provenance. Authority is never transferred.
 - Conflicts: same attribute (query terms on a line with a number), different value, in two units
   from different sources or versions. Typed by roles, versions and environments.
-- Packing: whole units only; both witnesses of every conflict are reserved first; the rest fill
-  in rank order. The budget counts the serialized evidence list with the declared tokenizer.
+- Packing: whole units only; both witnesses of every rule-flagged conflict are reserved first; the
+  rest fill in rank order; D6-promoted pairs and D4 extras use leftover budget only. A conflict
+  whose witnesses do not fit keeps its record, with the missing witnesses omitted. The budget counts the serialized evidence list with the declared tokenizer.
 """
 from __future__ import annotations
 
@@ -225,12 +226,21 @@ def list_cost(items: list["Ranked"], tokenizer_id: str) -> int:
                token_count(json.dumps(payload), tokenizer_id))
 
 
+WITNESS_OMITTED = "conflict_witness_over_budget"
+
+
 def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, RelationType]],
          budget_tokens: int, tokenizer_id: str, reserve_witnesses: bool,
-         extras: list[Ranked] = (), order_scores: Optional[dict[str, float]] = None) -> Assembled:
-    """Whole units, conflict witnesses reserved, then rank order. `extras` (D4-approved units the
-    rules excluded) are tried only after the rules' own fill, so they can use leftover budget and
-    never displace a rules-packed unit. `order_scores` (D4) reorders the packed units only."""
+         extras: list[Ranked] = (), order_scores: Optional[dict[str, float]] = None,
+         promoted_pairs: list[tuple[Ranked, Ranked, RelationType]] = ()) -> Assembled:
+    """Whole units, rule-flagged conflict witnesses reserved, then rank order. `promoted_pairs`
+    (D6) and `extras` (D4-approved units the rules excluded) are tried only after the rules' own
+    fill, so they use leftover budget and never displace a rules-packed unit. `order_scores` (D4)
+    reorders the packed units only.
+
+    A conflict is never dropped because a witness did not fit (holistic review): with conflict
+    reservation on, every flagged or promoted pair keeps its record, each witness that is not
+    packed is listed in `omitted` with WITNESS_OMITTED, and the response counts as truncated."""
     chosen: list[Ranked] = []
     used = 0
 
@@ -264,6 +274,13 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
         if not take(item) and item.relevant and item.coverage >= top_coverage - 1e-9:
             truncated_relevant = True
     rules_packed = [item.unit.evidence_id for item in chosen]
+    if reserve_witnesses:
+        for a, b, relation in promoted_pairs:           # D6: leftover budget only; never displaces
+            before = (list(chosen), used)
+            if take(a) and take(b):
+                flagged.append((a, b, relation))
+            else:
+                chosen[:], used = before
     for item in extras:                                 # leftover budget only; never displaces
         take(item)
     if not reserve_witnesses:
@@ -292,10 +309,23 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
             chosen.pop(extra_positions[-1])
             used = list_cost(chosen, tokenizer_id)
     evidence = [item.unit.model_copy(update={"duplicates": list(item.duplicates)}) for item in chosen]
+    records = list(flagged)
+    omitted: list[Omitted] = []
+    if reserve_witnesses:
+        packed = {item.unit.evidence_id for item in chosen}
+        for a, b, relation in list(conflict_pairs) + list(promoted_pairs):
+            if any(a is x and b is y for x, y, _ in records):
+                continue
+            records.append((a, b, relation))            # kept, with its missing witnesses omitted
+            for witness in (a, b):
+                if witness.unit.evidence_id not in packed and \
+                        not any(entry.ref_id == witness.unit.evidence_id for entry in omitted):
+                    omitted.append(Omitted(ref_id=witness.unit.evidence_id, reason=WITNESS_OMITTED))
+            truncated_relevant = True
     conflicts = [Conflict(conflict_id=f"cf-{index + 1}", a=a.unit.evidence_id, b=b.unit.evidence_id,
                           relation_type=relation, status=ConflictStatus.possible_conflict)
-                 for index, (a, b, relation) in enumerate(flagged)]
-    return Assembled(evidence=evidence, conflicts=conflicts, omitted=[], used_tokens=used,
+                 for index, (a, b, relation) in enumerate(records)]
+    return Assembled(evidence=evidence, conflicts=conflicts, omitted=omitted, used_tokens=used,
                      truncated_relevant=truncated_relevant,
                      relevant_packed=sum(1 for item in chosen if item.relevant),
                      relevant_ids=[item.unit.evidence_id for item in chosen if item.relevant],
@@ -346,18 +376,20 @@ def finish(prepared: Prepared, budget_tokens: int, tokenizer_id: str,
     """Pack. Rule-flagged pairs always stay; D6-promoted candidate pairs are added after them.
     D4 (scores and use band) may add rules-excluded units into leftover budget and reorder."""
     candidates, terms, ranked, omitted = prepared.candidates, prepared.terms, prepared.ranked, prepared.omitted
-    pairs = list(prepared.flagged) + [pair for pair in promoted if pair in prepared.pair_candidates]
+    promoted_pairs = [pair for pair in promoted if pair in prepared.pair_candidates]
     extras = []
     if d4_scores and d4_use is not None:
         extras = sorted((item for item in prepared.excluded if d4_scores.get(item.unit.evidence_id, 0.0) >= d4_use),
                         key=lambda item: -d4_scores[item.unit.evidence_id])
-    assembled = pack(ranked, pairs, budget_tokens, tokenizer_id, reserve_witnesses=prepared.common,
-                     extras=extras, order_scores=d4_scores or None)
+    assembled = pack(ranked, list(prepared.flagged), budget_tokens, tokenizer_id, reserve_witnesses=prepared.common,
+                     extras=extras, order_scores=d4_scores or None, promoted_pairs=promoted_pairs)
     packed_ids = {unit.evidence_id for unit in assembled.evidence}
     duplicate_refs = {ref for unit in assembled.evidence for ref in unit.duplicates}
     # reference closure: keep an omitted entry only for copies a packed unit still points to
     assembled.subject_terms = len(terms)
     assembled.uncovered_terms = [term for term in terms
                                  if not any(term in term_counts(candidate.text) for candidate in candidates)]
-    assembled.omitted = [entry for entry in omitted if entry.ref_id in duplicate_refs and entry.ref_id not in packed_ids]
+    witness_omissions = {entry.ref_id for entry in assembled.omitted}
+    assembled.omitted = assembled.omitted + [entry for entry in omitted if entry.ref_id in duplicate_refs
+                                             and entry.ref_id not in packed_ids and entry.ref_id not in witness_omissions]
     return assembled

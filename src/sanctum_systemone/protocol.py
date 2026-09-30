@@ -96,6 +96,29 @@ def _probability(value: Any) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool) and 0.0 <= float(value) <= 1.0
 
 
+PROBABILITY_SUM_TOLERANCE = 0.01          # choice probabilities must sum to 1 within this
+
+
+def _score_range(question: dict[str, Any]) -> Optional[tuple[float, float]]:
+    """(lowest, highest) declared score level: a list declares levels 0..n-1 (index = level), a
+    mapping declares its integer keys. None when no levels are declared."""
+    criteria = question.get("criteria")
+    if isinstance(criteria, list) and criteria:
+        return 0.0, float(len(criteria) - 1)
+    if isinstance(criteria, dict) and criteria:
+        try:
+            levels = [int(level) for level in criteria]
+        except (TypeError, ValueError):
+            return None
+        return float(min(levels)), float(max(levels))
+    return None
+
+
+def _score_in_range(question: dict[str, Any], score: float) -> bool:
+    bounds = _score_range(question)
+    return bounds is None or bounds[0] <= score <= bounds[1]
+
+
 def validate_answers(asked: dict[str, dict[str, Any]], response: Any) -> tuple[dict[str, dict[str, Any]], list[str]]:
     """(valid answers, invalid ids). An answer counts only if it is exactly what was asked."""
     answers = (response or {}).get("answers") if isinstance(response, dict) else None
@@ -114,12 +137,14 @@ def validate_answers(asked: dict[str, dict[str, Any]], response: Any) -> tuple[d
             options = set((question.get("criteria") or {}).keys()) if isinstance(question.get("criteria"), dict) else set(question.get("criteria") or [])
             probabilities = answer.get("probabilities")
             if (answer.get("choice") in options and isinstance(probabilities, dict) and set(probabilities) <= options
-                    and all(_probability(p) for p in probabilities.values())):
+                    and all(_probability(p) for p in probabilities.values())
+                    and abs(sum(float(p) for p in probabilities.values()) - 1.0) <= PROBABILITY_SUM_TOLERANCE):
                 valid[qid] = {"type": "choice", "choice": answer["choice"], "probabilities": dict(probabilities),
                               "confidence": answer.get("confidence")}
             else:
                 invalid.append(qid)
-        elif kind == "score" and isinstance(answer.get("score"), (int, float)) and not isinstance(answer.get("score"), bool):
+        elif kind == "score" and isinstance(answer.get("score"), (int, float)) and not isinstance(answer.get("score"), bool) \
+                and _score_in_range(question, float(answer["score"])):
             valid[qid] = {"type": "score", "score": float(answer["score"])}
         else:
             invalid.append(qid)
@@ -265,7 +290,7 @@ class SystemOneClient:
             outcome.unavailable_reason = UnavailableReason.OVER_BUDGET
             return outcome
         for batch, batch_state in zip(batches, states):
-            response, reason = self._post(batch_state, batch, started, deadline_s, outcome)
+            response, reason = self._post(batch_state, batch, started, deadline_s, outcome, max_calls)
             if reason is not None:
                 outcome.unavailable_reason = reason
                 break
@@ -290,10 +315,15 @@ class SystemOneClient:
         outcome.latency_ms = int((time.monotonic() - started) * 1000)
         return outcome
 
-    def _post(self, state, batch, started, deadline_s, outcome) -> tuple[Optional[dict], Optional[UnavailableReason]]:
+    def _post(self, state, batch, started, deadline_s, outcome,
+              max_calls: Optional[int] = None) -> tuple[Optional[dict], Optional[UnavailableReason]]:
+        """One exchange with retries. `max_calls` bounds HTTP attempts for the whole round,
+        retries included: a retry that would exceed it is not sent."""
         body = build_request(state, self.model, batch)
         reason = UnavailableReason.TIMEOUT
         for attempt in range(1 + self.spec.timeout_retry):
+            if max_calls is not None and outcome.calls >= max_calls:
+                return None, reason if attempt else UnavailableReason.OVER_BUDGET
             remaining = deadline_s - (time.monotonic() - started)
             if remaining <= 0.01:
                 return None, UnavailableReason.TIMEOUT

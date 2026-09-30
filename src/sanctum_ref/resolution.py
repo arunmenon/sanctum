@@ -21,7 +21,7 @@ from typing import Optional
 from sanctum_contracts import RetrieveRequest
 from sanctum_contracts.receipt import Activation, TermResolution
 
-from .memory import LabelTable, MemoryStore, PlaceRecord, normalize_label
+from .memory import Denotation, LabelTable, MemoryStore, PlaceRecord, normalize_label
 from .registry import Registry
 from .text import words
 
@@ -63,9 +63,28 @@ def _spans(query_words: list[str], labels: set[tuple[str, ...]]) -> list[tuple[i
     return found
 
 
-def entity_visible(store: MemoryStore, registry: Registry, entity_id: str, groups: set[str]) -> bool:
-    """Visible when the caller can read one of the entity's places in a hub whose places are
-    access-scoped (a hub-wide place such as every doc space proves nothing)."""
+def term_permission(registry: Registry, source: str, namespace: str, groups: set[str]) -> Optional[bool]:
+    """The name's own metadata permission: True/False when the term's source declares places for
+    the term's namespace (its domain), None when it declares none (then places decide)."""
+    manifest = registry.manifest(source)
+    if manifest is None:
+        return None
+    declared = [p for p in manifest.places if p.domain != "any" and p.domain.casefold() == namespace.casefold()]
+    if not declared:
+        return None
+    return any(groups & set(p.groups) for p in declared)
+
+
+def entity_visible(store: MemoryStore, registry: Registry, entity_id: str, groups: set[str],
+                   denotation: Optional[Denotation] = None) -> bool:
+    """A name is visible when its own term is: the term's metadata permission (source and
+    namespace) is checked first and decides when the source declares it; only otherwise does
+    visibility fall back to the entity's readable places in a hub whose places are access-scoped
+    (a hub-wide place such as every doc space proves nothing)."""
+    if denotation is not None:
+        permitted = term_permission(registry, denotation.source, denotation.namespace, groups)
+        if permitted is not None:
+            return permitted
     for place in store.places_for(entity_id):
         manifest = registry.manifest(place.source)
         if manifest is None:
@@ -102,7 +121,7 @@ def resolve(request: RetrieveRequest, store: MemoryStore, registry: Registry, gr
     resolution = Resolution(unresolved=_unresolved(request.query, matches, {r.lower() for r in releases}))
     chosen: dict[str, Interpretation] = {}
     for _, _, label in matches:
-        denotations = [d for d in store.denotes(label) if entity_visible(store, registry, d.entity_id, groups)]
+        denotations = [d for d in store.denotes(label) if entity_visible(store, registry, d.entity_id, groups, d)]
         entity_ids = sorted({d.entity_id for d in denotations})
         term = " ".join(label)
         origin, picked = "denotes", entity_ids
@@ -158,8 +177,14 @@ class EntityPlan:
     procedure_conflict: bool = False
 
 
-def compatible(first: str, second: str) -> Optional[str]:
-    """AND of two prefix filters: the narrower one, or None when they cannot both hold."""
+def compatible(first: str, second: str, prefix: bool = False) -> Optional[str]:
+    """AND of two filter values: the value when both hold, else None. Typed filter values
+    compare by equality ("1" and "10" never merge); only a filter the adapter declares with prefix
+    semantics narrows to the longer of two nested prefixes."""
+    if first == second:
+        return first
+    if not prefix:
+        return None
     if first.startswith(second):
         return first
     if second.startswith(first):

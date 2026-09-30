@@ -231,6 +231,11 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
         judgements[qid] = ItemJudgement(qid, p_raw, p, shadow)
         value = {"item": qid, "p_raw": round(p_raw, 4), "shadow": shadow, "refs": refs,
                  "request_hash": digest, "usage": outcome.usage, "calls": outcome.calls, "template": template}
+        # the evaluator's label reader (sanctum_eval.calibration_labels) keys on these names
+        if round_name == "d6":
+            value.update({"pair": qid, "a": refs[0], "b": refs[1]})
+        elif round_name == "d4":
+            value.update({"unit": qid, "ref": refs[0]})
         if p is not None:
             value["p"] = round(p, 4)
         results.append(DecisionResult(

@@ -2,7 +2,8 @@
 
 For each dev run with D4 decisions in its receipts (rows 8-9 of the prompt campaign), compare the
 rules order of the packed evidence with the counterfactual D4 order (packed units sorted by the
-D4 probability, calibrated p when present else p_raw, stable on ties; units without a D4 answer
+D4 probability, calibrated p when present else p_raw, or the score diagnostic's expected level;
+stable on ties; units without a D4 answer
 keep their rules position relative to each other and follow the scored ones). Reports
 coverage@K and first-supporting-unit rank for both orders, with denominators.
 
@@ -32,7 +33,10 @@ def d4_scores(receipt: dict) -> dict[str, float]:
         if not isinstance(value, dict) or not str(value.get("item", "")).startswith("d4:"):
             continue
         p = value.get("p") if value.get("p") is not None else value.get("p_raw")
-        if isinstance(p, (int, float)):
+        if p is None:                    # score-primitive diagnostic: order by the expected level
+            answer = (value.get("answers") or {}).get(str(value["item"])) or {}
+            p = answer.get("score")
+        if isinstance(p, (int, float)) and not isinstance(p, bool):
             scores[str(value["item"])[3:]] = float(p)
     return scores
 

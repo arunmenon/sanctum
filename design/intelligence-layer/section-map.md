@@ -19,9 +19,9 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 10 | Worked examples | [Sanctum contracts and worked scenarios](contracts-and-scenarios.md#section-10) |
 | 11 | Read path in detail | [Sanctum intelligence layer — architectural proposal](hld.md#section-11) |
 | 12 | Contracts | [Sanctum contracts and worked scenarios](contracts-and-scenarios.md#section-12) |
-| 13 | Write path and reconciliation (post-pilot) | [Sanctum intelligence layer — architectural proposal](hld.md#section-13) |
+| 13 | Write path and reconciliation (post-pilot) | Removed in v5.3: out of scope (research stage); see [review history](review-history.md#v5-3) |
 | 14 | Cross-cutting | [Sanctum intelligence layer — architectural proposal](hld.md#section-14) |
-| 15 | Replay levels | [Sanctum intelligence layer — architectural proposal](hld.md#section-15) |
+| 15 | Replay levels | Removed in v5.3: out of scope (research stage); see [review history](review-history.md#v5-3) |
 | 16 | Evaluation | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`) |
 | 17 | Experiments | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`) |
 | 18 | Plan | Lab: spike execution and follow-on decisions (`docs/experiments/spike-plan.md`) |
@@ -48,5 +48,15 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | Per-decision no-model control and activation rule | [Architectural proposal §6.7](hld.md#section-6-7); [System One providers §8](system-one-providers.md#8-calibration-binding-and-the-shadow-only-rule) |
 | Provider profiles; adding a third provider | [System One providers §2.1](system-one-providers.md#21-provider-profiles) |
 | Focused MVP review dispositions | [Review history](review-history.md#v5-2-2) |
+
+**v5.3 changes** (section numbers kept where sections survive):
+
+| Change | Owning page |
+|---|---|
+| 5 Assumed inputs (allowed set, required subset, no model authorization, visible names) | [Architectural proposal](hld.md#section-5) |
+| 5.1 Four routing stages: Understand, Select, Retrieve, Assemble | [Architectural proposal](hld.md#section-5-1) |
+| 5.2 Two pillars inside a given boundary | [Architectural proposal](hld.md#section-5-2) |
+| 14.1 Data classes (assumed input) | [Architectural proposal](hld.md#section-14-1) |
+| 13, 15 removed; Examples 10, 11 and Fixtures 21, 22 reduced to one line | [Review history](review-history.md#v5-3) |
 
 Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.

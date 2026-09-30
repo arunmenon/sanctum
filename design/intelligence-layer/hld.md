@@ -2,15 +2,15 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.2.1 (reorganized from v5.1). A design for proving the tenets at the research stage; production hardening is out of scope (see the [review history](review-history.md#v5-2-1)). Lab work is experimental. Original section numbers are retained.
+> Status: proposed research design, version 5.3 (reorganized from v5.1). Scope: routing intelligence. Policy and access control are assumed inputs, not designed here ([§5](hld.md#section-5)). Lab work is experimental. Original section numbers are retained where sections survive.
 
-This proposal expands the engineering team's initial Sanctum proposal with policy-constrained evidence selection, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains Q1, rather than an assumed agreement.
+This proposal expands the engineering team's initial Sanctum proposal with evidence routing inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains Q1, rather than an assumed agreement.
 
-**Review focus:** component boundaries, the proposed read-only pilot, evidence and authority semantics, safe fallback, and the questions in §21. The lab investigates the design's hypotheses; its implementation does not establish production readiness.
+**Review focus:** the routing stages, the memory and ontology, evidence and fact-kind authority semantics, failure honesty, and the questions in §21. The lab investigates the design's hypotheses; its implementation does not establish production readiness.
 
 ## Memory in the overall architecture
 
-Sanctum memory connects source names, canonical subjects, storage locations, procedures, and evidence relationships. A name identifying a service, a document discussing that service, and a repository containing its material have different meanings. Only reviewed identity mappings establish identity. Memory advises routing within authorized scope and remains separate from Engram's agent memory.
+Sanctum memory connects source names, canonical subjects, storage locations, procedures, and evidence relationships. A name identifying a service, a document discussing that service, and a repository containing its material have different meanings. Only reviewed identity mappings establish identity. Memory advises routing within the given allowed set and remains separate from Engram's agent memory.
 
 The complete [memory design](memory-design.md) owns ontology, resolution, procedures, governance, releases, and the improvement loop. [Contracts and scenarios](contracts-and-scenarios.md) owns wire details and the complete behavioral examples. The spike (lab) owns the hypotheses and evaluation protocol; the execution page (lab) separates experimental work from possible adoption.
 
@@ -24,37 +24,38 @@ The numbered sections below retain their v5.1 identifiers. Gaps in numbering ind
 
 **What Sanctum is today.** One MCP endpoint between agent harnesses (inner and outer loop) and several knowledge backends: Engram (agent memory), Dobby (SME-reviewed domain skills), Deep Insights (code and repo knowledge), KaaS (RAG over documents). Today it fans a question out and returns what comes back.
 
-**What we want it to become.** *A policy-constrained evidence router: it picks authorized, version-aware evidence across sources, fits it into the caller's token budget, and explains what it selected and what it left out.*
+**What we want it to become.** *An evidence router: inside the sources a caller is allowed to use, it picks version-aware evidence, fits it into the caller's token budget, and explains what it selected and what it left out.*
 
-**Three ideas, applied in this order:**
+**Two pillars inside a given boundary:**
 
 ```mermaid
 flowchart LR
-    Q(["Agent's question"]) --> P
-    P["<b>1. Policy</b><br/>Who is asking?<br/>What may they see?<br/><i>Rules only. Never guesses.</i>"]
-    P --> J["<b>2. Judgment</b><br/>Which allowed sources are worth asking?<br/>Is this chunk relevant? Do these two disagree?<br/><i>Fast typed decisions: rules, then Jev, LLM only if unsure</i>"]
-    J --> A(["Evidence with<br/>provenance, roles,<br/>conflicts, and gaps"])
-    M[("<b>3. Memory</b><br/>Where knowledge lives,<br/>what each source calls things,<br/>who owns what, how to ask")] -. advises .-> J
+    Q(["Agent's question"]) --> C
+    subgraph AS["Given: the caller's allowed sources and required subset (an input)"]
+        direction LR
+        C["<b>Cascade</b><br/>Understand, Select, Retrieve, Assemble<br/><i>typed decisions: rules, then System One, LLM only if unsure</i>"]
+        M[("<b>Memory and ontology</b><br/>names, subjects, places,<br/>procedures, authority, how to ask")]
+        M -. advises .-> C
+    end
+    C --> A(["Evidence with provenance,<br/>roles, conflicts, gaps,<br/>and why each source was used"])
 
-    classDef policy fill:#fde2e1,stroke:#c0392b,color:#000
     classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
     classDef mem fill:#e6f5e9,stroke:#2e7d32,color:#000
     classDef io fill:#f4f4f4,stroke:#888,color:#000
-    class P policy
-    class J judge
+    class C judge
     class M mem
     class Q,A io
 ```
 
-- **Policy** decides access and write rules. Deterministic. No model involved.
-- **Judgment** answers small questions with probabilities, inside what policy allows. Cheap tier first, LLM only when unsure.
-- **Memory** is Sanctum's own notebook *about sources*, not about content: where knowledge lives, what each source calls things (the meta-taxonomy), who owns which kind of fact, and how to query each source. It advises judgment. It never grants access and never decides what is true. It is separate from Engram.
+- **The allowed set is given.** Which sources a caller may use, and which of them are required, are inputs. The router never widens either; access control is assumed, not designed here ([§5](hld.md#section-5)).
+- **The cascade** answers small routing questions with probabilities, inside the allowed set. Cheap tier first, LLM only when unsure.
+- **Memory and ontology** are Sanctum's own notebook *about sources*, not about content: where knowledge lives, what each source calls things (the meta-taxonomy), who owns which kind of fact, and how to query each source. They advise the cascade, never decide what is true, and are separate from Engram.
 
 **Research stance.** Every intelligent piece must beat a strong rules-only baseline on the same traffic before it is switched on. If rules are enough, we keep rules.
 
 **How memory improves.** Through a closed loop: observe traffic, diagnose gaps, propose fixes, test them on a frozen benchmark, promote by risk. It learns, but it cannot change its own rules or grade its own homework ([§9.10](memory-design.md#section-9-10)).
 
-**What is small in v0.** Memory v0 has five node types, populated only from source structure, reviewed configuration, and exact matches, for one pilot service, and ships as versioned releases. Learned priors, non-identity mappings, automatic promotion, reconciliation, and writes are backlog ([§8.9](memory-design.md#section-8-9), §18 (lab)).
+**What is small in v0.** Memory v0 has five node types, populated only from source structure, reviewed configuration, and exact matches, for one pilot service, and ships as versioned releases. Learned priors, non-identity mappings and automatic promotion are backlog ([§8.9](memory-design.md#section-8-9), §18 (lab)).
 
 **The rule to remember.** A *name* for a thing, a document *about* a thing, and a *place* where material about a thing lives are three different relations. Only reviewed names establish identity ([§8.5](memory-design.md#section-8-5)).
 
@@ -105,21 +106,20 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 
 ### Goals
 
-- G1. Return the smallest set of **authorized, valid** evidence that supports the query, within budget, and **say when it is partial or insufficient**.
+- G1. Return the smallest set of **valid** evidence from the allowed sources that supports the query, within budget, and **say when it is partial or insufficient**.
 - G2. Call the fewest backends likely to be needed, **without silently omitting a required source**.
 - G3. Surface conflicts and provenance explicitly.
 - G4. Keep the fast path cheap (≤ 300 ms Sanctum overhead in `fast` mode, measured end to end; [§14](hld.md#section-14)).
-- G5. Record enough about each request to explain it and compare policies offline.
+- G5. Explain each response (which sources were selected or skipped, and why) so routing can be evaluated against a rules baseline.
 - G6. Onboard a backend through an adapter contract and a manifest, not core-path edits.
 
 ### Non-goals
 
 - NG1. Sanctum does not decide truth. Synthesis is opt-in.
 - NG2. Sanctum does not replace a backend's own retrieval or indexing.
-- NG3. Sanctum never weakens a backend's write governance (e.g. Dobby's PR review).
-- NG4. Sanctum does not mirror backend content.
-- NG5. No model output is an authorization decision.
-- NG6. The pilot is read-only.
+- NG3. Sanctum does not mirror backend content.
+- NG4. No model output is an authorization decision.
+- NG5. The MVP is read-only; access control, writes and replay are out of scope.
 
 ---
 
@@ -127,14 +127,13 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 
 ## 4. Design principles
 
-1. **Policy before prediction.** Authorized scope is computed first. Models only rank options inside it (F01).
+1. **Allowed set before prediction.** The allowed set is given before any judgment; models only rank options inside it (F01).
 2. **Decisions, not generations.** Every intelligent step is a typed question, and every answer can also be `unknown`, `abstained`, `unavailable`, or `invalid` (F02, F04).
-3. **Each decision fails safely in its own way.** Uncertain relevance keeps a candidate. Uncertain contradiction stays unresolved. Uncertain supersession never hides evidence. Uncertain write targets cause no side effect (F05).
+3. **Each decision fails safely in its own way.** Uncertain relevance keeps a candidate. Uncertain contradiction stays unresolved. Uncertain supersession never hides evidence (F05).
 4. **Memory advises, never authorizes.** The graph gives priors and explanations only (F06, F07).
-5. **Asynchronous reconciliation, synchronous policy and validity.** Disputes resolve later; access, versions, and known invalidity are respected now (F11).
+5. **Versions and known invalidity are respected now.** Disputes are shown, not resolved (F11).
 6. **Baseline first.** One change at a time against a strong rules baseline (F20).
-7. **Receipts before responses** when replay is promised (F18).
-8. **Library-first.** Logical components inside the existing Sanctum service until scale says otherwise.
+7. **Library-first.** Logical components inside the existing Sanctum service until scale says otherwise.
 
 ---
 
@@ -142,81 +141,81 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 
 ## 5. Architecture
 
+**Assumed inputs (v5.3).** This design takes three things as given and does not design or validate them:
+
+1. The router receives an **allowed set** of sources for the caller and a **required subset**, and never widens either.
+2. **No model output is an authorization decision.** A model only chooses among allowed, optional candidates.
+3. **Names the caller cannot see are not resolved for them** ([§9.2](memory-design.md#section-9-2)).
+
+Access control, identity and credentials are assumed, not designed or validated by this MVP.
+
 <a id="section-5-1"></a>
 
 ### 5.1 The journey of one question
 
-Every request passes through the same six stages. Side inputs are shown under each stage.
+Every request passes through four routing stages, inside the given allowed set.
 
 ```mermaid
 flowchart LR
-    S1["<b>1. Who is asking?</b><br/>verify token,<br/>find principal"]
-    S2["<b>2. What is allowed?</b><br/>caller grants ∩ project scope<br/>∩ registry ∩ data policy"]
-    S3["<b>3. What is worth asking?</b><br/>pick a subset<br/>of allowed sources"]
-    S4["<b>4. Ask</b><br/>parallel calls,<br/>one shared deadline"]
-    S5["<b>5. Clean up</b><br/>dedup, rank,<br/>flag conflicts,<br/>fit to budget"]
-    S6["<b>6. Record and reply</b><br/>receipt first,<br/>then response"]
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    AS[/"Given: allowed set,<br/>required subset"/]
+    S1["<b>1. Understand</b><br/>resolve names through<br/>the ontology; one or<br/>several interpretations"]
+    S2["<b>2. Select</b><br/>rules, then System One:<br/>which optional sources<br/>are worth asking"]
+    S3["<b>3. Retrieve</b><br/>per-source query plans in<br/>each hub's vocabulary;<br/>one shared deadline"]
+    S4["<b>4. Assemble</b><br/>dedupe, rank, flag conflicts,<br/>pack; say what was selected,<br/>skipped, and why"]
+    AS --> S1 --> S2 --> S3 --> S4
 
-    R[("Registry<br/><i>rules, owners,<br/>authority</i>")] --> S2
-    G[("Sanctum memory<br/><i>sources, vocabulary,<br/>procedures, copies</i>")] -.-> S3
-    D{{"Decision layer<br/><i>rules → Jev → LLM</i>"}} -.-> S3
-    D -.-> S5
-    B[["Engram · Dobby<br/>Deep Insights · KaaS"]] <--> S4
-    L[("Receipts")] --- S6
+    G[("Memory and ontology<br/><i>names, places, procedures,<br/>authority, copies</i>")] -.-> S1
+    G -.-> S2
+    G -.-> S3
+    D{{"Decision cascade<br/><i>rules → System One → LLM</i>"}} -.-> S2
+    D -.-> S4
+    B[["Engram · Dobby<br/>Deep Insights · KaaS"]] <--> S3
 
-    classDef policy fill:#fde2e1,stroke:#c0392b,color:#000
     classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
     classDef mem fill:#e6f5e9,stroke:#2e7d32,color:#000
     classDef io fill:#f4f4f4,stroke:#888,color:#000
-    class S1,S2,R policy
-    class S3,S5,D judge
+    class S1,S2,S4,D judge
     class G mem
-    class S4,S6,B,L io
+    class AS,S3,B io
 ```
 
-**Color key used throughout:** red = policy (never guesses), blue = judgment (typed decisions), green = memory (advises), grey = plumbing.
+The explanation in Assemble (every source selected or skipped, with its reason) is part of the response, because it is how routing is evaluated against a baseline.
+
+**Color key used throughout:** blue = cascade (typed decisions), green = memory and ontology (advises), grey = given inputs and plumbing. Red, where it remains in older diagrams, marks a given rule a model never challenges.
 
 <a id="section-5-2"></a>
 
-### 5.2 Three layers, three responsibilities
+### 5.2 Two pillars inside a given boundary
 
 ```mermaid
 flowchart TB
-    subgraph L1["POLICY LAYER: decides, deterministically"]
-        direction LR
-        P1["Identity and<br/>token exchange"]
-        P2["Effective scope"]
-        P3["Capability and<br/>authority registry"]
-        P4["Write governance"]
+    subgraph GIVEN["GIVEN: allowed sources and required subset (assumed input, not designed here)"]
+        direction TB
+        subgraph L2["CASCADE: estimates, with probabilities"]
+            direction LR
+            J1["Tier 0<br/>rules"]
+            J2["Tier 1<br/>System One / Jev"]
+            J3["Tier 2<br/>LLM, only if unsure"]
+            J1 --> J2 --> J3
+        end
+        subgraph L3["MEMORY AND ONTOLOGY: remembers, advises"]
+            direction LR
+            M1["Registry<br/>sources, authority,<br/>procedures"]
+            M5["Vocabulary<br/>terms, mappings"]
+            M3["Evidence relations<br/>copies, versions, subjects"]
+            M2["Observations"]
+            M4[("Memory graph<br/>projection")]
+            M1 --> M4
+            M5 --> M4
+            M3 --> M4
+            M2 --> M4
+        end
+        L3 -- "supplies priors and translations to" --> L2
+        L2 -- "outcomes feed" --> L3
     end
-    subgraph L2["JUDGMENT LAYER: estimates, with probabilities"]
-        direction LR
-        J1["Tier 0<br/>rules"]
-        J2["Tier 1<br/>System One / Jev"]
-        J3["Tier 2<br/>LLM, only if unsure"]
-        J1 --> J2 --> J3
-    end
-    subgraph L3["MEMORY LAYER: remembers, advises"]
-        direction LR
-        M1["Registry<br/>sources, authority,<br/>procedures"]
-        M5["Vocabulary<br/>terms, mappings"]
-        M3["Evidence relations<br/>copies, versions"]
-        M2["Observations<br/>receipts"]
-        M4[("Memory graph<br/>projection")]
-        M1 --> M4
-        M5 --> M4
-        M3 --> M4
-        M2 --> M4
-    end
-    L1 -- "sets the boundary for" --> L2
-    L3 -- "supplies priors to" --> L2
-    L2 -- "outcomes feed, via receipts" --> L3
 
-    classDef policy fill:#fde2e1,stroke:#c0392b,color:#000
     classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
     classDef mem fill:#e6f5e9,stroke:#2e7d32,color:#000
-    class P1,P2,P3,P4 policy
     class J1,J2,J3 judge
     class M1,M2,M3,M4,M5 mem
 ```
@@ -229,14 +228,12 @@ These are modules inside the existing Sanctum service in the pilot, not new serv
 
 | Component | Layer | Does | Does not |
 |---|---|---|---|
-| Identity and policy | Policy | Verify caller token for Sanctum's audience; derive effective scope; exchange for backend credentials | Forward the caller's token unchanged (F15) |
-| Capability registry | Policy | Lists backends, adapters, owners, data classes, governance, authority | Learn anything |
-| Route planner | Judgment | Chooses a subset of authorized sources under budget | Add sources outside the authorized set |
-| Evidence assembly | Judgment | Versioned units; exact dedup; rank; flag conflicts; pack | Drop a conflict witness silently |
-| Decision layer | Judgment | Typed questions via rules, System One, LLM | Decide access or governance |
-| Sanctum memory | Memory | Source map, vocabulary, procedures, artifact relations, observations | Hold content, grant access, or share a store with Engram |
+| Source registry | Memory | Lists backends, adapters, owners, fact-kind authority, procedures | Learn anything |
+| Route planner | Cascade | Chooses a subset of the allowed sources under budget | Add sources outside the allowed set |
+| Evidence assembly | Cascade | Versioned units; exact dedup; rank; flag conflicts; pack; explain selected and skipped sources | Drop a conflict witness silently |
+| Decision layer | Cascade | Typed questions via rules, System One, LLM | Decide access |
+| Sanctum memory | Memory | Source map, vocabulary, procedures, artifact relations and subjects, observations | Hold content, grant access, or share a store with Engram |
 | Adapters | Plumbing | Translate the contract per backend; timeouts; caps | Invent missing provenance |
-| Receipts | Plumbing | Durable record of inputs, decisions, outputs | Store full backend copies |
 
 ---
 
@@ -255,7 +252,7 @@ Two facts shape the design:
 - Questions in one call see the same state and run **independently**. One cannot use another's answer (F03).
 - Vendor calibration is not calibration on our traffic. We calibrate locally (F04, F05).
 
-**Policy rules and judgment rules.** Policy rules (access, required sources, permitted operations) are binding and are never challenged by a model. Judgment rules (usefulness, relevance, possible-conflict heuristics) are the baseline a model is evaluated against. Each decision declares its eligibility rule, the items a model may judge:
+**Given rules and judgment rules.** The allowed set and the required subset are given inputs and are never challenged by a model. Judgment rules (usefulness, relevance, possible-conflict heuristics) are the baseline a model is evaluated against. Each decision declares its eligibility rule, the items a model may judge:
 
 | Decision | Eligibility |
 |---|---|
@@ -298,7 +295,7 @@ flowchart LR
     class J judge
 ```
 
-The wire protocol, question mapping and handshake rules for this call (auth, model pinning, batching, deadlines, validation, calibration binding, data classes, receipts) are specified in [System One providers and the Jev handshake](system-one-providers.md).
+The wire protocol, question mapping and handshake rules for this call (model pinning, batching, deadlines, validation, calibration binding, eligibility) are specified in [System One providers and the Jev handshake](system-one-providers.md).
 
 <a id="section-6-3"></a>
 
@@ -328,13 +325,13 @@ Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance t
 | ID | Decision | What the probability means | Pilot | If uncertain |
 |---|---|---|---|---|
 | D1 | Intent (`why`, `when`, `what`, `how`, `related`, `verify`), multi-label | P(intent applies) per label | Rules; Jev challenger | Balanced `general` weights |
-| D2 | **Expected source usefulness** | P(source returns necessary supporting evidence \| query, authorized source) | **First Jev experiment** | Keep the source |
+| D2 | **Expected source usefulness** | P(source returns necessary supporting evidence \| query, allowed source) | **First Jev experiment** | Keep the source |
 | D3 | Ambiguity | P(query needs clarification or decomposition), query only | Rules; Jev challenger | Escalate within budget, else `partial` |
 | D4 | Relevance | P(unit supports an answer to the query); score variants diagnostic only | Existing ranker, then System One support judgment as a successive stage: the ranker orders candidates, System One may reorder or fill within the packed set | Rules order and rules-packed set |
 | D5 | Duplicate | Exact: same hash + version. Semantic: proposal only | Exact only | Keep both |
 | D6 | Possible conflict | P(two units assert a material typed relation about the same subject and attribute) | Bounded flag on rule-produced pairs | Rule-flagged pairs stay `possible_conflict`; candidate pairs stay unflagged |
 | D7 | Claim support | supported / contradicted / insufficient | Later | `insufficient` |
-| D8 | Write target | Proposes among **registry-permitted** destinations | Later | No side effect |
+| D8 | Write target | Out of scope (research stage) | – | – |
 | D9 | Supersession | Explicit version lineage first | Lineage only | Never hide evidence |
 
 <a id="section-6-5"></a>
@@ -457,7 +454,7 @@ When "implemented" and "intended" disagree, that is usually a real finding, not 
 
 ### 7.3 Ranking
 
-- **Filter first:** access, requested version or as-of date, known invalidity.
+- **Filter first:** requested version or as-of date, known invalidity (access is already applied by the given allowed set).
 - **Rank** by one common relevance score (existing cross-encoder in the pilot).
 - **Authority** is a constraint or tie-break, not a number blended into relevance.
 - **Routing prior is not reused** in ranking (avoids rewarding past exposure twice).
@@ -497,7 +494,7 @@ Caps per request: max candidates, max conflict pairs, max bytes, max model calls
 - A newer version replaces an older one **only when explicit applicability establishes supersession for this query**. An experimental branch never replaces production; a historical question keeps the historical version.
 - Uncertain alternatives and conflict witnesses are **kept**, not hidden.
 
-**Exact copies** may share one text payload, but every eligible copy keeps its own source, version, authority, and permission attribution. An accessible copy can never be used to reveal a restricted one, or to transfer authority from one source to another.
+**Exact copies** may share one text payload, but every copy keeps its own source, version, and authority attribution. A copy never transfers authority from one source to another.
 
 Automatic *ingestion* of lineage and copies is fine. Automatic *hiding* requires the stronger applicability rule.
 
@@ -512,42 +509,22 @@ Automatic *ingestion* of lineage and copies is fine. Automatic *hiding* requires
 sequenceDiagram
     autonumber
     participant A as Agent
-    participant P as Policy
-    participant G as Graph + registry
-    participant D as Decisions
+    participant U as Understand
+    participant S as Select
+    participant R as Retrieve
     participant B as Backends
-    participant E as Assembly
-    participant L as Receipts
+    participant E as Assemble
 
-    A->>P: question, scope, budget, mode
-    P->>P: verify token, compute effective scope
-    P->>G: allowed sources, entity neighborhoods (scope-filtered)
-    G-->>D: priors, must-consult list
-    Note over D: Round 1 rules, Round 2 one Jev call
-    D->>B: selected subset, shared deadline, delegated creds
+    A->>U: question, allowed set, required subset, budget, mode
+    U->>U: resolve names through the ontology (one or several interpretations)
+    U->>S: interpretations, candidate sources, procedures
+    Note over S: Round 1 rules, Round 2 one System One call on optional sources
+    S->>R: selected subset (required always included), reasons
+    R->>B: per-source query plans, one shared deadline
     B-->>E: results + per-source status
     Note over E: Round 3: rank, exact dedup, conflict flags, pack
-    E->>L: write receipt
-    L-->>E: receipt_id
-    E-->>A: evidence response
+    E-->>A: evidence response + selected, skipped, why
 ```
-
-The receipt is written **before** the response in modes that promise replay (F18).
-
----
-
-<a id="section-13"></a>
-
-## 13. Write path and reconciliation (post-pilot)
-
-- Destination permissions and review come from the registry. The model proposes; it never picks a weaker policy.
-- Writes check an exact base version.
-- Idempotency keys are scoped to principal and operation, bound to target, body hash, and base version.
-- Multi-target writes report per-target outcomes.
-- Hiding or superseding vetted evidence, even as an annotation, needs owner approval.
-- First release: proposals only. Automatic acceptance only for exact equivalences with rollback.
-
-Reconciliation triggers: new `possible_conflict`, version change on an artifact with known relations, scheduled staleness sweeps, entities with repeated conflicts.
 
 ---
 
@@ -557,14 +534,9 @@ Reconciliation triggers: new `possible_conflict`, version change on an artifact 
 
 <a id="section-14-1"></a>
 
-### 14.1 Security and data
+### 14.1 Data classes (assumed input)
 
-- Verify tokens for Sanctum's audience; approved token exchange for backends. No passthrough (F15).
-- Credentials travel in the authenticated transport or session, never as tool arguments visible to a model (v5.1).
-- Provider eligibility (hosted Jev vs. self-hosted vs. LLM) follows the **highest data class in the full state**, including graph descriptors and logs.
-- Graph entities, aliases, and statistics are scoped; neighborhoods are filtered before inference.
-- Evidence text is data. Model outputs are validated against allowed candidates. Feedback producers are authenticated and labeled (F16).
-- Caches are keyed by principal, scope, policy, and source versions; revocation invalidates them.
+Which providers may see which data classes is an input: provider eligibility by data class is given, not designed here ([System One providers §5](system-one-providers.md#5-the-handshake-thirteen-points)).
 
 <a id="section-14-2"></a>
 
@@ -575,8 +547,8 @@ gantt
     title Sanctum overhead in fast mode (targets, to validate)
     dateFormat X
     axisFormat %L ms
-    section Policy
-    Token + scope + registry      :p1, 0, 20
+    section Registry
+    Allowed set + registry lookup :p1, 0, 20
     section Memory + rules
     Graph lookup + Round 1 rules  :g1, after p1, 20
     section Judgment
@@ -585,18 +557,15 @@ gantt
     Fan-out (reported separately) :crit, b1, after j1, 1
     section Assembly
     Dedup + ranker + packing      :a1, after b1, 80
-    section Receipt
-    Durable receipt               :r1, after a1, 20
 ```
 
 | Stage | Target p95 |
 |---|---|
-| Token + scope + registry | 20 ms |
+| Allowed set + registry lookup | 20 ms |
 | Graph lookup, Round 1 rules | 20 ms |
 | Round 2, one Jev call | 150 ms |
 | Assembly: exact dedup, existing ranker, packing | 80 ms |
-| Durable receipt | 20 ms |
-| **Sanctum overhead** | **≈ 290 ms** |
+| **Sanctum overhead** | **the stage targets above, measured end to end** |
 
 Backend time is reported separately. Stage p95s do not add into an end-to-end p95, so the real number comes from whole-path measurement. `escalated` and `synthesize` modes have their own SLOs.
 
@@ -604,23 +573,7 @@ Backend time is reported separately. Stage p95s do not add into an end-to-end p9
 
 ### 14.3 Observability
 
-Per request: effective scope ref, candidates, selected subset, dispositions, provider and versions, per-source status, tokens, cost, latency split (Sanctum / backend / total), degraded reasons. Dashboards include **entities with no coverage** ([Ex. 8](contracts-and-scenarios.md#example-8)), **open conflicts by entity** ([Ex. 3](contracts-and-scenarios.md#example-3)), **unresolved terms** ([Ex. 14](contracts-and-scenarios.md#example-14)), and **governance queue** (proposals awaiting review, [Ex. 14](contracts-and-scenarios.md#example-14)–15).
-
----
-
-<a id="section-15"></a>
-
-## 15. Replay levels
-
-| Level | Lets us | Needs |
-|---|---|---|
-| `recompute_on_candidates` (**pilot**) | Re-run routing and ranking policies on what was retrieved | Receipt + retained evidence units |
-| `exact_bundle` (later) | Reproduce exactly what was served | Retained served bundle |
-| `frozen_corpus` (research) | Evaluate routers that would have called different sources | Approved sample with all-source retrieval captured |
-
-`replay_level` on the wire takes only `none`, `recompute_on_candidates`, or `exact_bundle`. **`frozen_corpus` is a research execution profile, not a response value** (v5.1): it describes how an evaluation is run, not what a response promises. Counterfactual claims about translated queries still need paired retrieval on a recorded snapshot ([§9.10](memory-design.md#section-9-10)).
-
-Revocation and erasure override replay.
+Per request: candidates, selected and skipped subset with reasons, dispositions, provider and versions, per-source status, tokens, cost, latency split (Sanctum / backend / total), degraded reasons. Dashboards include **entities with no coverage** ([Ex. 8](contracts-and-scenarios.md#example-8)), **open conflicts by entity** ([Ex. 3](contracts-and-scenarios.md#example-3)), **unresolved terms** ([Ex. 14](contracts-and-scenarios.md#example-14)).
 
 ---
 
@@ -629,7 +582,7 @@ Revocation and erasure override replay.
 ## 20. Anticipated questions
 
 **"Isn't this too big for where we are?"**
-The HLD describes the target shape so decisions stay consistent. The pilot is small: rules-first, one Jev call, graph v0 on existing storage, read-only, three backends. Everything else waits on an experiment.
+The HLD describes the target shape so decisions stay consistent. The pilot is small: rules-first, one Jev call, graph v0 on existing storage, read-only, three backends, and access control taken as given. Everything else waits on an experiment.
 
 **"Why a graph and not a table?"**
 The router's questions are multi-hop ([Ex. 1](contracts-and-scenarios.md#example-1), 4, 5). Physically, v0 may well be tables; E2b decides.
@@ -655,9 +608,6 @@ Scoped mode is supported and is where rules do most of the work ([Ex. 1](contrac
 **"Does Sanctum decide which source is right?"**
 No. It shows both sides with roles and versions ([Ex. 3](contracts-and-scenarios.md#example-3)). Resolution goes through each source's own governance.
 
-**"Does our data leave PayPal?"**
-Only for data classes approved for a hosted provider. Others use a self-hosted model or rules.
-
 **"What happens when Jev is down?"**
 Rules and graph priors with capped fan-out, response marked degraded ([Ex. 9](contracts-and-scenarios.md#example-9)).
 
@@ -671,21 +621,12 @@ Rules and graph priors with capped fan-out, response marked degraded ([Ex. 9](co
 |---|---|---|
 | Q1 | Is this HLD standalone, or must it stay compatible with the earlier C6 contract? | Standalone; record differences explicitly |
 | Q2 | Pilot journey and backends | Kestrel planning on one payments service; Deep Insights + Dobby + KaaS |
-| Q3 | Who owns authority declarations | Source owners, reviewed by platform team |
 | Q4 | Cost of omitting a needed source vs. calling an extra one | Set per question family with the adopter |
-| Q5 | Pilot replay level | `recompute_on_candidates` |
-| Q6 | Data classes approved for hosted Jev | Security review before E1 on real data; sanitized fixtures until then |
 | Q7 | Owner of evaluation labels | Evaluation track, with domain reviewers |
 | Q8 | Who owns canonical entities and entity types | Sanctum platform team |
-| Q9 | Who approves `DENOTES` identity mappings per source | Native term's owner **and** canonical entity's owner, or explicitly delegated stewardship ([§9.7](memory-design.md#section-9-7)) |
 | Q10 | Where Sanctum memory is stored | Existing Sanctum persistence; separate from Engram (E2b) |
-| Q11 | Who attests the pilot service's identity, domain membership, repo binding, and native names across sources? | Service owner + one delegated steward per source |
-| Q12 | Which owner approves each fact-kind authority declaration, at what scope, and how are disagreements resolved? | Source owners; platform team arbitrates |
-| Q13 | May service names, native paths, descriptors, query logs, and coverage counts be stored in Sanctum and sent to Jev? | Security review; sanitized lab data until approved |
-| Q14 | Maximum acceptable stale-ACL window; which change feeds exist; retention for replay | Security + source owners |
 | Q15 | What do Deep Insights, Dobby, and KaaS actually expose: stable IDs, version reads, filters, deletion notices, permission-aware search? | Adapter survey in October; lab hubs mirror the answers |
-| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Missing must-consult evidence: `insufficient` with explicit gaps, following [Example 9](contracts-and-scenarios.md#example-9). Resolve procedure-conflict status explicitly before acceptance; this remains an open decision. v5.2.1: the status default is stated in [§7.4](hld.md#section-7-4); procedure-conflict handling and per-decision failure behavior are out of scope at the research stage ([review history](review-history.md#v5-2-1)). |
-| Q17 | Can an evaluation identity query all pilot sources and retain evidence? Who owns labels and the fresh holdout? | Evaluation track, outside the tuning team |
-| Q18 | Who approves, deploys, and rolls back memory releases? | Sanctum platform team |
+| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Status follows [§7.4](hld.md#section-7-4): `partial` while other requested facts have evidence, `insufficient` when none remain. Procedure-conflict status remains open. |
+| Q17 | Who owns evaluation labels and the fresh holdout? | Evaluation track, outside the tuning team |
 
 ---

@@ -2,7 +2,7 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.2.1 (reorganized from v5.1). Lab work is experimental. Original section numbers are retained.
+> Status: proposed research design, version 5.3 (reorganized from v5.1). Scope: routing intelligence. Lab work is experimental. Original section numbers are retained where sections survive.
 
 This page preserves the source's review dispositions, the v5.1 change record, and the holistic review (R-Holistic) with its v5.2.1 dispositions. “Accepted” in these historical tables means a finding was accepted/addressed in that document; it does not establish stakeholder approval, executable verification, or production acceptance.
 
@@ -38,12 +38,12 @@ This page preserves the source's review dispositions, the v5.1 change record, an
 | F10 | Routing as subset decision | **Accepted** | [§9.10](memory-design.md#section-9-10), E5 |
 | F11 | Ranking and time semantics | **Accepted** | [§7.1](hld.md#section-7-1), [§7.3](hld.md#section-7-3), [§7.5](hld.md#section-7-5), [Ex. 4](contracts-and-scenarios.md#example-4) |
 | F12 | Token packing | **Accepted** | [§7.4](hld.md#section-7-4), [Ex. 3](contracts-and-scenarios.md#example-3) |
-| F13 | Model weakening governance | **Accepted** | [§13](hld.md#section-13), [Ex. 11](contracts-and-scenarios.md#example-11) |
-| F14 | Write idempotency | **Accepted, deferred to write note** | [§13](hld.md#section-13), [Ex. 11](contracts-and-scenarios.md#example-11) |
+| F13 | Model weakening governance | **Accepted** | §13 (removed in v5.3), [Ex. 11](contracts-and-scenarios.md#example-11) |
+| F14 | Write idempotency | **Accepted, deferred to write note** | §13 (removed in v5.3), [Ex. 11](contracts-and-scenarios.md#example-11) |
 | F15 | Token passthrough | **Accepted** | [§5.3](hld.md#section-5-3), [§14.1](hld.md#section-14-1) |
 | F16 | Untrusted evidence | **Accepted** | [Ex. 10](contracts-and-scenarios.md#example-10), [§14.1](hld.md#section-14-1) |
 | F17 | Latency arithmetic | **Accepted** | [§6.3](hld.md#section-6-3), [§14.2](hld.md#section-14-2) |
-| F18 | Replay guarantees | **Accepted, right-sized** | [§11](hld.md#section-11), [§15](hld.md#section-15) |
+| F18 | Replay guarantees | **Accepted, right-sized** | [§11](hld.md#section-11), §15 (removed in v5.3) |
 | F19 | Degradation | **Accepted** | [Ex. 9](contracts-and-scenarios.md#example-9) |
 | F20 | Bundled comparisons | **Accepted** | §16.2 (lab) ladder |
 | F21 | Contract versions | **Accepted** | [§6.6](hld.md#section-6-6), [§7.1](hld.md#section-7-1), [§12.2](contracts-and-scenarios.md#section-12-2) |
@@ -82,7 +82,7 @@ v5.1 is a contract-consistency patch. It changes no architecture. It closes gaps
 |---|---|---|---|
 | 1 | [§7.5](hld.md#section-7-5) needs branch, environment and effective time, but the [§7.1](hld.md#section-7-1) EvidenceUnit sketch lacked them | `applicability` block with `applicability_status`; no fabricated context | [§7.1](hld.md#section-7-1) |
 | 2 | Verify mode promised verdicts while D7 is deferred | Pilot `verify` returns evidence and conflict flags; `verdicts` absent until D7; advertised as `partial` | [§12.1](contracts-and-scenarios.md#section-12-1), [Ex. 7](contracts-and-scenarios.md#example-7), [§12.3](contracts-and-scenarios.md#section-12-3) |
-| 3 | `frozen_corpus` appeared as a replay level but not in the response enum | Declared a research execution profile, not a wire value | [§15](hld.md#section-15) |
+| 3 | `frozen_corpus` appeared as a replay level but not in the response enum | Declared a research execution profile, not a wire value | §15 (removed in v5.3) |
 | 4 | Prose used statuses (`unresolved`, `insufficient_budget`, `unsupported_for_as_of`) not in the [§12.2](contracts-and-scenarios.md#section-12-2) enums | Enums stay closed; detail moves to versioned reason codes | [§12.2](contracts-and-scenarios.md#section-12-2), [§9.3](memory-design.md#section-9-3), [Ex. 4](contracts-and-scenarios.md#example-4), [Fixture 19](contracts-and-scenarios.md#fixtures-16-25) |
 | 5 | No response shape for separated interpretations ([§9.2](memory-design.md#section-9-2)) | `interpretations[]` in the response; `caller_profile` in the request | [§12.0](contracts-and-scenarios.md#section-12-0), [§12.2](contracts-and-scenarios.md#section-12-2) |
 | 6 | No request contract; credentials could be read as tool arguments | `RetrieveRequest` defined; credentials only in transport or session | [§12.0](contracts-and-scenarios.md#section-12-0), [§14.1](hld.md#section-14-1) |
@@ -161,3 +161,42 @@ A focused review of the decision cascade and the System One layer, kept to rules
 | MVP-7 | Batch efficiency and input size are measured provider-profile properties, not hosting location; checklist for a third provider; a character limit is a backstop | **Adopted** | [System One providers §2.1, §13](system-one-providers.md#21-provider-profiles) |
 | MVP-8 | Tier 2 consistent in both diagrams (permitted actions only, else the baseline-preserving default); D4 ranker and System One as successive stages, score diagnostic | **Adopted** | [HLD §6.4, §6.5](hld.md#section-6-5), [System One providers §1, §12](system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance) |
 | MVP-9 | Activation per decision against its rules baseline and a named no-model control, with a metric that can observe the effect; no economic framework | **Adopted** | [HLD §6.7](hld.md#section-6-7), [System One providers §8](system-one-providers.md#8-calibration-binding-and-the-shadow-only-rule) |
+
+---
+
+<a id="v5-3"></a>
+
+## v5.3: routing intelligence only
+
+**v5.3 supersedes v5.2.2.** Owner direction: the policy layer was over-engineered for a research MVP. v5.3 treats policy as an assumed input and keeps two pillars, the cascade and the memory and ontology, operating inside a given allowed set. The request journey is four routing stages (Understand, Select, Retrieve, Assemble), and the Assemble stage keeps the selected, skipped and why explanation because it is how routing is evaluated. Memory design and System One providers are unchanged apart from governance workflow prose and data-class wording.
+
+Every removal, each **out of scope (research stage)**:
+
+| Removed | Where it was |
+|---|---|
+| Policy layer as a designed layer (identity and token exchange, effective scope, write governance) | HLD §0, §5.2, §5.3 |
+| Identity and token exchange, no-passthrough rule (F15) | HLD §5.3, §14.1 |
+| Scope intersection mechanics (grants ∩ project scope ∩ registry ∩ data policy) | HLD §5.1, §11, contracts Ex. 1 |
+| Delegated credentials on fan-out | HLD §11, contracts Ex. 1 |
+| Security and data rules of §14.1, except data-class eligibility as an input | HLD §14.1 |
+| Durable receipt before reply (principle 7, read-path step) | HLD §4, §11, §14.2 |
+| Replay levels | HLD §15 |
+| Write path and reconciliation | HLD §13 |
+| Write-governance non-goal and write-target decision (D8 marked out of scope) | HLD §3, §6.4 |
+| Asynchronous reconciliation principle | HLD §4 |
+| Data-egress anticipated question | HLD §20 |
+| Decisions Q3, Q5, Q6, Q9, Q11, Q12, Q13, Q14, Q18 (authority approval, replay level, hosted data classes, identity approval, attestation, authority arbitration, metadata to hosted providers, stale ACLs and retention, release approval) | HLD §21 |
+| Request credential rules and caller-token fields | Contracts §12.0 |
+| `receipt_id`, `effective_scope_ref`, `replay_level`, `replay_expiry` response fields and the `receipt_incomplete` reason code | Contracts §12.2 |
+| Delegated identity and write capabilities of the adapter contract; replay in Sanctum's manifest | Contracts §12.3 |
+| Example 10 (a document tries to steer Sanctum): security boundary | Contracts §10 |
+| Example 11 (recording a learning): writes | Contracts §10 |
+| Example 9 panel "registry or auth down" | Contracts §10 |
+| Example 12 approval step, data-class and scope-isolation checks | Contracts §10 |
+| Fixture 21 (descriptor poisoning and unshare) and Fixture 22 (probe access context): security boundary | Contracts §10 |
+| Governance approval workflow (ownership table, lifecycle diagram, automatic-change risk table) beyond the review rule | Memory §9.7 |
+| Approval workflow framing of the improvement loop | Memory §9.10 |
+| Approval-scope bullet in name resolution | Memory §9.2 |
+
+**Reworded, kept:** HLD §0, §3 (G1, G5, non-goals), §4 (principle 1), §5.1, §5.2, §5.3, §6.1 (given rules), §6.2, §6.4 (D2 wording), §7.3, §7.5 (copies keep attribution), §11, §14.1 (one line), §14.2 (registry lookup), §14.3, §20, §21 Q16 and Q17; contracts Ex. 1, Ex. 6, Ex. 9, Ex. 12, §12.0, §12.1, §12.2, §12.3, worked trace block 2; memory §9.2 (visibility as an assumed-input-dependent rule), §9.7, §9.10; System One providers §1 and handshake point 9 and the broker's data-class row (assumed input).
+

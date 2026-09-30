@@ -353,8 +353,7 @@ Rules (M01, M02):
 - When two meanings are both legitimately accessible, Sanctum **never picks the higher-scoring one**, never unions their authority or must-consult rules, and never names candidates the caller cannot see.
 - For agent callers, the default is separated interpretations (an agent mid-plan often cannot answer a clarification). Interactive callers can be asked for context.
 - Scope is three separate things: the name's **namespace**, the assertion's **applicability**, and **permission** to see the metadata.
-- A readable place is not proof that a name is visible (v5.2.1). Name visibility is checked against the name's own metadata permission, never inferred from the caller's access to a place that selects for the entity.
-- Approval must cover both the native term's namespace and the canonical entity's ownership boundary; a steward may cover both only where explicitly delegated.
+- Which names a caller can see is an assumed input ([HLD §5](hld.md#section-5)). Given that input, a readable place is not proof that a name is visible: visibility follows the name's own metadata permission, never the caller's access to a place that selects for the entity.
 
 <a id="section-9-3"></a>
 
@@ -502,51 +501,7 @@ flowchart LR
 
 ### 9.7 Governance
 
-**Ownership follows the layers.**
-
-| What | Owner | How it changes |
-|---|---|---|
-| Source-native terms and structure | Each source | Harvested; Sanctum never edits them |
-| Canonical entities, types, `MEMBER_OF` | Sanctum platform team | Review |
-| `DENOTES` (identity) | Native term's owner **and** canonical entity's owner (or explicitly delegated steward) | System proposes, humans approve |
-| `SELECTS_FOR` | Source owner | Review |
-| Authority declarations | Source owners, reviewed by platform | Never automatic |
-| Routing procedures | Sanctum platform team; coverage attested by source owners | Versioned, validated, replay-tested |
-| Memory releases | Sanctum platform team | Validate, fixtures, activate, roll back |
-
-**Lifecycle**
-
-```mermaid
-stateDiagram-v2
-    [*] --> proposed: system or human proposes
-    proposed --> shadow: schema + conflict checks pass
-    shadow --> accepted: replay passes + scoped approval
-    shadow --> rejected: fails replay or declined
-    proposed --> rejected: declined or conflicts
-    accepted --> deprecated: superseded or invalidated
-    rejected --> [*]
-    deprecated --> [*]
-```
-
-- **Shadow** items are computed and logged but have no operational effect ([§8.7](memory-design.md#section-8-7)).
-- Rejected proposals are kept with their evidence, so the same mistake is not re-proposed.
-- Items are deprecated rather than deleted, **within retention and privacy limits**; erasure overrides permanence ([§9.9](memory-design.md#section-9-9)).
-- Conflicting proposals (a name that already denotes something else, or resembles another entity in scope) become governance items and are never auto-merged.
-
-**What can change automatically, by behavioral risk (M06)**
-
-The test is not "what kind of record is this?" but "can this change remove a source, change a required set, or expose new metadata?"
-
-| Change | v0 |
-|---|---|
-| Health and availability stats | Automatic; failures produce unavailable/partial, never redefine authority |
-| Exact duplicates, adapter-proven lineage | Automatic ingestion; hiding evidence needs the applicability rule ([§7.5](hld.md#section-7-5)) |
-| Descriptors and coverage strengths | **Reviewed and pinned in the release** (they can cause a source to be skipped) |
-| `RELATES_TO` relations | Stored as proposals; operationally disabled |
-| `DENOTES`, `SELECTS_FOR`, `MEMBER_OF` | Proposed; scoped human approval |
-| Procedures and thresholds | Proposed; validation + replay + review |
-| New entity or edge types | Proposed; ADR |
-| Authority and access | **Never automatic** |
+**Only reviewed names establish identity.** A `DENOTES`, `SELECTS_FOR`, `MEMBER_OF`, authority declaration or procedure becomes operational only when it is reviewed and published in a memory release; the system may propose, never accept. Proposed and shadow items are computed and logged but have no operational effect ([§8.7](memory-design.md#section-8-7)); rejected proposals are kept so the same mistake is not re-proposed. Who approves which assertion, and the approval workflow, are out of scope at the research stage.
 
 **Descriptors (M06).** Generated from attributed fields only: entity, fact kind, artifact types, time range, observed evidence, freshness, uncertainty. Source text is data, not instructions. Descriptors cannot assert authority ("complete and authoritative"). They are scope-filtered and subject to egress rules before reaching Jev.
 
@@ -586,6 +541,8 @@ The test is not "what kind of record is this?" but "can this change remove a sou
 <a id="section-9-10"></a>
 
 ### 9.10 How memory improves: a gated loop
+
+**Memory improves through a proposed, tested, approved loop.** Gaps observed in traffic become proposals with evidence; proposals are tested against data they did not choose; only reviewed changes reach the next release. The approval workflow itself is out of scope at the research stage; the evaluation discipline below is in scope.
 
 ```mermaid
 flowchart LR

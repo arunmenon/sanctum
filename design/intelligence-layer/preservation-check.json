@@ -9,7 +9,8 @@
       "page": "hld.md",
       "source_sha256": "6b3acad0badee7fca53ac46a14640820f0cc215751eeb19ed91f220ddbb8aad2",
       "editorial_changes": 0,
-      "rendered_sha256": "852d823d16474928ef7e67c366ba10bc35c2b6c649eaaf2d8dae3573dc6d52f8"
+      "rendered_sha256": "852d823d16474928ef7e67c366ba10bc35c2b6c649eaaf2d8dae3573dc6d52f8",
+      "v5_3_note": "v5.3: two pillars inside a given allowed set"
     },
     {
       "section": 1,
@@ -30,21 +31,24 @@
       "page": "hld.md",
       "source_sha256": "2bcda754fea2e3b29153612c24c1583305ac17e02bf63680bea1842f56454b54",
       "editorial_changes": 0,
-      "rendered_sha256": "41ed324f094b9786fc7e93fff2bdf5628d85e0580c30cf378e88d564cc55106c"
+      "rendered_sha256": "41ed324f094b9786fc7e93fff2bdf5628d85e0580c30cf378e88d564cc55106c",
+      "v5_3_note": "v5.3: security, write and replay items dropped from goals and non-goals"
     },
     {
       "section": 4,
       "page": "hld.md",
       "source_sha256": "40c1e461a76209a83553fd301c1dde38b4a44e29710a9e0efef47ff826ac6116",
       "editorial_changes": 0,
-      "rendered_sha256": "8f168219eee608e66bbe624e4f8b8bebe3e8005ca1ce3cb9cc9479e49c0f6b46"
+      "rendered_sha256": "8f168219eee608e66bbe624e4f8b8bebe3e8005ca1ce3cb9cc9479e49c0f6b46",
+      "v5_3_note": "v5.3: principles on reconciliation and receipts dropped"
     },
     {
       "section": 5,
       "page": "hld.md",
       "source_sha256": "817eaaee7f968a12963f66a1f77a15c668fdf0681d901ed14fbdc5e840345e6f",
       "editorial_changes": 0,
-      "rendered_sha256": "6e66ee3a4ff189a86c586b18620aa270aa9839e61e6456202d5e57378585e580"
+      "rendered_sha256": "6e66ee3a4ff189a86c586b18620aa270aa9839e61e6456202d5e57378585e580",
+      "v5_3_note": "v5.3: policy layer replaced by assumed inputs; four routing stages; two pillars"
     },
     {
       "section": 6,
@@ -79,42 +83,48 @@
       "page": "contracts-and-scenarios.md",
       "source_sha256": "b28aefdf64f6a00031bc5cea61b33a7888033053a12e3605c29605d6d0993fdd",
       "editorial_changes": 0,
-      "rendered_sha256": "b5337378afe5b446ff58935901d7ffb0a2ff388070355245e8b60971a501bfd3"
+      "rendered_sha256": "b5337378afe5b446ff58935901d7ffb0a2ff388070355245e8b60971a501bfd3",
+      "v5_3_note": "v5.3: Examples 10, 11 and Fixtures 21, 22 reduced to one-line out-of-scope entries"
     },
     {
       "section": 11,
       "page": "hld.md",
       "source_sha256": "5b4063b8b19e9095442f392bf8e21737d519f1356bb0557efc05f5b179427872",
       "editorial_changes": 0,
-      "rendered_sha256": "6afef658f6970e9887b64907ac48b9f2ae19c443bf83710de3cacf667a8f7087"
+      "rendered_sha256": "6afef658f6970e9887b64907ac48b9f2ae19c443bf83710de3cacf667a8f7087",
+      "v5_3_note": "v5.3: read path redrawn as four routing stages; receipt step removed"
     },
     {
       "section": 12,
       "page": "contracts-and-scenarios.md",
       "source_sha256": "a60eeb0763bac5a6e067795f195590441ef60c7ca9363085bf03fbd781973ffd",
       "editorial_changes": 0,
-      "rendered_sha256": "525a391b33296f5a03028519051fc8665f9ea4c206ecd83328f4d58662518608"
+      "rendered_sha256": "525a391b33296f5a03028519051fc8665f9ea4c206ecd83328f4d58662518608",
+      "v5_3_note": "v5.3: credential rules, receipt and replay fields removed from request and response"
     },
     {
       "section": 13,
       "page": "hld.md",
       "source_sha256": "5d5d6cbf2a1cc5a59d18767ff17fefeec0531c431e51e6f487451f32ddfa5096",
       "editorial_changes": 0,
-      "rendered_sha256": "d2733629572c50cb46549e0be60c0db6aa5661bb1cb88e31dbdad0271aa3c2be"
+      "rendered_sha256": "d2733629572c50cb46549e0be60c0db6aa5661bb1cb88e31dbdad0271aa3c2be",
+      "v5_3_note": "Removed in v5.3: out of scope (research stage); recorded in review-history.md#v5-3"
     },
     {
       "section": 14,
       "page": "hld.md",
       "source_sha256": "e5959c6ba6ce77cb036aac969dae334834098c141658374b9b603dbc737b4cb6",
       "editorial_changes": 0,
-      "rendered_sha256": "0f7f6badda7494f9586e9f30d4b9c8e9b991f613d33ffbaf5badaf77099738dd"
+      "rendered_sha256": "0f7f6badda7494f9586e9f30d4b9c8e9b991f613d33ffbaf5badaf77099738dd",
+      "v5_3_note": "v5.3: 14.1 reduced to data classes as an assumed input"
     },
     {
       "section": 15,
       "page": "hld.md",
       "source_sha256": "05cd3dbc16e472b60fb0aadafc4dc8d2d576fecf3e0bed79b0a3493f1e9f3995",
       "editorial_changes": 0,
-      "rendered_sha256": "18bc33bab2a632a083997c8ecd6e41f4154b7138009d63517a2aaff409b21d62"
+      "rendered_sha256": "18bc33bab2a632a083997c8ecd6e41f4154b7138009d63517a2aaff409b21d62",
+      "v5_3_note": "Removed in v5.3: out of scope (research stage); recorded in review-history.md#v5-3"
     },
     {
       "section": 16,
@@ -149,14 +159,16 @@
       "page": "hld.md",
       "source_sha256": "2012c95b914201acaae62259224708a97948999d312a31f3a4384f6cd02ae636",
       "editorial_changes": 0,
-      "rendered_sha256": "7d753d42f723f3ec48db707ee032e280743f00648bc69738e939f6713b1ff4ad"
+      "rendered_sha256": "7d753d42f723f3ec48db707ee032e280743f00648bc69738e939f6713b1ff4ad",
+      "v5_3_note": "v5.3: data-egress question dropped"
     },
     {
       "section": 21,
       "page": "hld.md",
       "source_sha256": "0726a24b2756c8dfa08f1c60e88819c38a5973511bf44f11ca94985c6ad7e055",
       "editorial_changes": 2,
-      "rendered_sha256": "62d5c5ed70be312a2b56dd119728b3e92ff6225dfda7fc44bff74cfbb1506307"
+      "rendered_sha256": "62d5c5ed70be312a2b56dd119728b3e92ff6225dfda7fc44bff74cfbb1506307",
+      "v5_3_note": "v5.3: security, tenancy, write, replay and approval decisions dropped"
     },
     {
       "section": 22,

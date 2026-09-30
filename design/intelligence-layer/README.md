@@ -2,17 +2,19 @@
 
 ## Purpose and relationship to the team's proposal
 
-This document set expands the engineering team's initial Sanctum proposal. It develops a policy-constrained evidence router, a System One decision interface, and governed memory about knowledge sources. The accompanying lab is a spike to investigate the underlying hypotheses. Its findings will inform design choices and possible follow-on work.
+This document set expands the engineering team's initial Sanctum proposal. It develops an evidence router that works inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. The accompanying lab is a spike to investigate the underlying hypotheses. Its findings will inform design choices and possible follow-on work.
 
 The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains Q1. The architectural expansion and lab do not imply approval or replacement of that proposal.
 
-**Version: v5.2.2** (proposed). It supersedes v5.2 with reduced scope: the design stays focused on memory and the cascade flow, for proving the tenets; production hardening drafted in v5.2 was removed as out of scope at the research stage. See the [review history](review-history.md#v5-2-1).
+**Version: v5.3** (proposed). It supersedes v5.2.2 and narrows the design to routing intelligence; see the [review history](review-history.md#v5-3).
+
+**Scope: routing intelligence.** The design covers two pillars: the cascade (Understand, Select, Retrieve, Assemble, with typed decisions from rules, then System One, then an LLM only if unsure) and the memory and ontology that advise it. Both operate inside a given allowed set of sources and a required subset. Access control, identity, credentials, writes, replay and approval workflows are assumed or out of scope at the research stage, not designed here.
 
 ## Start here
 
 An agent asks what a service does on a gateway timeout. Relevant information may live in code, a reviewed domain skill, documents, or earlier agent sessions. Those sources may use different names and disagree because they describe different versions or kinds of fact.
 
-Sanctum would first establish what the caller may access, then choose useful sources, gather version-aware evidence, preserve conflicts, and fit the result into the caller's budget. Its memory records how to find and interpret source metadata. It cannot grant access or determine which source is true.
+Given the sources the caller may use, Sanctum would resolve the question's names, choose useful sources, gather version-aware evidence, preserve conflicts, and fit the result into the caller's budget. Its memory records how to find and interpret source metadata. It cannot grant access or determine which source is true.
 
 ## Read according to your question
 

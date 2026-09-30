@@ -34,7 +34,7 @@ flowchart TB
     class SD safe
 ```
 
-Tier 2 is optional and remains an interface until an LLM budget is decided. Like Tier 1, a valid and eligible Tier 2 judgment may affect only the decision's permitted actions, and anything else takes the decision's baseline-preserving default. Rules keep policy: must-consult, access, as-of and data class are settled before any model is asked.
+Tier 2 is optional and remains an interface until an LLM budget is decided. Like Tier 1, a valid and eligible Tier 2 judgment may affect only the decision's permitted actions, and anything else takes the decision's baseline-preserving default. Must-consult, the allowed set, as-of and data-class eligibility are given or settled by rules before any model is asked.
 
 ## 2. Provider interface
 
@@ -143,7 +143,7 @@ response { model,                               # resolved version, e.g. <family
 | 6 | Deadline and retries | The call inherits the round's remaining budget. At most one retry, only if time remains and only within the round's call limit (the limit counts HTTP attempts, retries included) (the benchmark client's 5-attempt exponential backoff is wrong for the request path). Timeout or error → `unavailable`, safe default, `decision_layer_unavailable`. |
 | 7 | Latency profiles | Latency is measured, and whether it gates adoption is an owner decision. Two profiles: **strict** (the HLD budget; records timeout frequency and fallback cost) and **relaxed** (enough time to measure prediction quality). Elapsed time includes broker, network, validation, batching and retries. p50/p95 reported per profile; quality measured under the relaxed profile is not evidence about the fast path. |
 | 8 | Output validation | A bad individual answer (wrong type, a choice that was not offered, a probability outside [0, 1]) voids that decision only: it is `unavailable` and its candidate is kept. An answer for an id that was never asked, a non-JSON body, or a resolved model version that changes mid-round voids the whole call. Nothing is ever partially trusted within one answer. |
-| 9 | Data classes | Eligibility follows the highest data class in the full state ([§14.1](hld.md#section-14-1)). A hosted provider receives only the data classes it is approved for. Restricted names and other principals' data never enter `state`. |
+| 9 | Data classes (assumed input) | Which providers may see which data classes is an input ([HLD §14.1](hld.md#section-14-1)); given that input, eligibility follows the highest data class in the full state. A hosted provider receives only the data classes it is approved for. Names outside the caller's allowed set and other principals' data never enter `state`. |
 | 10 | Observability and replay | Receipts carry provider, resolved model version, question ids, raw and calibrated p, latency, usage and a request hash. Model calls are `model_call` observations, separate from knowledge-source calls: they never count as sources attempted or as evidence-bearing retrieval. The broker keeps request/response pairs (credentials excluded) to replay the **decision layer only**, not the whole Sanctum response. |
 | 11 | Calibration | See [Calibration binding](#8-calibration-binding-and-the-shadow-only-rule). The binding names the template id and the state layout (or D2 descriptor release). |
 | 12 | Provider swap | Switching provider or model version requires recalibration and a rerun of the comparison. The pairing check treats provider and resolved model version as recorded effective inputs. A backend is advertised as supported only after it passes the [conformance checks](#9-conformance-checks-for-a-supported-backend). |
@@ -171,7 +171,7 @@ The SUT asks; the broker decides what may be sent. The broker binds each call in
 |---|---|
 | Which request and caller the call belongs to | The proxy's per-request binding |
 | Which candidate sources may be asked about, and their descriptors | The gateway's own view of the caller's allowed sources, not the SUT's list |
-| The data class of the state | Trusted run configuration; a caller saying "synthetic" is not enough |
+| The data class of the state | An assumed input from trusted run configuration; a caller saying "synthetic" is not enough |
 | Provider, model, payload size, call count and deadline | Provider configuration and the round budget; the SUT's call hint may only lower the limit, and the limit counts retries |
 | Round 3 item text | The broker resolves each evidence pointer itself, re-reading the artifact at its version, and only when this request's own hub calls returned it and the bound caller may read it; any failing pointer voids its question. The SUT sends pointers, never text |
 | State layout and size | The template's named layout; each batch's state carries only its own items; a payload over the declared limits is split, or refused when a single item is still too large, never truncated |

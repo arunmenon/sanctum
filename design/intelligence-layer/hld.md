@@ -12,7 +12,7 @@ This proposal expands the engineering team's initial Sanctum proposal with polic
 
 Sanctum memory connects source names, canonical subjects, storage locations, procedures, and evidence relationships. A name identifying a service, a document discussing that service, and a repository containing its material have different meanings. Only reviewed identity mappings establish identity. Memory advises routing within authorized scope and remains separate from Engram's agent memory.
 
-The complete [memory design](memory-design.md) owns ontology, resolution, procedures, governance, releases, and the improvement loop. [Contracts and scenarios](contracts-and-scenarios.md) owns wire details and the complete behavioral examples. [The spike](lab-spike.md) owns the hypotheses and evaluation protocol; [the execution page](spike-plan.md) separates experimental work from possible adoption.
+The complete [memory design](memory-design.md) owns ontology, resolution, procedures, governance, releases, and the improvement loop. [Contracts and scenarios](contracts-and-scenarios.md) owns wire details and the complete behavioral examples. The spike (lab) owns the hypotheses and evaluation protocol; the execution page (lab) separates experimental work from possible adoption.
 
 The numbered sections below retain their v5.1 identifiers. Gaps in numbering indicate material moved to a companion page, not omitted content.
 
@@ -54,11 +54,11 @@ flowchart LR
 
 **How memory improves.** Through a closed loop: observe traffic, diagnose gaps, propose fixes, test them on a frozen benchmark, promote by risk. It learns, but it cannot change its own rules or grade its own homework ([§9.10](memory-design.md#section-9-10)).
 
-**What is small in v0.** Memory v0 has five node types, populated only from source structure, reviewed configuration, and exact matches, for one pilot service, and ships as versioned releases. Learned priors, non-identity mappings, automatic promotion, reconciliation, and writes are backlog ([§8.9](memory-design.md#section-8-9), [§18](spike-plan.md#section-18)).
+**What is small in v0.** Memory v0 has five node types, populated only from source structure, reviewed configuration, and exact matches, for one pilot service, and ships as versioned releases. Learned priors, non-identity mappings, automatic promotion, reconciliation, and writes are backlog ([§8.9](memory-design.md#section-8-9), §18 (lab)).
 
 **The rule to remember.** A *name* for a thing, a document *about* a thing, and a *place* where material about a thing lives are three different relations. Only reviewed names establish identity ([§8.5](memory-design.md#section-8-5)).
 
-**How we test it.** A Sanctum Lab runs Sanctum against simulated knowledge hubs built from one synthetic world, with auto-derived gold answers, before moving to a thin slice of real traffic ([§17.2](lab-spike.md#section-17-2)).
+**How we test it.** A Sanctum Lab runs Sanctum against simulated knowledge hubs built from one synthetic world, with auto-derived gold answers, before moving to a thin slice of real traffic (§17.2 (lab)).
 
 ---
 
@@ -288,7 +288,7 @@ flowchart LR
     class J judge
 ```
 
-The wire protocol, question mapping and handshake rules for this call (auth, model pinning, batching, deadlines, validation, calibration binding, data classes, receipts) are specified in [System One providers and the Jev handshake](system-one-providers.md). One live call (measured once): 2 questions, 531 ms, `jev-latest` resolved to `jev-1.13.0`.
+The wire protocol, question mapping and handshake rules for this call (auth, model pinning, batching, deadlines, validation, calibration binding, data classes, receipts) are specified in [System One providers and the Jev handshake](system-one-providers.md).
 
 <a id="section-6-3"></a>
 
@@ -307,7 +307,7 @@ flowchart LR
     class R1,R2,R3 judge
 ```
 
-Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance that may reorder but never drop a rules-packed unit) are specified in [System One providers §14](system-one-providers.md#14-round-3-decisions-d6-conflict-d4-relevance).
+Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance that may reorder but never drop a rules-packed unit) are specified in [System One providers §12](system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance).
 
 <a id="section-6-4"></a>
 
@@ -377,7 +377,7 @@ DecisionResult
 - Train, calibrate, and test splits are grouped by project, task family, and time.
 - Report discrimination, class-specific errors, Brier/log loss, and risk-vs-coverage, not just ECE.
 - Model, rubric, options, data slice, and calibration map are versioned together.
-- In the lab, question templates and state layouts are named, versioned entries bound into each calibration; the variants under test and their status are listed in [System One providers §15](system-one-providers.md#15-prompt-and-state-variants-under-test).
+- Question templates and state layouts are named, versioned entries bound into each calibration ([System One providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
 
 ---
 
@@ -618,7 +618,7 @@ The router's questions are multi-hop ([Ex. 1](contracts-and-scenarios.md#example
 No. Engram is one of the sources. Sanctum memory is the router's own notebook about the sources, in a separate store ([§8.2](memory-design.md#section-8-2)).
 
 **"How do we test this before real backends are ready?"**
-The Sanctum Lab: simulated hubs built from one synthetic world, auto-derived gold answers, the ablation ladder as runnable configs, then a thin real slice ([§17.2](lab-spike.md#section-17-2)).
+The Sanctum Lab: simulated hubs built from one synthetic world, auto-derived gold answers, the ablation ladder as runnable configs, then a thin real slice (§17.2 (lab)).
 
 **"Do we need an enterprise ontology?"**
 No. A thin core owned by Sanctum, source vocabularies left untouched, and reviewed names and places linking them ([§8.4](memory-design.md#section-8-4), [§8.5](memory-design.md#section-8-5)).

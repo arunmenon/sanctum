@@ -45,7 +45,7 @@ This page preserves the source's review dispositions and v5.1 change record. “
 | F17 | Latency arithmetic | **Accepted** | [§6.3](hld.md#section-6-3), [§14.2](hld.md#section-14-2) |
 | F18 | Replay guarantees | **Accepted, right-sized** | [§11](hld.md#section-11), [§15](hld.md#section-15) |
 | F19 | Degradation | **Accepted** | [Ex. 9](contracts-and-scenarios.md#example-9) |
-| F20 | Bundled comparisons | **Accepted** | [§16.2](lab-spike.md#section-16-2) ladder |
+| F20 | Bundled comparisons | **Accepted** | §16.2 (lab) ladder |
 | F21 | Contract versions | **Accepted** | [§6.6](hld.md#section-6-6), [§7.1](hld.md#section-7-1), [§12.2](contracts-and-scenarios.md#section-12-2) |
 | F22 | Adapter contract | **Accepted** | [§12.3](contracts-and-scenarios.md#section-12-3), [Ex. 12](contracts-and-scenarios.md#example-12) |
 | F23 | Relationship to earlier "C6" proposal | **Needs input** | Q1 |
@@ -67,7 +67,7 @@ This page preserves the source's review dispositions and v5.1 change record. “
 | M09 | Version applicability | **Accepted** | [§7.5](hld.md#section-7-5), [Fixture 24](contracts-and-scenarios.md#fixtures-16-25) |
 | M10 | Reconstruction | **Accepted**; reconstruction window declared | [§8.4](memory-design.md#section-8-4), [§9.9](memory-design.md#section-9-9) |
 | M11 | Jev ranks, does not establish identity | **Accepted** | [§9.10](memory-design.md#section-9-10), [Ex. 14](contracts-and-scenarios.md#example-14) |
-| M12 | Counterfactuals and baseline | **Accepted** | [§17.1](lab-spike.md#section-17-1) E6, [§17.2](lab-spike.md#section-17-2) alias-table comparison, [Ex. 14](contracts-and-scenarios.md#example-14) |
+| M12 | Counterfactuals and baseline | **Accepted** | §17.1 (lab) E6, §17.2 (lab) alias-table comparison, [Ex. 14](contracts-and-scenarios.md#example-14) |
 | M13 | Holdout reuse | **Accepted**; matters from E7 | [§9.8](memory-design.md#section-9-8), [§9.10](memory-design.md#section-9-10), [Fixture 25](contracts-and-scenarios.md#fixtures-16-25) |
 
 ---
@@ -87,4 +87,4 @@ v5.1 is a contract-consistency patch. It changes no architecture. It closes gaps
 | 5 | No response shape for separated interpretations ([§9.2](memory-design.md#section-9-2)) | `interpretations[]` in the response; `caller_profile` in the request | [§12.0](contracts-and-scenarios.md#section-12-0), [§12.2](contracts-and-scenarios.md#section-12-2) |
 | 6 | No request contract; credentials could be read as tool arguments | `RetrieveRequest` defined; credentials only in transport or session | [§12.0](contracts-and-scenarios.md#section-12-0), [§14.1](hld.md#section-14-1) |
 | 7 | Sanctum did not advertise partial support | Sanctum capability manifest with supported / partial / unsupported | [§12.3](contracts-and-scenarios.md#section-12-3) |
-| 8 | Lab configs let C1 and C4a be unfair controls | C1-fair, C1-naive, C4a-equivalent, C4a-label-only; hybrid DocHub before H5 conclusions; adapter survey and Kestrel-shaped questions in the minimum | [§17.2](lab-spike.md#section-17-2) |
+| 8 | Lab configs let C1 and C4a be unfair controls | C1-fair, C1-naive, C4a-equivalent, C4a-label-only; hybrid DocHub before H5 conclusions; adapter survey and Kestrel-shaped questions in the minimum | §17.2 (lab) |

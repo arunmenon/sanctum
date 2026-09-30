@@ -8,7 +8,7 @@ them. Each item names the design section it tests.
 
 ## Why the lab looked at System One
 
-Tests: design §1 (cascade), §3 (wire protocol).
+Tests: [design §1 (cascade)](../../design/intelligence-layer/system-one-providers.md#1-the-cascade-and-where-providers-sit), [§3 (wire protocol)](../../design/intelligence-layer/system-one-providers.md#3-wire-protocol-post-v1systemone), [§5 points 2 and 4](../../design/intelligence-layer/system-one-providers.md#5-the-handshake-thirteen-points).
 
 The M6 stand-in (TF-IDF over pinned descriptors) never reached a confident "not useful" answer, so C3 equalled C2 and hypothesis H1 (does a System One model route better?) was untested. One live Jev call showed what an integration must handle:
 
@@ -20,6 +20,8 @@ The M6 stand-in (TF-IDF over pinned descriptors) never reached a confident "not 
 | `usage`: 363 input tokens, 60 output tokens | Hosted usage is reported; open backends may report none |
 
 ## Owner decisions for the spike
+
+Tests: [design §5 points 7 and 9 (latency profiles, data classes)](../../design/intelligence-layer/system-one-providers.md#5-the-handshake-thirteen-points) and [§14 (when a variant may go live)](../../design/intelligence-layer/system-one-providers.md#14-template-and-state-layout-registry).
 
 | ID | Decision |
 |---|---|
@@ -35,7 +37,7 @@ The M6 stand-in (TF-IDF over pinned descriptors) never reached a confident "not 
 
 ## Acceptance blockers carried into E1
 
-Tests: design §11.
+Tests: [design §7 (what the model can and cannot lose)](../../design/intelligence-layer/system-one-providers.md#7-what-the-model-can-and-cannot-lose) and [§5 point 1 (auth)](../../design/intelligence-layer/system-one-providers.md#5-the-handshake-thirteen-points).
 
 | Blocker | Status |
 |---|---|
@@ -47,7 +49,7 @@ Tests: design §11.
 
 ### Calibrations
 
-Tests: design §8 (binding and shadow-only rule). Files in `configs/calibration/`; a fit whose use band is 1.0 is kept under `rejected/`, so the SUT runs shadow by absence.
+Tests: [design §8 (binding and shadow-only rule)](../../design/intelligence-layer/system-one-providers.md#8-calibration-binding-and-the-shadow-only-rule). Files in `configs/calibration/`; a fit whose use band is 1.0 is kept under `rejected/`, so the SUT runs shadow by absence.
 
 | Binding | Template, layout | Fitted on | Band | Held-out Brier (raw) | Status |
 |---|---|---|---|---|---|
@@ -63,7 +65,7 @@ Finding: Round 3 fits used to record the layout as `none`, which the SUT accepts
 
 ### Batch measurement
 
-Tests: design §12. `typesafe-jev`, relaxed profile, laptop to hosted endpoint ([report](../reports/system-one-batches-typesafe-jev.md)):
+Tests: [design §11 (batching)](../../design/intelligence-layer/system-one-providers.md#11-batching). `typesafe-jev`, relaxed profile, laptop to hosted endpoint ([report](../reports/system-one-batches-typesafe-jev.md)):
 
 | Questions per call | Warm latency ms (median of 2) | Input tokens | Output tokens | Input tokens per question |
 |---|---|---|---|---|
@@ -77,7 +79,7 @@ Every call resolved `jev-latest` to `jev-1.13.0`; cold calls took 320 to 568 ms.
 
 ### Local Laya on CPU
 
-Tests: design §13. Laya 0.3.22, English checkpoint `55cf4c4e`, Apple M1 Pro (10 cores, 16 GB) ([report](../reports/system-one-laya-dev.md), [batches](../reports/system-one-batches-laya-local.md)):
+Tests: [design §13 (self-hosted provider example)](../../design/intelligence-layer/system-one-providers.md#13-example-a-self-hosted-provider-laya-on-cpu-laya-local). Laya 0.3.22, English checkpoint `55cf4c4e`, Apple M1 Pro (10 cores, 16 GB) ([report](../reports/system-one-laya-dev.md), [batches](../reports/system-one-batches-laya-local.md)):
 
 | Measure | Value |
 |---|---|
@@ -92,7 +94,7 @@ Tests: design §13. Laya 0.3.22, English checkpoint `55cf4c4e`, Apple M1 Pro (10
 
 ## Round 3 (D6, D4) variants and status
 
-Tests: design §14 (Round 3) and the variant rules. **Live** means a calibration with a usable band exists and a run may apply it; **shadow** means answers are recorded and never applied; **diagnostic** means shadow-only by definition.
+Tests: [design §12 (Round 3)](../../design/intelligence-layer/system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance) and [§14 (template and state-layout registry)](../../design/intelligence-layer/system-one-providers.md#14-template-and-state-layout-registry). **Live** means a calibration with a usable band exists and a run may apply it; **shadow** means answers are recorded and never applied; **diagnostic** means shadow-only by definition.
 
 | Variant | Decision | Kind | Status | Campaign result pointer |
 |---|---|---|---|---|

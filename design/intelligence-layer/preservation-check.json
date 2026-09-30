@@ -20,7 +20,7 @@
     },
     {
       "section": 2,
-      "page": "lab-spike.md",
+      "page": "lab: docs/experiments/lab-spike.md",
       "source_sha256": "2d0c6ff37bf378cdc4c60c19c4414e9b85374cdc13aab1104cf57a277a387ad0",
       "editorial_changes": 0,
       "rendered_sha256": "45aecd5f5f5a512978d918995a8a4e34073c7d55f666195f556494ae8951c99c"
@@ -118,21 +118,21 @@
     },
     {
       "section": 16,
-      "page": "lab-spike.md",
+      "page": "lab: docs/experiments/lab-spike.md",
       "source_sha256": "3816097ac24af8b5506167ef0a66ba4c4c8db6e7cfc70341c7de1657f231bc54",
       "editorial_changes": 0,
       "rendered_sha256": "016f5ca4b2270c3de879bcb7d7fd7e9a01ba2cb455c16184988dea00f8526496"
     },
     {
       "section": 17,
-      "page": "lab-spike.md",
+      "page": "lab: docs/experiments/lab-spike.md",
       "source_sha256": "730d49a926d28f0fda6cdd36f02072470c601a866d09dd906f94baa98da0f890",
       "editorial_changes": 1,
       "rendered_sha256": "26077b9c55219552dde14d157ca2f14d97910a2a714253b49032b0d790000216"
     },
     {
       "section": 18,
-      "page": "spike-plan.md",
+      "page": "lab: docs/experiments/spike-plan.md",
       "source_sha256": "44fbe4d388eb75f2de4ce0bfa1d9ea6a4bf59cd228b99a5fbc2fae3dfcb22b49",
       "editorial_changes": 0,
       "rendered_sha256": "a77496dd08c1674e94d4ee9c5c77214ee26280f6211136dd45809386395bb06d"

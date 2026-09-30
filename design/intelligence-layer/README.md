@@ -20,11 +20,11 @@ Sanctum would first establish what the caller may access, then choose useful sou
 | [Memory and meta-taxonomy](memory-design.md) | How identities, locations, procedures, ownership and releases work | Memory, source integration and governance reviewers |
 | [Contracts and worked scenarios](contracts-and-scenarios.md) | Exact response expectations and normal, ambiguous, conflicting and failed cases | Implementers, adapter owners and evaluators |
 | [System One providers and the Jev handshake](system-one-providers.md) | How decisions reach a System One model: provider interface, `/v1/systemone` protocol, broker isolation, calibration and conformance | Decision-layer, provider and security reviewers |
-| [Hypothesis-validation spike](lab-spike.md) | What the lab investigates, how comparisons work, and what results can establish | Research and evaluation contributors |
-| [Execution and follow-on decisions](spike-plan.md) | Spike sequence, evidence gates, current artifact pointers and adoption prerequisites | Contributors and delivery stakeholders |
 | [Review history](review-history.md) | Prior findings, editorial changes and their traceability | Reviewers needing the history |
 
-For a first review, read this overview and the HLD, then follow only the relevant detail links. For a lab review, read the spike and execution pages before the package. The [section map](section-map.md) locates every original section.
+For a first review, read this overview and the HLD, then follow only the relevant detail links. The [section map](section-map.md) locates every original section.
+
+This set is design only: it states what Sanctum is and the rules it follows. Everything measured or run lives with the lab, outside this set: the hypothesis-validation spike (sections 2, 16, 17), the execution plan (section 18) and the System One lab page are in the lab repository under `docs/experiments/` (lab-spike.md, spike-plan.md, system-one-lab.md), with reports under `docs/reports/`. The lab links to these design pages; these pages do not link to the lab.
 
 ## How to interpret status
 
@@ -52,6 +52,6 @@ Detailed Q1–Q18 decisions remain in the HLD. Dates and the older monthly rollo
 
 ## Publication and maintenance
 
-Publish this as the parent Confluence page, with the six linked pages as children. Replace local links with their Confluence page/heading targets and render Mermaid diagrams using the supported mechanism in your space. Check cross-page anchors after import. Keep the original v5.1 document as a historical attachment rather than a competing current page.
+Publish this as the parent Confluence page, with the five linked design pages as children; the lab pages publish separately. Replace local links with their Confluence page/heading targets and render Mermaid diagrams using the supported mechanism in your space. Check cross-page anchors after import. Keep the original v5.1 document as a historical attachment rather than a competing current page.
 
-Each numbered section has one owning page. Changes to hypotheses belong in the spike, schemas in their owning contract section, execution status in the lab milestone/run records, and architectural decisions in the HLD. Summaries link to those owners. The detailed design, examples, diagrams and evaluation protocol have been preserved; the split introduces no page-length limit.
+Each numbered section has one owning page. Changes to hypotheses belong in the lab's spike page, schemas in their owning contract section, execution status and measurements in the lab's records, and architectural decisions in the HLD. Summaries link to those owners. The detailed design, examples, diagrams and evaluation protocol have been preserved; the split introduces no page-length limit.

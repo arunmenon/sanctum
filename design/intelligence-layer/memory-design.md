@@ -4,7 +4,7 @@
 
 > Status: proposed research design, reorganized from v5.1. Lab work is experimental. Original section numbers are retained.
 
-This page preserves the detailed memory design supporting the [HLD](hld.md). It explains what the router knows about sources, how identities differ from subjects and locations, and how mappings and procedures are governed. These are proposed architectural behaviors; individual mechanisms require the evidence described in the [lab spike](lab-spike.md).
+This page preserves the detailed memory design supporting the [HLD](hld.md). It explains what the router knows about sources, how identities differ from subjects and locations, and how mappings and procedures are governed. These are proposed architectural behaviors; individual mechanisms require the evidence described in the lab spike (lab).
 
 Read §8 for the representation and §9 for construction, use, governance, and improvement. Schema and scenario references link to their owning pages. The physical storage choice remains an experimental question.
 

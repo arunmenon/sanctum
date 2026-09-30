@@ -582,7 +582,7 @@ flowchart TB
 
 ### Fixtures 16–25: memory edge cases
 
-These come from the memory review (M01–M13). Each becomes a test case in E0 and in the Sanctum Lab ([§17.2](lab-spike.md#section-17-2)). Names are illustrative.
+These come from the memory review (M01–M13). Each becomes a test case in E0 and in the Sanctum Lab (§17.2 (lab)). Names are illustrative.
 
 | # | Setup | Expected | Covers |
 |---|---|---|---|

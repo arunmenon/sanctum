@@ -8,7 +8,7 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 |---|---|---|
 | 0 | One-page summary | [Sanctum intelligence layer — architectural proposal](hld.md#section-0) |
 | 1 | Problem | [Sanctum intelligence layer — architectural proposal](hld.md#section-1) |
-| 2 | Research hypotheses | [Sanctum Lab — hypothesis-validation spike](lab-spike.md#section-2) |
+| 2 | Research hypotheses | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`, outside the design set) |
 | 3 | Goals and non-goals | [Sanctum intelligence layer — architectural proposal](hld.md#section-3) |
 | 4 | Design principles | [Sanctum intelligence layer — architectural proposal](hld.md#section-4) |
 | 5 | Architecture | [Sanctum intelligence layer — architectural proposal](hld.md#section-5) |
@@ -22,12 +22,12 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 13 | Write path and reconciliation (post-pilot) | [Sanctum intelligence layer — architectural proposal](hld.md#section-13) |
 | 14 | Cross-cutting | [Sanctum intelligence layer — architectural proposal](hld.md#section-14) |
 | 15 | Replay levels | [Sanctum intelligence layer — architectural proposal](hld.md#section-15) |
-| 16 | Evaluation | [Sanctum Lab — hypothesis-validation spike](lab-spike.md#section-16) |
-| 17 | Experiments | [Sanctum Lab — hypothesis-validation spike](lab-spike.md#section-17) |
-| 18 | Plan | [Sanctum spike execution and follow-on decisions](spike-plan.md#section-18) |
+| 16 | Evaluation | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`) |
+| 17 | Experiments | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`) |
+| 18 | Plan | Lab: spike execution and follow-on decisions (`docs/experiments/spike-plan.md`) |
 | 19 | Review disposition (F01–F23) | [Sanctum review history and restructuring record](review-history.md#section-19) |
 | 20 | Anticipated questions | [Sanctum intelligence layer — architectural proposal](hld.md#section-20) |
 | 21 | Decisions needed from the group | [Sanctum intelligence layer — architectural proposal](hld.md#section-21) |
 | 22 | What changed in v5.1 | [Sanctum review history and restructuring record](review-history.md#section-22) |
 
-Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1 for experiment E1; it does not own a numbered section.
+Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.

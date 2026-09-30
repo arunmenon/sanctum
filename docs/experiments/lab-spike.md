@@ -1,6 +1,6 @@
 # Sanctum Lab — hypothesis-validation spike
 
-[Overview and reading guide](README.md) · [Section map](section-map.md)
+[Overview and reading guide](../../design/intelligence-layer/README.md) · [Section map](../../design/intelligence-layer/section-map.md)
 
 > Status: proposed research design, reorganized from v5.1. Lab work is experimental. Original section numbers are retained.
 
@@ -16,9 +16,9 @@ The detailed protocol follows: §2 owns the hypothesis register; §16 owns the e
 
 - [Existing scaffold plan](lab-spike.md): detailed world, hub, runner, and evaluation design. Its header still says no code exists and some vocabulary predates v5.1; treat it as planning history where it conflicts with current artifacts.
 - [Lab package README](../../README.md): package scope and current documented implementation.
-- [Milestone register](../../docs/milestones.md): owns the package's milestone numbering and exit criteria.
-- [Discrepancy register](../../docs/discrepancy-register.md): proposed contract differences requiring resolution.
-- [Measurement plan](../../docs/measurement-plan.md): executable evaluation conventions.
+- [Milestone register](../milestones.md): owns the package's milestone numbering and exit criteria.
+- [Discrepancy register](../discrepancy-register.md): proposed contract differences requiring resolution.
+- [Measurement plan](../measurement-plan.md): executable evaluation conventions.
 
 Use the v5.1 configurations below when interpreting comparisons. Package differences remain explicit proposals until resolved; implementation alone does not amend the architecture.
 
@@ -93,7 +93,7 @@ A rung is kept only if it beats the rung below it on the same traffic.
 
 ### 16.4 Gates
 
-1. **Contract gates** (must pass regardless of quality): no unauthorized access or egress, no governance bypass, declared replay behavior, explicit partial results. The examples and fixtures in [§10](contracts-and-scenarios.md#section-10) become test cases.
+1. **Contract gates** (must pass regardless of quality): no unauthorized access or egress, no governance bypass, declared replay behavior, explicit partial results. The examples and fixtures in [§10](../../design/intelligence-layer/contracts-and-scenarios.md#section-10) become test cases.
 2. **Quality gates:** non-inferiority within a predeclared margin, paired clustered intervals.
 3. **Economic gates:** cost per successful task, backend load, latency by mode.
 
@@ -110,11 +110,11 @@ A rung is kept only if it beats the rung below it on the same traffic.
 | ID | Question | Change vs. B* | Decision rule |
 |---|---|---|---|
 | E0b | H0: is a unified layer better than direct hubs? | Agent-level: agent with direct hub access vs. agent using Sanctum (C0 vs. C2/C4, [§17.2](lab-spike.md#section-17-2)) | Proceed only if evidence per token and answer quality improve |
-| E0 | Is the harness trustworthy? | None; run [§10](contracts-and-scenarios.md#section-10) examples as fixtures | Every fixture has an explicit, deterministic outcome |
-| E1 | H1: does Jev route better? | Replace D2 scoring only | Adopt if non-inferior on evidence and better on cost/latency (latency is measured per profile, not a gate in the spike; see [System One providers](system-one-providers.md)) |
+| E0 | Is the harness trustworthy? | None; run [§10](../../design/intelligence-layer/contracts-and-scenarios.md#section-10) examples as fixtures | Every fixture has an explicit, deterministic outcome |
+| E1 | H1: does Jev route better? | Replace D2 scoring only | Adopt if non-inferior on evidence and better on cost/latency (latency is measured per profile, not a gate in the spike; see [System One providers](../../design/intelligence-layer/system-one-providers.md)) |
 | E2 | H2: do observation priors help? | Toggle observation-derived priors; vocabulary, rules, queries and source snapshots fixed | Non-inferior on evidence within an owner-agreed margin plus a predeclared benefit; intervals reported; small samples are inconclusive |
 | E2b | Storage | Same queries on tables+cache vs. graph DB | Pick on latency, rebuild cost, access enforcement |
-| E3 | H3: ranking / dedup / conflicts | One at a time ([System One §14](system-one-providers.md#14-round-3-decisions-d6-conflict-d4-relevance): D6, then D4; D5 exact only) | Adopt per component |
+| E3 | H3: ranking / dedup / conflicts | One at a time ([System One §12](../../design/intelligence-layer/system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance): D6, then D4; D5 exact only) | Adopt per component |
 | E4 | H4: escalation | Add Tier 2 on the uncertain band | Adopt if risk-vs-coverage improves per cost |
 | E5 | Online learning | Logged exploration inside authorized set | Only after reward definitions are validated |
 | E6 | H5: does the vocabulary help? | With vs. without resolution and translation, same registry, authority, budget, ranker; paired retrieval on source snapshots; ablate resolution, selection, translation; compare with a plain alias table | Every live identity reviewed; zero wrong-entity activation on fixtures; recall gain on alias questions without loss on canonical and homonym cases |
@@ -157,14 +157,14 @@ One fictional org, written once as a structured file. Everything else is generat
 | Planted situation | Tests |
 |---|---|
 | Services `payment-auth`, `identity-auth`, `ledger`, `checkout` | Normal routing |
-| Both auth services are called "Auth Service" in some hubs | Ambiguity ([Fixture 16](contracts-and-scenarios.md#fixtures-16-25)) |
-| Each hub uses its own name for payment-auth (`PA-svc`, *Auth Service*, space *PA*) | Vocabulary ([Example 5](contracts-and-scenarios.md#example-5)) |
-| Retry limit changes 3 → 5 in release R42; the skill still says 3 | Conflict ([Example 3](contracts-and-scenarios.md#example-3)) |
-| Releases R40–R42, plus an experimental branch | Versions ([Example 4](contracts-and-scenarios.md#example-4), [Fixture 24](contracts-and-scenarios.md#fixtures-16-25)) |
-| Same policy page in DocHub and the CodeHub wiki | Exact duplicates ([Example 2](contracts-and-scenarios.md#example-2)) |
-| A skill that discusses two services | Composite subjects ([Fixture 17](contracts-and-scenarios.md#fixtures-16-25)) |
-| A new service no hub covers | Honest gaps ([Example 8](contracts-and-scenarios.md#example-8)) |
-| A page containing instructions to "ignore other sources" | Untrusted content ([Example 10](contracts-and-scenarios.md#example-10)) |
+| Both auth services are called "Auth Service" in some hubs | Ambiguity ([Fixture 16](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-16-25)) |
+| Each hub uses its own name for payment-auth (`PA-svc`, *Auth Service*, space *PA*) | Vocabulary ([Example 5](../../design/intelligence-layer/contracts-and-scenarios.md#example-5)) |
+| Retry limit changes 3 → 5 in release R42; the skill still says 3 | Conflict ([Example 3](../../design/intelligence-layer/contracts-and-scenarios.md#example-3)) |
+| Releases R40–R42, plus an experimental branch | Versions ([Example 4](../../design/intelligence-layer/contracts-and-scenarios.md#example-4), [Fixture 24](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-16-25)) |
+| Same policy page in DocHub and the CodeHub wiki | Exact duplicates ([Example 2](../../design/intelligence-layer/contracts-and-scenarios.md#example-2)) |
+| A skill that discusses two services | Composite subjects ([Fixture 17](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-16-25)) |
+| A new service no hub covers | Honest gaps ([Example 8](../../design/intelligence-layer/contracts-and-scenarios.md#example-8)) |
+| A page containing instructions to "ignore other sources" | Untrusted content ([Example 10](../../design/intelligence-layer/contracts-and-scenarios.md#example-10)) |
 | A restricted space visible only to some principals | Scope and disclosure (Fixtures 16, 21) |
 
 #### The hubs
@@ -177,14 +177,14 @@ Each hub is a small MCP server that mimics the **shape and vocabulary** of the r
 | SkillHub | Dobby | Skill tree in markdown, its own names | Skill search; PR-governed flag |
 | DocHub | KaaS | Chunked pages in spaces | Keyword/embedding search; no version reads for some spaces |
 | MemoryHub | Engram | Session notes using `PA-svc` | Session search, scoped to principal |
-| IncidentHub | future source | Incident reports | Held back to test onboarding ([Example 12](contracts-and-scenarios.md#example-12)) |
+| IncidentHub | future source | Incident reports | Held back to test onboarding ([Example 12](../../design/intelligence-layer/contracts-and-scenarios.md#example-12)) |
 
 All hubs share four properties:
 
 - **Honest search.** Real keyword retrieval (e.g. SQLite FTS or BM25), so an unknown alias genuinely misses. A hub that "understands" everything would hide the problem Sanctum is meant to solve.
 - **Per-principal ACLs**, so scope and disclosure can be tested.
 - **Failure knobs:** latency, timeouts, errors, per hub.
-- **Declared capabilities** (version reads, filters), matching the adapter contract ([§12.3](contracts-and-scenarios.md#section-12-3)).
+- **Declared capabilities** (version reads, filters), matching the adapter contract ([§12.3](../../design/intelligence-layer/contracts-and-scenarios.md#section-12-3)).
 
 #### The question set
 

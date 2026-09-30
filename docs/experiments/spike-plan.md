@@ -1,6 +1,6 @@
 # Sanctum spike execution and follow-on decisions
 
-[Overview and reading guide](README.md) · [Section map](section-map.md)
+[Overview and reading guide](../../design/intelligence-layer/README.md) · [Section map](../../design/intelligence-layer/section-map.md)
 
 > Status: proposed research design, reorganized from v5.1. Lab work is experimental. Original section numbers are retained.
 
@@ -8,7 +8,7 @@ This page separates spike execution from possible subsequent engineering. It mak
 
 ## Current evidence and status
 
-The [package README](../../README.md) describes M0 contracts/evaluator, M1 synthetic world, and M2 simulated hubs and runner, and lists the reference SUT (C1-naive, C1-fair, C2) as built at M3. These are documentation claims inspected during restructuring, not newly verified runtime results. The [milestone register](../../docs/milestones.md) owns package milestone numbering and exit criteria. Consult run artifacts and reviews before marking a milestone complete.
+The [package README](../../README.md) describes M0 contracts/evaluator, M1 synthetic world, and M2 simulated hubs and runner, and lists the reference SUT (C1-naive, C1-fair, C2) as built at M3. These are documentation claims inspected during restructuring, not newly verified runtime results. The [milestone register](../milestones.md) owns package milestone numbering and exit criteria. Consult run artifacts and reviews before marking a milestone complete.
 
 The older [scaffold plan](lab-spike.md) still says no code exists. Do not use that header as a current progress statement or duplicate it into Confluence.
 
@@ -20,7 +20,7 @@ The older [scaffold plan](lab-spike.md) still says no code exists. Do not use th
 | Synthetic world and hubs | Render independently auditable evidence; implement honest retrieval, ACLs, versions and observed calls | Reproducible corpus, source-backed gold, hub conformance and isolation evidence | To be assigned |
 | Rules baseline | Run C1-fair and C2 with the same assembly, budgets and ranker | Per-question evidence, omission and status checks; repeatable paired runs | To be assigned |
 | Memory hypothesis | Add C4 and the equivalent-table and label-only controls | Memory fixtures; equivalent semantics check; hybrid DocHub before H5 conclusions | To be assigned |
-| Decision-provider hypothesis | Compare C3/C5 against matching rules baselines ([System One providers and the Jev handshake](system-one-providers.md)) | Named provider, calibration bound to the resolved model version, bounded failures, harmful omissions, latency per profile and cost; M6 overclaim blockers fixed; fresh acceptance set | To be assigned |
+| Decision-provider hypothesis | Compare C3/C5 against matching rules baselines ([System One providers and the Jev handshake](../../design/intelligence-layer/system-one-providers.md)) | Named provider, calibration bound to the resolved model version, bounded failures, harmful omissions, latency per profile and cost; M6 overclaim blockers fixed; fresh acceptance set | To be assigned |
 | Broader experiments | Agent-level H0, onboarding, release changes, improvement proposals | Independent acceptance evidence for each claim; safe failure and rollback behavior | To be assigned |
 | Spike conclusion | Summarize supported, rejected and unresolved hypotheses | Reproducible reports, limitations and recommendations back to the HLD | To be assigned |
 
@@ -72,6 +72,6 @@ flowchart LR
     OCT --> NOV --> DEC
 ```
 
-**Weekly demo track.** Each week, trace one [§10](contracts-and-scenarios.md#section-10) example live: scope → sources called and skipped with reasons → evidence with roles → conflicts → receipt. Then re-run it with one change (a failure, a policy change, a new source).
+**Weekly demo track.** Each week, trace one [§10](../../design/intelligence-layer/contracts-and-scenarios.md#section-10) example live: scope → sources called and skipped with reasons → evidence with roles → conflicts → receipt. Then re-run it with one change (a failure, a policy change, a new source).
 
 ---

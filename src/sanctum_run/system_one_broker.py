@@ -145,7 +145,7 @@ class SystemOneBroker:
         questions = {str(qid): q for qid, q in raw.items()} if isinstance(raw, dict) else {}
         refused = sorted(qid for qid, q in questions.items()
                          if not isinstance(q, dict) or q.get("type") not in QUESTION_TYPES)
-        pointers_sha256 = None
+        pointers_sha256, state_for = None, None
         if round_id in ROUND3:
             # evidence text reaches the model only through the broker's own reads of refs the bound
             # caller may read and this request fetched; the SUT supplies refs, never text
@@ -153,6 +153,9 @@ class SystemOneBroker:
             refused = sorted(set(refused) | set(bad))
             state = {"query": query, "items": {qid: items[qid] for qid in sorted(items) if qid not in refused}}
             release = "none"          # Round 3 calibration binds on the template (agreed with the SUT side)
+            items_state = state["items"]
+            # each batch carries only its own items, so batches can split to fit max_state_chars
+            state_for = lambda qids: {"query": query, "items": {qid: items_state[qid] for qid in qids}}  # noqa: E731
             pointers = {qid: (arguments.get("items") or {}).get(qid, {}).get("refs") for qid in state["items"]}
             pointers_sha256 = hashlib.sha256(json.dumps(pointers, sort_keys=True).encode()).hexdigest()
         else:
@@ -183,7 +186,8 @@ class SystemOneBroker:
                                      api_key=self.secret, transport=recorder)
             try:
                 outcome = await anyio.to_thread.run_sync(
-                    client.decide, state, asked, self.profile.deadline_ms / 1000.0, max_calls)
+                    lambda: client.decide(state, asked, self.profile.deadline_ms / 1000.0, max_calls,
+                                          state_for=state_for))
             finally:
                 client.close()
             outcome.invalid_ids = sorted(set(outcome.invalid_ids) | set(refused))

@@ -335,3 +335,34 @@ def test_round3_pointer_refusals_and_store_text(scenario_world, server, tmp_path
     [text_item] = sent["state"]["items"]["d4:e3"]
     assert text_item["text"] == out["row_text"][0:40] and "SUT SUPPLIED TEXT" not in json.dumps(sent)
     assert all(call.pointers_sha256 for call in out["trace"].model_calls if call.questions == ["d4:e3"])
+
+
+async def _round3_batches(world, broker, out):
+    tokens = TokenService(world / "identity" / "principals.json", "broker-test-secret")
+    caller = tokens.issue_caller_token(PRINCIPAL)
+    async with HubGateway(world, released_hub_ids(DEFAULT_HUBS_CONFIG), tokens) as gateway:
+        proxy = await GatewayProxy.create(gateway, world)
+        gateway.system_one = broker
+        handle = gateway.handle("req-5", caller)
+        proxy.bind("req-5", caller, handle, query="retry limit")
+        with gateway.sut_call("req-5"):
+            found = await handle.call("codehub", "search_code", {"query": "retry"})
+            refs = [{"source_id": "codehub", "artifact_id": r["artifact_id"], "version": r["version"],
+                     "start": 0, "end": 40} for r in found["results"][:3]]
+            qids = [f"d4:e{n}" for n in range(len(refs))]
+            out["result"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d4", "questions": {qid: NOUL for qid in qids},
+                "items": {qid: {"refs": [ref]} for qid, ref in zip(qids, refs)}}, "req-5", caller)
+        proxy.unbind("req-5", handle)
+
+
+def test_round3_batches_carry_only_their_own_items(scenario_world, server, tmp_path):  # noqa: F811
+    # room for about one item per state: the client splits per batch instead of voiding the round
+    broker = _broker(server, tmp_path, capabilities={"max_state_chars": 260},
+                     profile=ProfileConfig("relaxed", deadline_ms=5000, max_calls_per_round=12))
+    out = {}
+    anyio.run(_round3_batches, scenario_world, broker, out)
+    assert out["result"]["unavailable_reason"] is None and len(out["result"]["answers"]) == 3
+    assert len(server.behavior.requests) == 3
+    for request in server.behavior.requests:
+        assert set(request["state"]["items"]) == set(request["questions"])

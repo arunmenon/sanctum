@@ -99,6 +99,14 @@ def test_positives_reach_d6_as_candidates_not_rule_flags(shadow_run):
     assert len(candidate_pos) * 2 >= len(positives)          # at least half exposed to D6 as candidates
     assert len(candidate_pos) > len(flagged_pos)              # the rules miss most of them
     assert len(candidate_neg) >= 15                           # hard negatives the rules also surface
+    # counting convention (reconciled): labels are per (case, pair) item; the same unit pair can be a
+    # candidate in two cases, and under the case scope a genuine conflict about an attribute the case
+    # did not ask for is a negative there. Distinct positives never exceed the slice's 20.
+    from sanctum_eval.calibration_labels import labels_from_run
+    items = labels_from_run("d6", shadow_run.out_dir, GOLD)
+    items_slice = labels_from_run("d6", shadow_run.out_dir, GOLD, scope="slice")
+    assert set(items) == set(items_slice) and sum(items_slice.values()) >= sum(items.values())
+    assert len(candidate_pos) <= len(positives) == 20
 
 
 def test_overlay_only_adds_challenge_artifacts(challenge_world, tmp_path):

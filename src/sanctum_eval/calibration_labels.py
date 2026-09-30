@@ -120,7 +120,7 @@ def _item_and_refs(value: dict) -> tuple[str, list[dict]]:
     return "", []
 
 
-def labels_from_run(decision: str, run_dir: Path, cases_dir: Path) -> dict[tuple[str, str], int]:
+def labels_from_run(decision: str, run_dir: Path, cases_dir: Path, scope: str = "case") -> dict[tuple[str, str], int]:
     """(case_id, key) -> 0/1 for a dev run.
 
     Preferred source: the receipt decisions of a shadow-collect run, whose values carry REF
@@ -129,7 +129,13 @@ def labels_from_run(decision: str, run_dir: Path, cases_dir: Path) -> dict[tuple
     units. Keys are "a|b" for d6 and the evidence id for d4 in both cases."""
     if decision not in DECISIONS:
         raise ValueError(f"labels exist for {DECISIONS}, not {decision!r}")
+    if scope not in ("case", "slice"):
+        raise ValueError("scope is 'case' or 'slice'")
     golds = {gold.request.request_id: gold for gold in (load_gold(p) for p in sorted(Path(cases_dir).glob("*.yaml")))}
+    # scope "slice": a D6 pair is positive if it witnesses an expected relation of ANY case in
+    # cases_dir (the same world), so a genuine conflict about another attribute is not a negative
+    # merely because this case's question did not ask for it
+    all_relations = [relation for gold in golds.values() for relation in gold.relations]
     receipts = {row["request_id"]: row for row in _read_jsonl(Path(run_dir) / "receipts.jsonl")}
     labels: dict[tuple[str, str], int] = {}
     labelled_from_refs: set[str] = set()
@@ -141,7 +147,8 @@ def labels_from_run(decision: str, run_dir: Path, cases_dir: Path) -> dict[tuple
                 continue
             item, refs = _item_and_refs(value)
             if decision == "d6" and item.startswith("d6:") and len(refs) == 2:
-                labels[(gold.case_id, item[3:])] = d6_pair_label(gold, refs[0], refs[1])
+                judged = gold if scope == "case" else gold.model_copy(update={"relations": all_relations})
+                labels[(gold.case_id, item[3:])] = d6_pair_label(judged, refs[0], refs[1])
                 labelled_from_refs.add(request_id)
             elif decision == "d4" and item.startswith("d4:") and len(refs) == 1:
                 labels[(gold.case_id, item[3:])] = d4_unit_label(gold, refs[0])

@@ -153,3 +153,25 @@ def test_relation_types_from_run_is_diagnostic_only(case, tmp_path):
     (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
     assert relation_types_from_run(tmp_path, cases) == {("m0-001", "ev-a1|ev-b1"): "policy_implementation_divergence",
                                                         ("m0-001", "ev-a1|ev-z"): None}
+
+
+def test_d6_label_scope_case_vs_slice(case, tmp_path):
+    """The same genuine conflict judged in a case whose question did not ask for it: negative under
+    the case scope (the specified default), positive under the slice scope."""
+    gold, response, receipt, _ = case("m0-001")
+    other = gold.model_copy(update={"case_id": "m0-001b", "relations": [],
+                                    "request": gold.request.model_copy(update={"request_id": "req-other"})})
+    cases = tmp_path / "cases"
+    cases.mkdir()
+    import yaml
+    (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
+    (cases / "m0-001b.yaml").write_text(yaml.safe_dump(other.model_dump(mode="json", exclude_none=True), sort_keys=False))
+    decision = {"status": "answered", "target": "d6:ev-a1|ev-b1", "disposition": "preserve_candidate",
+                "provider": "t", "policy_version": "d6", "latency_ms": 1, "cost": 0.0,
+                "value": {"item": "d6:ev-a1|ev-b1", "refs": [REF_A, REF_B]}}
+    rows = [{**receipt, "decisions": [decision]}, {**receipt, "request_id": "req-other", "decisions": [decision]}]
+    (tmp_path / "receipts.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+    by_case = labels_from_run("d6", tmp_path, cases)
+    by_slice = labels_from_run("d6", tmp_path, cases, scope="slice")
+    assert by_case == {("m0-001", "ev-a1|ev-b1"): 1, ("m0-001b", "ev-a1|ev-b1"): 0}
+    assert by_slice == {("m0-001", "ev-a1|ev-b1"): 1, ("m0-001b", "ev-a1|ev-b1"): 1}

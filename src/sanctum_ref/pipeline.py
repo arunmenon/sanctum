@@ -28,11 +28,12 @@ from sanctum_contracts import (
 from sanctum_contracts.receipt import QueryPlan, SelfReportedCall
 
 from .adapters import Candidate, HubPort, evidence_unit, fetch_arguments, search_arguments
-from .assembly import assemble
+from .assembly import finish, prepare
 from .config import ArmConfig
 from .intent import analyze
 from .registry import Registry, RegistryUnavailable
 from .providers import d2_request, unavailable
+from .providers.http_systemone import decide_items
 from .memory import LabelTable, MemoryUnavailable, build_store, load_release
 from .resolution import resolve, resolve_label_only
 from .routing import SourcePlan, apply_memory, plan_sources
@@ -119,9 +120,11 @@ class MemoryState:
 class Retriever:
     def __init__(self, arm: ArmConfig, registry: Optional[Registry],
                  registry_error: Optional[str] = None, memory: Optional[MemoryState] = None,
-                 provider=None):
+                 provider=None, round3: str = "none", round3_provider=None):
         self.arm = arm
         self.provider = provider
+        self.round3 = round3                      # none | d6 | d4 (design page §14)
+        self.round3_provider = round3_provider
         self.registry = registry
         self.registry_error = registry_error
         self.memory = memory
@@ -169,10 +172,16 @@ class Retriever:
         self._fetch_gaps: set[str] = set()
         candidates = await self._ask(request, plans, port, clock, deadline, intent.fact_kinds, outcomes,
                                      capabilities)
-        assembled = assemble(candidates, intent.terms, intent.fact_kinds, request.budget_tokens,
-                             self.arm.tokenizer, common=self.arm.common_assembly,
-                             dedup_exact=self.arm.exact_dedup,
-                             domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})
+        prepared = prepare(candidates, intent.terms, intent.fact_kinds, common=self.arm.common_assembly,
+                           dedup_exact=self.arm.exact_dedup,
+                           domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})
+        promoted: list = []
+        if self.round3 == "d6" and self.round3_provider is not None and (prepared.flagged or prepared.pair_candidates):
+            promoted, round3_decisions, round3_failed = await self._judge_conflicts(request, prepared, port)
+            decisions = decisions + round3_decisions
+            if round3_failed:
+                degraded = sorted(set(degraded) | {"decision_layer_unavailable"})
+        assembled = finish(prepared, request.budget_tokens, self.arm.tokenizer, promoted)
         sources, response_reasons, required_gap = self._sources(plans, outcomes,
                                                                 intent.detected_fact_kinds or intent.fact_kinds,
                                                                 self._fetch_gaps)
@@ -225,6 +234,28 @@ class Retriever:
                           tokenizer_id=self.arm.tokenizer),
             truncation=assembled.truncated_relevant, degraded_reasons=degraded)
         return response, receipt
+
+    async def _judge_conflicts(self, request: RetrieveRequest, prepared, port: HubPort):
+        """D6 (design page §14): judge rule-produced pairs only. Flagged pairs stay flagged whatever
+        the answer; a candidate pair is promoted only when its calibrated p reaches the use band."""
+        def ref(item) -> dict:
+            unit = item.unit
+            return {"source_id": unit.source_id, "artifact_id": unit.artifact_id, "version": unit.source_version,
+                    "start": unit.span.start, "end": unit.span.end}
+        pairs = list(prepared.flagged) + list(prepared.pair_candidates)
+        items = {f"d6:{a.unit.evidence_id}|{b.unit.evidence_id}": [ref(a), ref(b)] for a, b, _ in pairs}
+        try:
+            judgements, results, calibration = await decide_items(
+                self.round3_provider, "d6", items, request.query, port, self.arm.deadline_ms)
+        except Exception:                     # a provider failure is never a conflict decision
+            return [], [unavailable(self.round3_provider.name, time.monotonic())], True
+        promoted = []
+        for a, b, relation in prepared.pair_candidates:
+            judgement = judgements.get(f"d6:{a.unit.evidence_id}|{b.unit.evidence_id}")
+            if calibration is not None and judgement and judgement.p is not None and judgement.p >= calibration.use:
+                promoted.append((a, b, relation))
+        failed = all(r.status.value != "answered" for r in results)
+        return promoted, results, failed
 
     async def _judge_usefulness(self, request: RetrieveRequest, plans: list[SourcePlan], port: HubPort):
         """Round 2, D2 (HLD §6.3): one question per optional called source. A confident "not

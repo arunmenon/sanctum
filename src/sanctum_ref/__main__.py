@@ -4,6 +4,7 @@ Serves `sanctum.retrieve` on stdio. Hubs are reachable only through the gateway 
 inherited descriptors. Takes no secrets: none are accepted on argv or read from the environment.
 """
 import argparse
+import dataclasses
 import sys
 from pathlib import Path
 
@@ -30,6 +31,9 @@ def main(argv=None) -> int:
     parser.add_argument("--system-one-providers", type=Path, default=ROOT / "configs" / "system_one_providers.yaml")
     parser.add_argument("--calibration-dir", type=Path, default=ROOT / "configs" / "calibration")
     parser.add_argument("--decision-params", type=Path, default=ROOT / "configs" / "d2_standin.yaml")
+    parser.add_argument("--round3", default="none", choices=["none", "d6", "d4"],
+                        help="Round 3 System One decision (design page §14); the config id gains +D6 / +D4")
+    parser.add_argument("--round3-provider", default=None, help="provider name for the Round 3 decision")
     parser.add_argument("--proxy-read-fd", type=int, required=True)
     parser.add_argument("--proxy-write-fd", type=int, required=True)
     arguments = parser.parse_args(argv)
@@ -46,8 +50,20 @@ def main(argv=None) -> int:
         except (ProviderNotApproved, ValueError) as error:
             print(f"sanctum_ref: {error}", file=sys.stderr)
             return 2
+    round3_provider = None
+    if arguments.round3 != "none":
+        if not arguments.round3_provider:
+            print("sanctum_ref: --round3 needs --round3-provider", file=sys.stderr)
+            return 2
+        round3_provider = build_provider(arguments.round3_provider, arguments.decision_params,
+                                         arguments.system_one_providers, arguments.calibration_dir)
+        if not hasattr(round3_provider, "_transport"):
+            print("sanctum_ref: Round 3 needs a System One HTTP provider", file=sys.stderr)
+            return 2
+        arm = dataclasses.replace(arm, config_id=f"{arm.config_id}+{arguments.round3.upper()}")
     anyio.run(serve, arm, arguments.registry, arguments.proxy_read_fd, arguments.proxy_write_fd,
-              arguments.memory_seed if arm.uses_memory else None, provider, arguments.memory_release)
+              arguments.memory_seed if arm.uses_memory else None, provider, arguments.memory_release,
+              arguments.round3, round3_provider)
     return 0
 
 

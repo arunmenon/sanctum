@@ -28,6 +28,13 @@ from sanctum_systemone import CallOutcome, ProviderSpec, SystemOneClient
 from .interface import POLICY_VERSION, TARGET, unavailable
 
 TEMPLATE_VERSION = "d2-noul-v1"
+TEMPLATES = {"d2": TEMPLATE_VERSION, "d6": "d6-noul-v1", "d4": "d4-noul-v1"}
+ROUND3_INSTRUCTIONS = {
+    "d6": "Answer true if the two evidence units listed under this question's id in state.items assert "
+          "incompatible values for the same fact, scope and version.",
+    "d4": "Answer true if the evidence unit listed under this question's id in state.items supports an "
+          "answer to the query in the state.",
+}
 D2_INSTRUCTIONS = ("Answer true if searching the source named in the question is likely to return evidence "
                    "necessary to answer the query in the state, judged from the source's description.")
 BROKER_TOOL = "system_one.decide"
@@ -113,11 +120,12 @@ class Calibration:
         self.a, self.b = float(data["platt"]["a"]), float(data["platt"]["b"])
         self.use, self.skip = float(data["bands"]["use"]), float(data["bands"]["skip"])
 
-    def matches(self, provider: str, model: Optional[str], descriptor_release: Optional[str]) -> bool:
+    def matches(self, provider: str, model: Optional[str], descriptor_release: Optional[str],
+                template: str = TEMPLATE_VERSION) -> bool:
         binding = self.binding
         return (binding.get("provider") == provider and binding.get("model") == model
-                and binding.get("template") == TEMPLATE_VERSION
-                and binding.get("descriptor_release") in (None, descriptor_release))
+                and binding.get("template") == template
+                and binding.get("descriptor_release") in (None, "none", descriptor_release))
 
     def apply(self, p_raw: float) -> float:
         p = min(max(p_raw, 1e-6), 1 - 1e-6)
@@ -132,8 +140,9 @@ class SystemOneHttpAdapter:
         self._transport = transport or BrokerTransport()
         self._max_calls = max_calls_per_round
 
-    def _calibration(self, model: Optional[str]) -> Optional[Calibration]:
-        path = self._calibration_dir / f"{self.name}@{model}.yaml"
+    def _calibration(self, model: Optional[str], decision: str = "d2") -> Optional[Calibration]:
+        suffix = "" if decision == "d2" else f".{decision}"
+        path = self._calibration_dir / f"{self.name}@{model}{suffix}.yaml"
         try:
             return Calibration(path) if model and path.exists() else None
         except (OSError, KeyError, TypeError, ValueError, yaml.YAMLError):
@@ -185,3 +194,50 @@ class SystemOneHttpAdapter:
                 disposition=disposition, provider=self.name, model_version=outcome.model,
                 policy_version=POLICY_VERSION, latency_ms=outcome.latency_ms, cost=0))
         return results
+
+
+class ItemJudgement:
+    """One Round 3 answer: raw and calibrated p (None when shadow or unavailable)."""
+
+    def __init__(self, qid: str, p_raw: Optional[float], p: Optional[float], shadow: bool):
+        self.qid, self.p_raw, self.p, self.shadow = qid, p_raw, p, shadow
+
+
+async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: dict[str, list[dict[str, Any]]],
+                       query: str, port: Any, deadline_ms: int) -> tuple[dict[str, ItemJudgement], list[DecisionResult], Optional[Calibration]]:
+    """A Round 3 round (design page §14): one `noul` per item; items carry provenance refs only and
+    the broker reads the text. Returns judgements, receipt DecisionResults and the calibration used."""
+    started = time.monotonic()
+    template = TEMPLATES[round_name]
+    questions = {qid: {"type": "noul", "instructions": ROUND3_INSTRUCTIONS[round_name]} for qid in items}
+    payload = {"round": round_name, "query": query, "questions": questions,
+               "items": {qid: {"refs": refs} for qid, refs in items.items()}, "max_calls": adapter._max_calls}
+    outcome = await adapter._transport.send(port, payload, deadline_ms)
+    digest = request_hash(round_name, query, questions)
+    judgements: dict[str, ItemJudgement] = {}
+    results: list[DecisionResult] = []
+    calibration = None if outcome.unavailable_reason else adapter._calibration(outcome.model, round_name)
+    shadow = calibration is None or not calibration.matches(adapter.name, outcome.model,
+                                                            outcome.descriptor_release, template)
+    for qid, refs in items.items():
+        answer = None if outcome.unavailable_reason else outcome.answers.get(qid)
+        if answer is None:
+            judgements[qid] = ItemJudgement(qid, None, None, True)
+            result = unavailable(adapter.name, started, outcome.model)
+            results.append(result.model_copy(update={"target": f"{round_name}:{qid}"}))
+            continue
+        p_raw = answer["noul"]
+        p = None if shadow else calibration.apply(p_raw)
+        judgements[qid] = ItemJudgement(qid, p_raw, p, shadow)
+        value = {"item": qid, "p_raw": round(p_raw, 4), "shadow": shadow, "refs": refs,
+                 "request_hash": digest, "usage": outcome.usage, "calls": outcome.calls, "template": template}
+        if p is not None:
+            value["p"] = round(p, 4)
+        results.append(DecisionResult(
+            status="answered", value=value, target=f"{round_name}: {ROUND3_INSTRUCTIONS[round_name]}",
+            distribution={"true": round(p_raw, 4), "false": round(1 - p_raw, 4)},
+            calibration=None if shadow else {"method": "platt_on_logit", "binding": f"{adapter.name}@{outcome.model}.{round_name}"},
+            disposition="use" if (p is not None and p >= calibration.use) else "preserve_candidate",
+            provider=adapter.name, model_version=outcome.model, policy_version=POLICY_VERSION,
+            latency_ms=outcome.latency_ms, cost=0))
+    return judgements, results, (None if shadow else calibration)

@@ -26,6 +26,7 @@ NUMBER = re.compile(r"(?<![A-Za-z0-9.])\d+(?:\.\d+)?(?![A-Za-z0-9])")
 RELEVANT_COVERAGE = 0.4
 HEADER_LINE = re.compile(r"^\s*(#|//|/\*|\*|---|name:|namespace:)")
 MAX_CONFLICT_UNITS = 8
+MAX_CANDIDATE_PAIRS = 6          # D6 candidates: attribute clash without identity overlap
 CONFLICT_COVERAGE = 0.3
 FRONT_MATTER_NAME = re.compile(r"^name:\s*(.+)$", re.MULTILINE)
 PLACE_WORDS = frozenset({"repo", "space", "skill", "queue", "md", "yaml", "java", "src", "main", "com"})
@@ -182,8 +183,10 @@ def same_subject(a: Candidate, b: Candidate, domain_terms: set[str]) -> bool:
     return not signature_a or not signature_b or bool(signature_a & signature_b)
 
 
-def find_conflicts(ranked: list[Ranked], terms: tuple[str, ...],
-                   domain_terms: set[str] = frozenset()) -> list[tuple[Ranked, Ranked, RelationType]]:
+def find_conflicts(ranked: list[Ranked], terms: tuple[str, ...], domain_terms: set[str] = frozenset(),
+                   candidates_out: list | None = None) -> list[tuple[Ranked, Ranked, RelationType]]:
+    """Rule-flagged pairs. When `candidates_out` is given, pairs with an attribute clash that the
+    same-subject rule dropped as noise are collected there (bounded) for D6 to judge."""
     pool = [item for item in ranked if item.coverage >= CONFLICT_COVERAGE][:MAX_CONFLICT_UNITS]
     values = [attribute_values(item.candidate.text, set(terms)) for item in pool]
     conflicts = []
@@ -192,12 +195,14 @@ def find_conflicts(ranked: list[Ranked], terms: tuple[str, ...],
             a, b = pool[i].unit, pool[j].unit
             if a.source_id == b.source_id and a.source_version == b.source_version:
                 continue
-            if not same_subject(pool[i].candidate, pool[j].candidate, domain_terms):
-                continue
             meanings_a, meanings_b = pool[i].candidate.interpretations, pool[j].candidate.interpretations
             if meanings_a and meanings_b and not meanings_a & meanings_b:
                 continue                 # separated interpretations are never compared (no blending)
             clash = any(key in values[j] and values[j][key] != value for key, value in values[i].items())
+            if not same_subject(pool[i].candidate, pool[j].candidate, domain_terms):
+                if clash and candidates_out is not None and len(candidates_out) < MAX_CANDIDATE_PAIRS:
+                    candidates_out.append((pool[i], pool[j], relation_type(a, b)))
+                continue
             if clash:
                 conflicts.append((pool[i], pool[j], relation_type(a, b)))
             if len(conflicts) >= MAX_CONFLICTS:
@@ -274,16 +279,45 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
                      relevant_ids=[item.unit.evidence_id for item in chosen if item.relevant])
 
 
-def assemble(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: frozenset[str],
-             budget_tokens: int, tokenizer_id: str, common: bool, dedup_exact: bool,
-             domain_terms: set[str] = frozenset()) -> Assembled:
+@dataclass
+class Prepared:
+    """Round 3 input: ranked units, exact-duplicate omissions, rule-flagged pairs and the bounded
+    candidate pairs D6 may promote."""
+    candidates: list[Candidate]
+    terms: tuple[str, ...]
+    ranked: list[Ranked]
+    omitted: list[Omitted]
+    flagged: list[tuple[Ranked, Ranked, RelationType]]
+    pair_candidates: list[tuple[Ranked, Ranked, RelationType]]
+    common: bool
+
+
+def prepare(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: frozenset[str],
+            common: bool, dedup_exact: bool, domain_terms: set[str] = frozenset()) -> Prepared:
     ranked = [item for item in score(candidates, terms) if item.coverage > 0 or not common]
     ranked = order(ranked, fact_kinds, by_relevance=common)
     omitted: list[Omitted] = []
     if dedup_exact:
         ranked, omitted = dedup(ranked, fact_kinds)
-    pairs = find_conflicts(ranked, terms, domain_terms)
-    assembled = pack(ranked, pairs, budget_tokens, tokenizer_id, reserve_witnesses=common)
+    pair_candidates: list = []
+    flagged = find_conflicts(ranked, terms, domain_terms, pair_candidates)
+    return Prepared(candidates, terms, ranked, omitted, flagged, pair_candidates, common)
+
+
+def assemble(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: frozenset[str],
+             budget_tokens: int, tokenizer_id: str, common: bool, dedup_exact: bool,
+             domain_terms: set[str] = frozenset()) -> Assembled:
+    """Rules-only assembly (no Round 3 model decisions)."""
+    return finish(prepare(candidates, terms, fact_kinds, common, dedup_exact, domain_terms),
+                  budget_tokens, tokenizer_id)
+
+
+def finish(prepared: Prepared, budget_tokens: int, tokenizer_id: str,
+           promoted: list[tuple[Ranked, Ranked, RelationType]] = ()) -> Assembled:
+    """Pack. Rule-flagged pairs always stay; D6-promoted candidate pairs are added after them."""
+    candidates, terms, ranked, omitted = prepared.candidates, prepared.terms, prepared.ranked, prepared.omitted
+    pairs = list(prepared.flagged) + [pair for pair in promoted if pair in prepared.pair_candidates]
+    assembled = pack(ranked, pairs, budget_tokens, tokenizer_id, reserve_witnesses=prepared.common)
     packed_ids = {unit.evidence_id for unit in assembled.evidence}
     duplicate_refs = {ref for unit in assembled.evidence for ref in unit.duplicates}
     # reference closure: keep an omitted entry only for copies a packed unit still points to

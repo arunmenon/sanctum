@@ -15,3 +15,16 @@ Supersedes the milestone numbering in `docs/design/sanctum-lab-plan.md` §10. Ea
 | **M8** Stretch | Agent-level H0 (direct hub access vs Sanctum C2/C4); release swap and rollback during requests | H0 report; FX-23 under concurrent load |
 
 Holdout is run once per milestone from M5 on, by the holdout owner, and never used for tuning.
+
+## E1 (H1 with Jev): result
+
+Measured once, relaxed profile, `typesafe-jev` resolved to `jev-1.13.0`, calibration `typesafe-jev@jev-1.13.0` fitted on dev (60 calls). Latency reported, not gated (model_call p50 about 360 ms, p95 about 430 to 470 ms, laptop to hosted endpoint).
+
+| Set | Comparison | Safe success | Necessary-evidence recall | Sources called per case | Wrong entity |
+|---|---|---|---|---|---|
+| Acceptance (20, fresh, run once) | C2 vs C3 | 0.50 vs 0.50 | 0.88 vs 0.88 | 2.60 vs 2.30 (-0.30, 95% CI [-0.67, -0.05]) | 0 vs 0 |
+| Acceptance (20) | C4 vs C5 | 0.65 vs 0.65 | 0.97 vs 0.97 | 2.60 vs 2.25 (-0.35, [-0.72, -0.10]) | 0 vs 0 |
+| Holdout (40, tag M6-jev) | C2 vs C3 | 0.50 vs 0.53 | 0.88 vs 0.85 (-0.03, [-0.09, 0.00]) | 2.75 vs 2.38 (-0.38, [-0.57, -0.19]) | 0 vs 0 |
+| Holdout (40) | C4 vs C5 | 0.65 vs 0.68 | 0.91 vs 0.88 (-0.03, [-0.09, 0.00]) | 2.75 vs 2.33 (-0.42, [-0.64, -0.21]) | 0 vs 0 |
+
+Reading: Jev as the D2 usefulness model cuts sources called by 12 to 15 percent with no change in safe success and no wrong-entity activations. On the holdout it costs one case of necessary-evidence recall per comparison (one harmful skip in 40); on the acceptance set none. Whether one harmful skip in 40 is inside D-MARGIN is an owner decision. Strict profile: every call hit the 150 ms deadline from this laptop, so C3/C5 equal C2/C4 there. Dev results are in-sample (calibration set). Reports: docs/reports/system-one-jev-{dev,acceptance,holdout}.md; run logs in acceptance/runs.log and holdout/runs.log.

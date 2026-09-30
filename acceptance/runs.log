@@ -1,0 +1,1 @@
+{"at": "2026-09-30T02:05Z", "set": "acceptance", "milestone": "M6-jev", "configs": ["C2","C4","C3-jev","C5-jev"], "note": "First attempt of C3/C5 ran with the Jev key not loaded in the shell: every model call was unavailable/not_configured and results equalled C2/C4; discarded and rerun once with the key loaded. Controls C2/C4 ran once. Lead did not read specs or gold."}

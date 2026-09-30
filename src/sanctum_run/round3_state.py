@@ -29,10 +29,12 @@ from typing import Any, Optional
 STATE_V1 = "r3-state-v1"
 STATE_V2 = "r3-state-v2"
 STATE_V2_COMPACT = "r3-state-v2-compact"   # small-context providers (Laya): same fields, qualifiers first
-STATE_LAYOUTS = (STATE_V1, STATE_V2, STATE_V2_COMPACT)
+STATE_V2_COMPACT_150 = "r3-state-v2-compact-150"
+STATE_LAYOUTS = (STATE_V1, STATE_V2, STATE_V2_COMPACT, STATE_V2_COMPACT_150)
 MAX_EXCERPT_CHARS = 1200
 PREFIX_CHARS = 400
 COMPACT_EXCERPT_CHARS = 350
+COMPACT_CAPS = {STATE_V2_COMPACT: COMPACT_EXCERPT_CHARS, STATE_V2_COMPACT_150: 150}
 
 ROLE_BY_SOURCE = {"codehub": "implemented_behavior", "skillhub": "procedure", "dochub": "reference",
                   "memoryhub": "session_note", "incidenthub": "incident"}
@@ -124,9 +126,9 @@ def build_record(layout: str, ref: dict[str, Any], row: Any, query: str) -> dict
     if layout == STATE_V1:
         return {"source_id": ref["source_id"], "version": row.version, "environment": row.environment,
                 "text": row.text[start:end][:MAX_EXCERPT_CHARS]}
-    if layout == STATE_V2_COMPACT:
-        excerpt, spans, selected = excerpt_of(row.text, start, end, query, COMPACT_EXCERPT_CHARS,
-                                              COMPACT_EXCERPT_CHARS, qualifiers_first=True)
+    if layout in COMPACT_CAPS:
+        excerpt, spans, selected = excerpt_of(row.text, start, end, query, COMPACT_CAPS[layout],
+                                              COMPACT_CAPS[layout], qualifiers_first=True)
     else:
         excerpt, spans, selected = excerpt_of(row.text, start, end, query)
     return {"source_id": ref["source_id"], "artifact_id": row.artifact_id, "version": row.version,

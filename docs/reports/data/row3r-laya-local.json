@@ -1,0 +1,124 @@
+{
+ "campaign_row": {
+  "calls": 32,
+  "input_tokens": 16214,
+  "output_tokens": 0
+ },
+ "ceilings": {
+  "calls": 5000,
+  "input_tokens": 10000000
+ },
+ "decision": "d6",
+ "diagnostic": false,
+ "git_commit": "2d4219482b3c4bbd3d860951da6621878ce24a47",
+ "items": {
+  "dev-026\tev-1|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-79494b3d81",
+     "end": 310,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R40"
+    },
+    {
+     "artifact_id": "art-8d9e99085a",
+     "end": 268,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "p": 0.7942
+   }
+  },
+  "dev-036\tev-1|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "p": 0.8231
+   }
+  },
+  "dev-036\tev-6|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b1a3c404c0",
+     "end": 515,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "p": 0.7985
+   }
+  }
+ },
+ "items_answered": 3,
+ "items_labelled": 3,
+ "items_unavailable": 81,
+ "model_call_outcomes": {
+  "ok": 2,
+  "truncated": 26
+ },
+ "models": [
+  "laya-rl-agent"
+ ],
+ "provider": "laya-local",
+ "row": "3r",
+ "signals": {
+  "p": {
+   "all": {
+    "brier_raw": 0.6486,
+    "n": 3,
+    "positives": 0,
+    "pr_auc": null,
+    "roc_auc": null
+   },
+   "candidates": {
+    "n": 0,
+    "positives": 0,
+    "pr_auc": null,
+    "roc_auc": null
+   },
+   "rule_flagged": {
+    "brier_raw": 0.6486,
+    "n": 3,
+    "positives": 0,
+    "pr_auc": null,
+    "roc_auc": null
+   }
+  }
+ },
+ "state": "excerpts-compact",
+ "template": "d6-noul-v3-excerpts-compact",
+ "tolerance": 0.2
+}

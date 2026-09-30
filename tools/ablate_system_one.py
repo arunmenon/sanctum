@@ -110,6 +110,17 @@ def record(row: dict) -> None:
     LEDGER.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
 
 
+def leaf_errors(error: BaseException, depth: int = 0) -> list[str]:
+    """The innermost exceptions of a (possibly nested) exception group, with their last frames."""
+    import traceback
+    if isinstance(error, BaseExceptionGroup):
+        return [line for inner in error.exceptions for line in leaf_errors(inner, depth + 1)]
+    frames = traceback.extract_tb(error.__traceback__)[-3:]
+    where = " <- ".join(f"{Path(f.filename).name}:{f.lineno} {f.name}" for f in reversed(frames))
+    cause = f" (cause: {type(error.__cause__).__name__}: {error.__cause__})" if error.__cause__ else ""
+    return [f"{type(error).__name__}: {error} at {where}{cause}"]
+
+
 # ---- signals --------------------------------------------------------------------------------------
 def signals(template, answers: dict, qid: str) -> dict:
     """Named numeric signals from one item's answers. Only `p` (a positive-polarity noul) may ever
@@ -293,13 +304,20 @@ def main():
     set_campaign_budget(campaign)
     arguments.scratch.mkdir(parents=True, exist_ok=True)
     run_dir = arguments.scratch / f"row{arguments.row}-{arguments.provider}-{template.id}"
-    if arguments.decision == "d2":
-        items, labels, relation_types, models, outcomes, unavailable = collect_d2(arguments, template)
-    else:
-        if run_dir.exists():
-            shutil.rmtree(run_dir)
-        items, labels, relation_types, models, outcomes, unavailable = collect_round3(arguments, template, run_dir)
-    record({"row": arguments.row, "provider": arguments.provider, "template": template.id, **campaign.summary()})
+    failure = None
+    try:
+        if arguments.decision == "d2":
+            items, labels, relation_types, models, outcomes, unavailable = collect_d2(arguments, template)
+        else:
+            if run_dir.exists():
+                shutil.rmtree(run_dir)
+            items, labels, relation_types, models, outcomes, unavailable = collect_round3(arguments, template, run_dir)
+    except BaseException as error:                    # spend is recorded even when collection fails
+        failure = error
+        raise SystemExit("collection failed:\n" + "\n".join(leaf_errors(error)))
+    finally:
+        record({"row": arguments.row, "provider": arguments.provider, "template": template.id,
+                **campaign.summary(), **({"note": f"failed: {type(failure).__name__}"} if failure else {})})
     keys = sorted(k for k in items if k in labels)
     flagged = {k: items[k]["rule_flagged"] for k in keys}
     signal_names = sorted({name for k in keys for name, value in items[k]["signals"].items() if isinstance(value, (int, float))})

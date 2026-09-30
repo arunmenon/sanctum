@@ -280,11 +280,16 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
         truncated_relevant = truncated_relevant or dropped.relevant
         used = list_cost(chosen, tokenizer_id)
     if order_scores:
+        fitting, fitting_used = list(chosen), used      # rules order, known to fit
         chosen.sort(key=lambda item: -order_scores.get(item.unit.evidence_id, -1.0))
         used = list_cost(chosen, tokenizer_id)
-        while chosen and used > budget_tokens:         # a reorder can change the token count slightly
+        while used > budget_tokens:                     # a reorder can change the token count slightly
             extra_positions = [i for i, item in enumerate(chosen) if item.unit.evidence_id not in rules_packed]
-            chosen.pop(extra_positions[-1] if extra_positions else -1)
+            if not extra_positions:
+                # never trade a rules-packed unit for an order: keep the order that fits
+                chosen, used = fitting, fitting_used
+                break
+            chosen.pop(extra_positions[-1])
             used = list_cost(chosen, tokenizer_id)
     evidence = [item.unit.model_copy(update={"duplicates": list(item.duplicates)}) for item in chosen]
     conflicts = [Conflict(conflict_id=f"cf-{index + 1}", a=a.unit.evidence_id, b=b.unit.evidence_id,

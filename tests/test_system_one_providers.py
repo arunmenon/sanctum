@@ -264,3 +264,46 @@ def test_per_batch_state_splits_on_state_size():
         sent = [set(r["state"]["items"]) for r in server.behavior.requests]
     assert outcome.invalid_ids == ["huge"] and set(outcome.answers) == {"a", "b", "c"}
     assert sent == [{"a", "b"}, {"c"}] and all(len(repr(state_for(list(batch)))) <= 400 for batch in sent)
+
+
+def test_campaign_budget_is_enforced_before_dispatch():
+    """Review A1: the ceiling is checked before each HTTP attempt, retries count, and usage is
+    recorded once per exchange; an exhausted budget makes no further request."""
+    from sanctum_systemone import CampaignBudget, set_campaign_budget
+    spec = SPECS["local-test"]
+    budget = CampaignBudget(max_calls=3, max_input_tokens=10_000)
+    set_campaign_budget(budget)
+    try:
+        with SystemOneTestServer(ServerBehavior(fail_times=1)) as server:
+            client = SystemOneClient(spec, server.base_url, spec.model)
+            first = client.decide({}, {"q": NOUL}, 5, max_calls=1)          # 503 then ok: 2 attempts
+            second = client.decide({}, {"q": NOUL}, 5, max_calls=1)         # third attempt
+            third = client.decide({}, {"q": NOUL}, 5, max_calls=1)          # refused before dispatch
+            sent = len(server.behavior.requests)
+        assert first.unavailable_reason is None and first.calls == 2
+        assert second.unavailable_reason is None and third.unavailable_reason == "over_budget"
+        assert third.calls == 0 and sent == 3 and budget.calls == 3
+        from sanctum_systemone.protocol import build_request, estimate_input_tokens
+        failed_attempt = estimate_input_tokens(build_request({}, spec.model, {"q": NOUL}))
+        # two answered exchanges at their reported usage (60 each) plus the 503 at its reservation
+        assert budget.input_tokens == 60 * 2 + failed_attempt
+        tight = CampaignBudget(max_calls=10, max_input_tokens=50)       # below one reservation
+        set_campaign_budget(tight)
+        with SystemOneTestServer() as server:
+            refused = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"q": NOUL}, 5, max_calls=1)
+            assert refused.unavailable_reason == "over_budget" and not server.behavior.requests
+    finally:
+        set_campaign_budget(None)
+
+
+def test_shadow_comes_from_a_missing_binding_not_a_sentinel(tmp_path):
+    """Review A2: a calibration whose use band is 1.0 (or missing) is not usable; the adapter runs
+    shadow-only, exactly as when no calibration file exists."""
+    binding = {"provider": "local-test", "model": "test-model-1", "template": TEMPLATE_VERSION}
+    (tmp_path / "local-test@test-model-1.yaml").write_text(yaml.safe_dump(
+        {"binding": binding, "platt": {"a": 1.0, "b": 0.0}, "bands": {"use": 1.0, "skip": 0.0}}))
+    with SystemOneTestServer() as server:
+        sentinel = _decide(_adapter(server, tmp_path))
+    assert all(r.value["shadow"] and r.value["call"] and "p" not in r.value for r in sentinel)
+    assert not list((ROOT / "configs" / "calibration").glob("*.yaml")) or all(
+        yaml.safe_load(p.read_text())["bands"]["use"] < 1.0 for p in (ROOT / "configs" / "calibration").glob("*.yaml"))

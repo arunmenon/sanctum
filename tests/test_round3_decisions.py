@@ -150,3 +150,50 @@ def test_d4_shadow_is_rules_only(tmp_path):
     scores, use, results, failed = anyio.run(retriever._judge_relevance, request, prepared, None)
     assert scores is None and use is None and not failed
     assert all(r.value["shadow"] and r.value["template"] == "d4-noul-v1" for r in results if r.value)
+
+
+@pytest.mark.parametrize("budget", [1000, 1500, 2000])
+def test_d4_superset_holds_at_tight_budgets_with_adversarial_scores(budget):
+    """Review A3: at fixed tight budgets, adversarial D4 scores (irrelevant units first, rules
+    units last, reversed rank) never remove a unit the rules-only packer includes."""
+    many = _d4_units() + [_candidate("codehub", f"r{i}", f"// repo:payments/payment-auth\\nclass RetryConfig{i} {{\\n  "
+                                     f"MAX_RETRIES = {i};\\n}}\\n" + "x " * (60 + 11 * i), rank=i) for i in range(8)]
+    fact_kinds = frozenset({"implementation"})
+    prepared = prepare(many, TERMS, fact_kinds, common=True, dedup_exact=True, domain_terms={"payment"})
+    rules = {u.evidence_id for u in finish(prepared, budget, "cl100k_base").evidence}
+    ids = [item.unit.evidence_id for item in prepared.ranked + prepared.excluded]
+    adversaries = [
+        {i: (1.0 if i in {x.unit.evidence_id for x in prepared.excluded} else 0.0) for i in ids},
+        {i: position / len(ids) for position, i in enumerate(ids)},          # reversed rank
+        {i: (0.0 if i in rules else 1.0) for i in ids},
+    ]
+    for scores in adversaries:
+        for use in (0.0, 0.5):
+            d4 = finish(prepared, budget, "cl100k_base", d4_scores=scores, d4_use=use)
+            assert rules <= {u.evidence_id for u in d4.evidence}, (budget, use)
+            assert d4.used_tokens <= budget
+
+
+def test_reorder_that_costs_more_never_removes_a_rules_packed_unit(monkeypatch):
+    """Review A3, the exact risk: the D4 reorder changes serialization cost and pushes the list
+    over budget after extras are exhausted. The packer must keep the fitting order, not drop a
+    rules-packed unit."""
+    import sanctum_ref.assembly as assembly
+    prepared = prepare(_units(), TERMS, frozenset({"implementation", "procedure"}), common=True, dedup_exact=True,
+                       domain_terms={"payment"})
+    rank = [item.unit.evidence_id for item in prepared.ranked]
+    real_cost = assembly.list_cost
+
+    def order_sensitive_cost(items, tokenizer_id):
+        ids = [item.unit.evidence_id for item in items]
+        in_rank_order = ids == sorted(ids, key=lambda i: rank.index(i) if i in rank else len(rank))
+        return real_cost(items, tokenizer_id) + (0 if in_rank_order else 50)
+
+    monkeypatch.setattr(assembly, "list_cost", order_sensitive_cost)
+    rules = finish(prepared, 4000, "cl100k_base")
+    budget = rules.used_tokens                                  # exactly full under rules order
+    rules = finish(prepared, budget, "cl100k_base")
+    reversed_scores = {i: position / len(rank) for position, i in enumerate(rank)}
+    d4 = finish(prepared, budget, "cl100k_base", d4_scores=reversed_scores, d4_use=0.99)
+    assert {u.evidence_id for u in rules.evidence} <= {u.evidence_id for u in d4.evidence}
+    assert d4.used_tokens <= budget

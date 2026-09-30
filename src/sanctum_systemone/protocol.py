@@ -165,6 +165,58 @@ def _add_usage(total: Optional[dict[str, Any]], usage: Any) -> Optional[dict[str
     return total
 
 
+class CampaignBudget:
+    """A hard campaign ceiling enforced before every HTTP attempt (review: pre-dispatch cap).
+
+    Each attempt must fit in the remaining calls and reserve an input-token estimate for that
+    exchange; the exchange's reported usage is then recorded once (or the reservation, when the
+    provider reports none). Thread-safe; one per process (`set_campaign_budget`)."""
+
+    def __init__(self, max_calls: int, max_input_tokens: int, max_output_tokens: Optional[int] = None):
+        import threading
+        self.max_calls, self.max_input_tokens, self.max_output_tokens = max_calls, max_input_tokens, max_output_tokens
+        self.calls = self.input_tokens = self.output_tokens = 0
+        self._lock = threading.Lock()
+        self._reserved = 0
+
+    def reserve(self, estimated_input_tokens: int) -> bool:
+        with self._lock:
+            if self.calls + 1 > self.max_calls:
+                return False
+            if self.input_tokens + self._reserved + estimated_input_tokens > self.max_input_tokens:
+                return False
+            if self.max_output_tokens is not None and self.output_tokens >= self.max_output_tokens:
+                return False
+            self.calls += 1
+            self._reserved += estimated_input_tokens
+            return True
+
+    def settle(self, estimated_input_tokens: int, usage: Any) -> None:
+        with self._lock:
+            self._reserved -= estimated_input_tokens
+            reported = usage.get("input_tokens") if isinstance(usage, dict) else None
+            self.input_tokens += int(reported) if isinstance(reported, (int, float)) else estimated_input_tokens
+            output = usage.get("output_tokens") if isinstance(usage, dict) else None
+            self.output_tokens += int(output) if isinstance(output, (int, float)) else 0
+
+    def summary(self) -> dict[str, int]:
+        return {"calls": self.calls, "input_tokens": self.input_tokens, "output_tokens": self.output_tokens}
+
+
+_CAMPAIGN: Optional[CampaignBudget] = None
+
+
+def set_campaign_budget(budget: Optional[CampaignBudget]) -> None:
+    global _CAMPAIGN
+    _CAMPAIGN = budget
+
+
+def estimate_input_tokens(body: dict[str, Any]) -> int:
+    """Conservative reservation: about 3 characters per token over the serialized request."""
+    import json as _json
+    return len(_json.dumps(body)) // 3 + 64
+
+
 class SystemOneClient:
     """One `/v1/systemone` endpoint. The API key is passed in by the caller (the runner's broker
     or a lab tool); this module never reads the environment for it."""
@@ -245,15 +297,31 @@ class SystemOneClient:
             remaining = deadline_s - (time.monotonic() - started)
             if remaining <= 0.01:
                 return None, UnavailableReason.TIMEOUT
+            estimate = estimate_input_tokens(body)
+            if _CAMPAIGN is not None and not _CAMPAIGN.reserve(estimate):
+                return None, UnavailableReason.OVER_BUDGET          # refused before dispatch
             outcome.calls += 1
+            usage_seen: Any = None
             try:
                 response = self._http.post(ENDPOINT, json=body, timeout=remaining)
+                if response.status_code == 200:
+                    try:
+                        parsed = response.json()
+                        usage_seen = parsed.get("usage") if isinstance(parsed, dict) else None
+                    except ValueError:
+                        usage_seen = None
             except httpx.TimeoutException:
+                if _CAMPAIGN is not None:
+                    _CAMPAIGN.settle(estimate, None)
                 reason = UnavailableReason.TIMEOUT
                 continue
             except httpx.HTTPError:
+                if _CAMPAIGN is not None:
+                    _CAMPAIGN.settle(estimate, None)
                 reason = UnavailableReason.ERROR
                 continue
+            if _CAMPAIGN is not None:
+                _CAMPAIGN.settle(estimate, usage_seen)             # counted once per exchange
             if response.status_code >= 500:
                 reason = UnavailableReason.ERROR
                 continue

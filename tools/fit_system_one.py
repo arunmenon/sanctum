@@ -31,7 +31,7 @@ from sanctum_ref.providers import d2_request
 from sanctum_run.gateway import released_hub_ids
 from sanctum_run.runner import DEFAULT_HUBS_CONFIG, DEFAULT_WORLD_BUILD, git_state, load_cases, public_request
 from sanctum_run.system_one_broker import descriptor_release as release_of, load_descriptors, state_sources
-from sanctum_systemone import SystemOneClient, load_provider_specs
+from sanctum_systemone import CampaignBudget, SystemOneClient, load_provider_specs, set_campaign_budget
 from tools.fit_d2_standin import recalls
 from tools.measure_system_one_batches import dotenv
 
@@ -149,6 +149,9 @@ if __name__ == "__main__":
     parser.add_argument("--harm-tolerance", type=float, default=0.05)
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--decision", default="d2", choices=["d2", "d6", "d4"])
+    parser.add_argument("--max-input-tokens", type=int, default=200_000,
+                        help="hard campaign ceiling, enforced before each HTTP attempt")
+    parser.add_argument("--max-output-tokens", type=int, default=None)
     parser.add_argument("--memory-release", default=None)
     parser.add_argument("--max-false-rate", type=float, default=0.2,
                         help="Round 3: tolerated share of false positives among held-out promotions")
@@ -157,6 +160,10 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     if "holdout" in str(arguments.cases.resolve()) or "acceptance" in str(arguments.cases.resolve()):
         raise SystemExit("fit on dev cases only")
+    # hard campaign ceiling, enforced before every HTTP attempt in this process (the runner's broker
+    # included); retries count; usage is recorded once per exchange
+    campaign = CampaignBudget(arguments.max_calls, arguments.max_input_tokens, arguments.max_output_tokens)
+    set_campaign_budget(campaign)
     spec = load_provider_specs(ROOT / "configs" / "system_one_providers.yaml")[arguments.provider]
     environment = {**dotenv(), **os.environ}
     if arguments.decision != "d2":
@@ -179,6 +186,11 @@ if __name__ == "__main__":
         a, b = platt([(logit(raw[k]), labels[k]) for k in keys])
         from sanctum_ref.providers.http_systemone import TEMPLATES
         out = ROOT / "configs" / "calibration" / f"{arguments.provider}@{model}.{arguments.decision}.yaml"
+        if use >= 1.0:
+            # no band met the tolerance: record the fit, but leave no live binding, so the SUT runs
+            # shadow-only by absence of a calibration (never by a sentinel band)
+            out = ROOT / "configs" / "calibration" / "rejected" / out.name
+            out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(yaml.safe_dump({
             "binding": {"provider": arguments.provider, "model": model, "model_revision": arguments.model_revision,
                         "decision": arguments.decision, "template": TEMPLATES[arguments.decision],

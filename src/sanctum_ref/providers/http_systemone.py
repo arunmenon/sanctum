@@ -120,6 +120,10 @@ class Calibration:
         self.binding = data["binding"]
         self.a, self.b = float(data["platt"]["a"]), float(data["platt"]["b"])
         self.use, self.skip = float(data["bands"]["use"]), float(data["bands"]["skip"])
+        if not 0.0 < self.use < 1.0:
+            # a calibration that cannot promote is not a calibration: shadow mode comes from the
+            # absence of a usable binding, never from a sentinel band
+            raise ValueError("use band must be strictly between 0 and 1")
 
     def matches(self, provider: str, model: Optional[str], descriptor_release: Optional[str],
                 template: str = TEMPLATE_VERSION) -> bool:

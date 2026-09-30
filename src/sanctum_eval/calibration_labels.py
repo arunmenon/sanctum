@@ -158,3 +158,22 @@ def labels_from_run(decision: str, run_dir: Path, cases_dir: Path) -> dict[tuple
             for evidence_id, label in d4_labels(gold, units).items():
                 labels[(gold.case_id, evidence_id)] = label
     return labels
+
+
+def relation_types_from_run(run_dir: Path, cases_dir: Path) -> dict[tuple[str, str], Optional[str]]:
+    """Diagnostic for the D6 fit: (case_id, "a|b") -> the gold relation type a labelled-positive pair
+    witnesses (any of the four types counts as positive), or None for negatives. Only the type is
+    exposed; no other gold content."""
+    golds = {gold.request.request_id: gold for gold in (load_gold(p) for p in sorted(Path(cases_dir).glob("*.yaml")))}
+    types: dict[tuple[str, str], Optional[str]] = {}
+    for receipt in _read_jsonl(Path(run_dir) / "receipts.jsonl"):
+        gold = golds.get(receipt["request_id"])
+        for item in (receipt.get("decisions", []) if gold is not None else []):
+            value = item.get("value")
+            if not isinstance(value, dict):
+                continue
+            key, refs = _item_and_refs(value)
+            if key.startswith("d6:") and len(refs) == 2:
+                relation = d6_relation_type(gold, refs[0], refs[1])
+                types[(gold.case_id, key[3:])] = relation.value if relation is not None else None
+    return types

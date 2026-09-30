@@ -136,3 +136,20 @@ def test_labels_from_run_prefers_receipt_refs(case, tmp_path):
     (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
     assert labels_from_run("d6", tmp_path, cases) == {("m0-001", "ev-a1|ev-b9"): 1}
     assert set(labels_from_run("d4", tmp_path, cases)) == {("m0-001", "ev-u7")}
+
+
+def test_relation_types_from_run_is_diagnostic_only(case, tmp_path):
+    from sanctum_eval.calibration_labels import relation_types_from_run
+
+    gold, response, receipt, _ = case("m0-001")
+    base = {"status": "answered", "disposition": "preserve_candidate", "provider": "local-test",
+            "policy_version": "d6-noul-v1", "latency_ms": 1, "cost": 0.0}
+    decisions = [{**base, "target": "d6:ev-a1|ev-b1", "value": {"item": "d6:ev-a1|ev-b1", "refs": [REF_A, REF_B]}},
+                 {**base, "target": "d6:ev-a1|ev-z", "value": {"item": "d6:ev-a1|ev-z",
+                                                               "refs": [REF_A, {**REF_A, "artifact_id": "art-z"}]}}]
+    (tmp_path / "receipts.jsonl").write_text(json.dumps({**receipt, "decisions": decisions}) + "\n")
+    cases = tmp_path / "cases"
+    cases.mkdir()
+    (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
+    assert relation_types_from_run(tmp_path, cases) == {("m0-001", "ev-a1|ev-b1"): "policy_implementation_divergence",
+                                                        ("m0-001", "ev-a1|ev-z"): None}

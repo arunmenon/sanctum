@@ -2,7 +2,7 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.2 (reorganized from v5.1). Lab work is experimental. Original section numbers are retained; v5.2 additions are marked.
+> Status: proposed research design, version 5.2.1 (reorganized from v5.1). A design for proving the tenets, not a production specification; production hardening items are listed in the [hardening backlog](hardening-backlog.md). Lab work is experimental. Original section numbers are retained.
 
 This proposal expands the engineering team's initial Sanctum proposal with policy-constrained evidence selection, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains Q1, rather than an assumed agreement.
 
@@ -237,67 +237,6 @@ These are modules inside the existing Sanctum service in the pilot, not new serv
 | Sanctum memory | Memory | Source map, vocabulary, procedures, artifact relations, observations | Hold content, grant access, or share a store with Engram |
 | Adapters | Plumbing | Translate the contract per backend; timeouts; caps | Invent missing provenance |
 | Receipts | Plumbing | Durable record of inputs, decisions, outputs | Store full backend copies |
-| Execution context (v5.2) | Policy | One per request: scope, absolute deadline, budget ledger, pinned versions ([§5.4](hld.md#section-5-4)) | Change after creation, except ledger charges; widen scope |
-
----
-
-<a id="section-5-4"></a>
-
-### 5.4 Execution context (v5.2)
-
-Policy, planning, retrieval, assembly and escalation are separate components, but one request is one execution. Every stage reads the same **ExecutionContext**, created by policy at stage 2 and immutable afterwards except for its budget ledger. No stage derives its own deadline, budget or version set.
-
-```text
-ExecutionContext                                  # owned by policy; created once per request
-  request_id, tenant_id, principal_ref            # principal as verified by Identity and policy
-  effective_scope                                 # caller grants ∩ project scope ∩ registry ∩ data policy
-    scope_steps[]                                 # each narrowing step, with its origin (below)
-  data_class_ceiling                              # highest class any stage may place in model state
-  deadline_at                                     # absolute; every stage reads remaining time from it
-  ledger                                          # budget ledger (below)
-  pins                                            # coherent version snapshot (below)
-    memory_release_id, policy_epoch, rule_set_version
-    calibration_bindings{decision -> binding_id}
-    source_snapshots{source_id -> snapshot token | none}
-  caller_profile, mode
-```
-
-**Scope narrowing is explicit.** Effective scope is computed once, by intersection, and only narrows afterwards. Project scope is a scope input, not only resolution context: it removes sources and places before any judgment runs. Each narrowing (project scope, data policy, a procedure's place selector, a clarification) appends a `scope_step` with its origin, so a receipt can show why a source was not eligible. Nothing downstream can widen scope; a stage that would need wider scope reports a gap instead.
-
-**One budget ledger spans the request.** The ledger holds the caller's limits and the operator's caps and charges every consuming action to them:
-
-| Charged action | Unit | Reserved before dispatch |
-|---|---|---|
-| Rule evaluation, memory lookup | time | no; accounted |
-| Source search and fetch, including retries | calls, time | yes, per attempt |
-| Decomposition and escalation | calls, time, tokens | yes |
-| System One and LLM calls, including retries and split batches | calls, input and output tokens, time | yes, per attempt |
-| Response serialization | tokens, by the declared tokenizer | yes, before packing |
-
-A stage reserves before it acts and releases what it did not use. A retry is a new reservation, never free. When a reservation cannot be made, the stage takes its safe default ([§6.4](hld.md#section-6-4)) and records `budget_exhausted` for that decision; it does not borrow from another stage. The response carries the ledger's totals, and the receipt carries each charge with its call id.
-
-**The version snapshot is pinned at stage 2.** The memory release, policy epoch, rule-set version and calibration bindings are fixed for the whole request ([§9.6](memory-design.md#section-9-6)). Authorization and revocation stay live: the policy epoch is rechecked before evidence leaves Sanctum, and a request whose epoch was superseded by a revocation drops the affected evidence and says so. Source snapshot tokens are pinned where an adapter offers them ([§12.3](contracts-and-scenarios.md#section-12-3)); where it does not, the unit's freshness is reported as unknown rather than assumed.
-
-**Cache keys and observation identity.** A cached result is reusable only under an identical key:
-
-| Cache | Key |
-|---|---|
-| Source results | tenant, principal or scope digest, policy epoch, source id, adapter and index version, snapshot token, normalized query plan |
-| Decision results | tenant, scope digest, decision id, complete calibration binding (provider, model or checkpoint, template and state layout, descriptor snapshot, memory release, decoding), input hash |
-| Resolution | tenant, scope digest, memory release, normalized term |
-
-Every call a request makes (source, model, escalation) gets a stable observation id: `request_id`, stage, sequence and attempt. Receipts, ledgers and replay records refer to calls only by that id.
-
-**Retention is per store, not per request.**
-
-| Store | Holds | Access | Erasure |
-|---|---|---|---|
-| Assertion storage (memory) | Reviewed assertions and their envelopes ([§9.11](memory-design.md#section-9-11)) | Platform team, scoped readers | Tombstone within the reconstruction window ([§9.9](memory-design.md#section-9-9)) |
-| Routing observations | Candidates, selections, dispositions, ledger charges; query text redacted to a digest unless retention is approved | Evaluation and operations roles | Expires with the observation window |
-| Retained evidence | Units served, for `recompute_on_candidates` replay ([§15](hld.md#section-15)) | Replay role under the original principal's scope | Erased on revocation or deletion of the source content |
-| Inference replay | Model requests and responses, credentials excluded | Decision-layer owners | Synthetic data only until a written retention rule approves more |
-
-Engram stays a separate store with its own availability; none of these stores is shared with it.
 
 ---
 
@@ -381,12 +320,10 @@ Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance t
 | D3 | Ambiguity | P(query needs clarification or decomposition), query only | Rules; Jev challenger | Escalate within budget, else `partial` |
 | D4 | Relevance | Relevance score per unit | Existing cross-encoder | Keep, lower rank |
 | D5 | Duplicate | Exact: same hash + version. Semantic: proposal only | Exact only | Keep both |
-| D6 | Possible conflict | P(two units assert a material typed relation about the same attested subject and attribute: contradiction, policy/implementation divergence, environment or version difference) | Bounded flag on rule-produced pairs | Rule-flagged pairs stay `possible_conflict`; candidate pairs stay unflagged |
+| D6 | Possible conflict | P(two units assert a material typed relation about the same subject and attribute) | Bounded flag on rule-produced pairs | Rule-flagged pairs stay `possible_conflict`; candidate pairs stay unflagged |
 | D7 | Claim support | supported / contradicted / insufficient | Later | `insufficient` |
 | D8 | Write target | Proposes among **registry-permitted** destinations | Later | No side effect |
 | D9 | Supersession | Explicit version lineage first | Lineage only | Never hide evidence |
-
-The last column is the uncertain case only. What every decision does when its output is invalid, a dependency is denied or failed, or the budget is exhausted, and how conflict records and status defaults follow, is one contract: the evidence-preservation contract in [§12.4](contracts-and-scenarios.md#section-12-4) (v5.2).
 
 <a id="section-6-5"></a>
 
@@ -462,8 +399,7 @@ EvidenceUnit
     applicability_status = known | partial | unknown
   occurred_at?, recorded_at?, retrieved_at
   classification, authority_assertion_ref?
-  subjects[]                                      # v5.2: attested subject bindings (memory §8.10)
-  fetch_handle?                                   # v5.2: exact (artifact, version, span) when addressable
+  subjects[]                                      # v5.2.1: attested subject bindings (memory §8.10)
   exact_token_count, tokenizer_id
 ```
 
@@ -531,7 +467,9 @@ flowchart LR
 
 Caps per request: max candidates, max conflict pairs, max bytes, max model calls. Tokens are counted on the serialized response with a declared tokenizer.
 
-Packing draws on the request's budget ledger ([§5.4](hld.md#section-5-4)): the serialization reservation is made before packing, not after. A conflict whose witnesses do not both fit is still returned as a conflict record, with the missing witness listed in `omitted`; a witness never enters through ordinary filling with its flag dropped. Witness reservations for D6-promoted pairs are bounded by a declared share of the budget ([§12.4](contracts-and-scenarios.md#section-12-4), v5.2).
+**Status defaults (v5.2.1).** Status is judged per interpretation against the requested facts: `sufficient` when every requested fact has obtainable evidence in the response; `partial` when some do and others are missing, denied, failed or did not fit, with the specific reasons; `insufficient` only when nothing obtainable remains for the requested facts. A missing must-consult source therefore gives `partial` with `required_source_unavailable` while other requested facts are covered, never `sufficient`.
+
+**Conflicts survive packing (v5.2.1).** A flagged conflict is a response object, not a packing side effect. When both witnesses cannot fit, the conflict record is still returned, the witness that does not fit is listed in `omitted` with reason `conflict_witness_omitted`, and the interpretation is at most `partial`. A witness never enters through ordinary filling with its flag dropped, and a D6 promotion never displaces rules-packed evidence.
 
 <a id="section-7-5"></a>
 
@@ -611,7 +549,7 @@ Reconciliation triggers: new `possible_conflict`, version change on an artifact 
 - Provider eligibility (hosted Jev vs. self-hosted vs. LLM) follows the **highest data class in the full state**, including graph descriptors and logs.
 - Graph entities, aliases, and statistics are scoped; neighborhoods are filtered before inference.
 - Evidence text is data. Model outputs are validated against allowed candidates. Feedback producers are authenticated and labeled (F16).
-- Caches are keyed by tenant, principal or scope, policy epoch, rule set, memory release, source and index versions, and, for decisions, the complete model binding ([§5.4](hld.md#section-5-4)); revocation invalidates them (v5.2).
+- Caches are keyed by principal, scope, policy, and source versions; revocation invalidates them.
 
 <a id="section-14-2"></a>
 
@@ -651,7 +589,7 @@ Backend time is reported separately. Stage p95s do not add into an end-to-end p9
 
 ### 14.3 Observability
 
-Per request: effective scope ref and its narrowing steps, candidates, selected subset, dispositions, provider and versions, per-source status, budget ledger charges, tokens, cost, latency split (Sanctum / backend / total), degraded reasons. Every source, model and escalation call carries a stable observation id (request, stage, sequence, attempt), and each observation store has its own access and erasure rule ([§5.4](hld.md#section-5-4), v5.2). Dashboards include **entities with no coverage** ([Ex. 8](contracts-and-scenarios.md#example-8)), **open conflicts by entity** ([Ex. 3](contracts-and-scenarios.md#example-3)), **unresolved terms** ([Ex. 14](contracts-and-scenarios.md#example-14)), and **governance queue** (proposals awaiting review, [Ex. 14](contracts-and-scenarios.md#example-14)–15).
+Per request: effective scope ref, candidates, selected subset, dispositions, provider and versions, per-source status, tokens, cost, latency split (Sanctum / backend / total), degraded reasons. Dashboards include **entities with no coverage** ([Ex. 8](contracts-and-scenarios.md#example-8)), **open conflicts by entity** ([Ex. 3](contracts-and-scenarios.md#example-3)), **unresolved terms** ([Ex. 14](contracts-and-scenarios.md#example-14)), and **governance queue** (proposals awaiting review, [Ex. 14](contracts-and-scenarios.md#example-14)–15).
 
 ---
 
@@ -731,7 +669,7 @@ Rules and graph priors with capped fan-out, response marked degraded ([Ex. 9](co
 | Q13 | May service names, native paths, descriptors, query logs, and coverage counts be stored in Sanctum and sent to Jev? | Security review; sanitized lab data until approved |
 | Q14 | Maximum acceptable stale-ACL window; which change feeds exist; retention for replay | Security + source owners |
 | Q15 | What do Deep Insights, Dobby, and KaaS actually expose: stable IDs, version reads, filters, deletion notices, permission-aware search? | Adapter survey in October; lab hubs mirror the answers |
-| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Resolved in v5.2 by the evidence-preservation contract ([§12.4](contracts-and-scenarios.md#section-12-4)): `insufficient` only when nothing obtainable remains for the requested facts, otherwise `partial` with `required_source_unavailable` or `_denied`; never `sufficient`. Procedure-conflict status remains an open decision. |
+| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Missing must-consult evidence: `insufficient` with explicit gaps, following [Example 9](contracts-and-scenarios.md#example-9). Resolve procedure-conflict status explicitly before acceptance; this remains an open decision. v5.2.1: the status default is stated in [§7.4](hld.md#section-7-4); procedure-conflict handling and per-decision failure behavior are in the [hardening backlog](hardening-backlog.md). |
 | Q17 | Can an evaluation identity query all pilot sources and retain evidence? Who owns labels and the fresh holdout? | Evaluation track, outside the tuning team |
 | Q18 | Who approves, deploys, and rolls back memory releases? | Sanctum platform team |
 

@@ -30,16 +30,13 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 21 | Decisions needed from the group | [Sanctum intelligence layer — architectural proposal](hld.md#section-21) |
 | 22 | What changed in v5.1 | [Sanctum review history and restructuring record](review-history.md#section-22) |
 
-**v5.2 additions** (no new top-level sections; each addition belongs to the section that owns its topic):
+**v5.2.1 additions** (no new top-level sections):
 
 | Addition | Owning page |
 |---|---|
-| 5.4 Execution context | [Architectural proposal](hld.md#section-5-4) |
+| 7.4 Status defaults and conflicts that survive packing | [Architectural proposal](hld.md#section-7-4) |
 | 8.10 Attributed subjects: `Artifact ABOUT Entity` in operation | [Memory design](memory-design.md#section-8-10) |
-| 9.6 Coherence under concurrent change | [Memory design](memory-design.md#section-9-6) |
-| 9.11 The governed assertion envelope | [Memory design](memory-design.md#section-9-11) |
-| 12.3 Capability-aware identity, filter and temporal contract | [Contracts and scenarios](contracts-and-scenarios.md#section-12-3) |
-| 12.4 Evidence-preservation contract | [Contracts and scenarios](contracts-and-scenarios.md#section-12-4) |
-| R-Holistic dispositions | [Review history](review-history.md#v5-2) |
+| Hardening backlog (production concerns outside the design) | [Hardening backlog](hardening-backlog.md) |
+| R-Holistic dispositions | [Review history](review-history.md#v5-2-1) |
 
 Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.

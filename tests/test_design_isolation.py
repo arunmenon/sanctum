@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DESIGN = ROOT / "design"
-EXPECTED = {"hld.md", "memory-design.md", "contracts-and-scenarios.md", "system-one-providers.md", "README.md",
+EXPECTED = {"hld.md", "memory-design.md", "contracts-and-scenarios.md", "system-one-providers.md", "README.md", "hardening-backlog.md",
             "section-map.md", "review-history.md", "preservation-check.json"}
 LAB_TARGETS = re.compile(r"(^|/)(docs/reports|docs/experiments|reports|experiments|runs|holdout|acceptance)(/|$)")
 LINK = re.compile(r"\]\(([^)\s]+)\)|href=[\"']([^\"']+)[\"']")

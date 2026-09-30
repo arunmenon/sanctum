@@ -6,7 +6,7 @@ This document set expands the engineering team's initial Sanctum proposal. It de
 
 The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains Q1. The architectural expansion and lab do not imply approval or replacement of that proposal.
 
-**Version: v5.2** (proposed). v5.2 adds an execution context, a governed assertion envelope, one evidence-preservation contract and an operational `ABOUT` layer, in response to the holistic review; see the [review history](review-history.md#v5-2).
+**Version: v5.2.1** (proposed). It supersedes v5.2 with reduced scope: the design stays focused on memory and the cascade flow, for proving the tenets; production hardening drafted in v5.2 moved to the [hardening backlog](hardening-backlog.md). See the [review history](review-history.md#v5-2-1).
 
 ## Start here
 
@@ -22,6 +22,7 @@ Sanctum would first establish what the caller may access, then choose useful sou
 | [Memory and meta-taxonomy](memory-design.md) | How identities, locations, procedures, ownership and releases work | Memory, source integration and governance reviewers |
 | [Contracts and worked scenarios](contracts-and-scenarios.md) | Exact response expectations and normal, ambiguous, conflicting and failed cases | Implementers, adapter owners and evaluators |
 | [System One providers and the Jev handshake](system-one-providers.md) | How decisions reach a System One model: provider interface, `/v1/systemone` protocol, broker isolation, calibration and conformance | Decision-layer, provider and security reviewers |
+| [Hardening backlog](hardening-backlog.md) | Production concerns deliberately outside the design, and when each becomes necessary | Reviewers planning beyond the lab |
 | [Review history](review-history.md) | Prior findings, editorial changes and their traceability | Reviewers needing the history |
 
 For a first review, read this overview and the HLD, then follow only the relevant detail links. The [section map](section-map.md) locates every original section.
@@ -54,6 +55,6 @@ Detailed Q1–Q18 decisions remain in the HLD. Dates and the older monthly rollo
 
 ## Publication and maintenance
 
-Publish this as the parent Confluence page, with the five linked design pages as children; the lab pages publish separately. Replace local links with their Confluence page/heading targets and render Mermaid diagrams using the supported mechanism in your space. Check cross-page anchors after import. Keep the original v5.1 document as a historical attachment rather than a competing current page.
+Publish this as the parent Confluence page, with the linked design pages as children; the lab pages publish separately. Replace local links with their Confluence page/heading targets and render Mermaid diagrams using the supported mechanism in your space. Check cross-page anchors after import. Keep the original v5.1 document as a historical attachment rather than a competing current page.
 
 Each numbered section has one owning page. Changes to hypotheses belong in the lab's spike page, schemas in their owning contract section, execution status and measurements in the lab's records, and architectural decisions in the HLD. Summaries link to those owners. The detailed design, examples, diagrams and evaluation protocol have been preserved; the split introduces no page-length limit.

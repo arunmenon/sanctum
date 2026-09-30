@@ -2,9 +2,9 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.2 (reorganized from v5.1). Lab work is experimental. Original section numbers are retained.
+> Status: proposed research design, version 5.2.1 (reorganized from v5.1). Lab work is experimental. Original section numbers are retained.
 
-This page preserves the source's review dispositions, the v5.1 change record, and the v5.2 holistic review (R-Holistic) with its dispositions. “Accepted” in these historical tables means a finding was accepted/addressed in that document; it does not establish stakeholder approval, executable verification, or production acceptance.
+This page preserves the source's review dispositions, the v5.1 change record, and the holistic review (R-Holistic) with its v5.2.1 dispositions. “Accepted” in these historical tables means a finding was accepted/addressed in that document; it does not establish stakeholder approval, executable verification, or production acceptance.
 
 ## Restructuring record
 
@@ -91,31 +91,33 @@ v5.1 is a contract-consistency patch. It changes no architecture. It closes gaps
 
 ---
 
-<a id="v5-2"></a>
+<a id="v5-2-1"></a>
 
-## v5.2: holistic review (R-Holistic)
+## v5.2.1: holistic review (R-Holistic), reduced scope
 
-The holistic review read all design pages and the lab implementation and asked whether the design is complete enough for a production-generic cascade. v5.2 answers its three first-priority changes and the missing `ABOUT` layer. It adds contracts; it does not change the architecture's layers or boundaries. Disposition values: **adopted** (changed as proposed), **adapted** (the intent is adopted in a different form), **deferred** (accepted as a gap, not addressed in v5.2), **rejected** (not a design change, with the reason).
+**v5.2.1 supersedes v5.2.** v5.2 answered the holistic review with production contracts (execution context, assertion envelope, a full evidence-preservation matrix, capability negotiation). The owner judged that over-engineered for the MVP: the HLD is a design for proving the tenets, not a production specification. v5.2.1 keeps only what the memory and cascade flow need and moves the rest to the [hardening backlog](hardening-backlog.md). v5.2 remains in history.
+
+Disposition values: **adopted** (in the design), **deferred to hardening backlog** (accepted as a concern, outside the design until the backlog stage), **rejected** (not a design change, with the reason).
 
 | Finding | Topic | Disposition | Where, or why |
 |---|---|---|---|
-| R-H 1.1 | One trusted request execution context and budget ledger | **Adopted** | [HLD §5.4](hld.md#section-5-4): ExecutionContext, absolute deadline, ledger spanning rules, searches, fetches, model calls, retries and serialization; explicit scope narrowing; pinned versions |
-| R-H 1.2 | Safe defaults inconsistent; conflict packing loses flags | **Adopted** | [Contracts §12.4](contracts-and-scenarios.md#section-12-4) transition matrix for D1 to D9; conflict records kept with explicit omission; status defaults reconciled; [HLD §6.4](hld.md#section-6-4), [§7.4](hld.md#section-7-4), [Ex. 9](contracts-and-scenarios.md#example-9), Q16 aligned |
-| R-H 1.3 | Independent D2 probabilities do not define subset selection | **Deferred** | Accepted as a gap: a small planner around independent predictions (marginal value, minimum coverage, bounded exploration) needs its own design and evidence; D2's safe default is unchanged |
-| R-H 1.4 | Round information contracts, cache keys, observation ids | **Adapted** | Cache keys, stable observation ids and retention rules adopted in [HLD §5.4](hld.md#section-5-4) and [§14](hld.md#section-14); typed per-round state schemas deferred with the decision executor (R-H 4.2) |
-| R-H 2.1 | Release pinning is not correctness under concurrent change | **Adopted** | [Memory §9.6](memory-design.md#section-9-6): content-addressed dependency closures, live policy epoch, change-feed watermarks and gap detection, freshness limits, recheck before egress |
-| R-H 2.2 | Governance lacks an enforceable assertion model | **Adopted** | [Memory §9.11](memory-design.md#section-9-11): assertion envelope and publication checks |
-| R-H 2.3 | Retention boundaries for receipts and inference replay | **Adopted** | [HLD §5.4](hld.md#section-5-4) retention table: assertion storage, routing observations, retained evidence, inference replay |
-| R-H 3.1 | Identity and replay capabilities not negotiated | **Adopted** | [Contracts §12.3](contracts-and-scenarios.md#section-12-3) capability-aware identity, filter and temporal contract with honest partial support |
-| R-H 3.2 | Metadata visibility inferred from readable places | **Adopted** | [Memory §9.11](memory-design.md#section-9-11): namespace, applicability and metadata permission kept apart; places are not proof of name visibility |
-| R-H 3.3 | Hub vocabulary leaks into subjects and selectors | **Adopted** | [Memory §8.10](memory-design.md#section-8-10) attributed subjects; typed selector semantics in [Contracts §12.3](contracts-and-scenarios.md#section-12-3) |
-| R-H 4.1 | Broker purpose is architectural, implementation harness-specific | **Adapted** | The broker's authority stays as specified in [System One providers §6](system-one-providers.md#6-isolation-the-system-one-broker); v5.2 adds exact-version evidence handles ([Contracts §12.3](contracts-and-scenarios.md#section-12-3)) and a per-request data-class ceiling ([HLD §5.4](hld.md#section-5-4)); trusted template rendering and physical placement are implementation choices |
-| R-H 4.2 | Selected decisions, not a generic cascade | **Deferred** | Discriminated decision schemas and one shared decision executor across tiers are accepted as the next contract change; v5.2 limits itself to the four changes above |
-| R-H 4.3 | Invariants weaker in the implementation than stated | **Rejected** as a design change | The stated invariants stand; the gaps are implementation defects, tracked with the lab |
-| R-H 4.4 | Lab assumptions in the core | **Rejected** as a design change | The design already puts vocabularies, preferences and temporal terms in owner and adapter data; removing them from code is implementation work |
-| R-H 5.1 | Activation needs decision-specific economic gates; D6 displacement | **Adapted** | D6 displacement bounded in [Contracts §12.4](contracts-and-scenarios.md#section-12-4); per-decision economic activation gates (benefit over a no-model control, spend, omission risk, candidate recall) deferred to the next System One providers revision |
-| R-H 5.2 | Runtime calibration matching weaker than the binding | **Adapted** | The execution context pins complete calibration bindings and cache keys include them ([HLD §5.4](hld.md#section-5-4)); runtime matching is implementation; drift monitoring deferred |
-| R-H 5.3 | Long outages and LLM escalation policies | **Deferred** | Circuit breaking, sustained fallback capacity and purpose-bound LLM use need an operations design; request-level safe fallback is unchanged |
+| R-H 1.1 | One trusted execution context and budget ledger | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
+| R-H 1.2 | Safe defaults inconsistent; conflict packing loses flags | **Adopted** (reduced) | Status defaults and conflict retention in [HLD §7.4](hld.md#section-7-4), [Ex. 9](contracts-and-scenarios.md#example-9), `conflict_witness_omitted` in [§12.2](contracts-and-scenarios.md#section-12-2); D6 row in [§6.4](hld.md#section-6-4) reconciled. The D1 to D9 behavior matrix and Q16 are deferred to the backlog |
+| R-H 1.3 | Independent D2 probabilities do not define subset selection | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
+| R-H 1.4 | Round contracts, cache keys, observation ids | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
+| R-H 2.1 | Release pinning is not correctness under concurrent change | **Adopted** (one rule) / **deferred** | A feed gap means freshness unknown ([memory §9.6](memory-design.md#section-9-6)); closures, policy epoch, watermarks and freshness limits deferred to the backlog |
+| R-H 2.2 | Governance lacks an enforceable assertion model | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
+| R-H 2.3 | Retention boundaries | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
+| R-H 3.1 | Identity and replay capabilities not negotiated | **Adopted** (one sentence) / **deferred** | Adapters declare version reads and identity stability ([§12.3](contracts-and-scenarios.md#section-12-3)); full negotiation deferred |
+| R-H 3.2 | Metadata visibility inferred from readable places | **Adopted** | [Memory §9.2](memory-design.md#section-9-2): a readable place is not proof of name visibility |
+| R-H 3.3 | Hub vocabulary leaks into subjects and selectors | **Adopted** (subjects) / **deferred** (selectors) | [Memory §8.10](memory-design.md#section-8-10) subject bindings; typed selectors deferred |
+| R-H 4.1 | Broker purpose architectural, implementation harness-specific | **Deferred to hardening backlog** | Exact-version evidence handles in the [backlog](hardening-backlog.md); the broker's authority is unchanged in [System One providers §6](system-one-providers.md#6-isolation-the-system-one-broker) |
+| R-H 4.2 | Selected decisions, not a generic cascade | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
+| R-H 4.3 | Invariants weaker in the implementation | **Rejected** as a design change | Implementation defects, tracked with the lab |
+| R-H 4.4 | Lab assumptions in the core | **Rejected** as a design change | Implementation work; the design already puts vocabularies in owner and adapter data |
+| R-H 5.1 | Economic activation gates; D6 displacement | **Adopted** (one sentence) / **deferred** | D6 promotion never displaces rules-packed evidence ([HLD §7.4](hld.md#section-7-4)); gates deferred |
+| R-H 5.2 | Runtime calibration matching | **Adopted** (unchanged) | The binding rule in [System One providers §8](system-one-providers.md#8-calibration-binding-and-the-shadow-only-rule) stands; runtime matching and drift monitoring deferred |
+| R-H 5.3 | Long outages and LLM escalation | **Deferred to hardening backlog** | [Backlog](hardening-backlog.md) |
 
 The review's memory-fidelity table and judgments describe the lab implementation and need no design disposition.
 

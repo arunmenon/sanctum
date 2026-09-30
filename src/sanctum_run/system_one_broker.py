@@ -1,4 +1,4 @@
-"""Runner-side System One broker (docs/intelligence-layer/system-one-providers.md §6).
+"""Runner-side System One broker (design/intelligence-layer/system-one-providers.md §6).
 
 The SUT asks through the gateway proxy's `system_one.decide` tool; the broker decides what is
 sent. Each call is bound independently of the SUT's claims:

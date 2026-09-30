@@ -1,4 +1,4 @@
-"""The `/v1/systemone` protocol core (docs/intelligence-layer/system-one-providers.md).
+"""The `/v1/systemone` protocol core (design/intelligence-layer/system-one-providers.md).
 
 Neutral like `sanctum_contracts`: imports only the standard library, httpx and pydantic, so the
 SUT's providers (`sanctum_ref.providers`) and the runner's broker (`sanctum_run`) share one

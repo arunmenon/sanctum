@@ -114,7 +114,7 @@ response { model,                               # resolved version, e.g. jev-1.1
 |---|---|---|
 | 1 | Auth | `Authorization: Bearer <key>`. The key lives on the broker side only (secret store or `.env`), never in the SUT process, receipts, logs or manifests. |
 | 2 | Model pinning | Request an exact version where the provider allows it; always record the resolved `model` from the response. Calibration is keyed by provider and resolved version and is invalid after a version change. |
-| 3 | Request shape | `state` is a minimal sanitized projection: query, the caller's allowed optional source ids, their pinned descriptors. Questions carry `type`, `instructions` and, for `choice`/`score`, `criteria`. |
+| 3 | Request shape | `state` is a minimal sanitized projection built by the broker, never by the SUT. D2: query plus the pinned descriptors of the allowed optional sources. Round 3: query plus one record per evidence ref, in a named **state layout** (`r3-state-v1` text slices; `r3-state-v2` provenance-backed records with source, artifact, version, environment, subject, attribute, assertion role, verbatim excerpt and excerpt offsets; `r3-state-v2-compact` and `-compact-150` for small-context providers). Questions come from a **named, versioned template** (`configs/system_one_templates.yaml`, [§15](#15-prompt-and-state-variants-under-test)) and carry `type`, `instructions` and, for `choice`/`score`, `criteria`. |
 | 4 | Response semantics | `noul` is P(true); `choice` has `probabilities` and a separate `confidence`; `score` is an expected level. Bands use calibrated probabilities. `confidence` is recorded, not thresholded, until its definition is confirmed with TypeSafe. `usage` may be null. |
 | 5 | Batching and limits | A round has a total call limit and one shared deadline across its batches. Respect `max_questions_per_call` and `max_options`; split and merge when exceeded. `score` ↔ `choice` conversion only through an explicit, tested mapping declared for that provider. |
 | 6 | Deadline and retries | The call inherits the round's remaining budget. At most one retry, and only if time remains (the benchmark client's 5-attempt exponential backoff is wrong for the request path). Timeout or error → `unavailable`, safe default, `decision_layer_unavailable`. |
@@ -122,9 +122,9 @@ response { model,                               # resolved version, e.g. jev-1.1
 | 8 | Output validation | A bad individual answer (wrong type, a choice that was not offered, a probability outside [0, 1]) voids that decision only: it is `unavailable` and its candidate is kept. An answer for an id that was never asked, a non-JSON body, or a resolved model version that changes mid-round voids the whole call. Nothing is ever partially trusted within one answer. |
 | 9 | Data classes | Eligibility follows the highest data class in the full state ([§14.1](hld.md#section-14-1)). Hosted Jev: synthetic lab data only (D-JEV). Restricted names and other principals' data never enter `state`. |
 | 10 | Observability and replay | Receipts carry provider, resolved model version, question ids, raw and calibrated p, latency, usage and a request hash. Model calls are `model_call` observations, separate from knowledge-source calls: they never count as sources attempted or as evidence-bearing retrieval. The broker keeps request/response pairs (credentials excluded) to replay the **decision layer only**, not the whole Sanctum response. |
-| 11 | Calibration | See [Calibration binding](#calibration-binding-and-the-shadow-only-rule). |
-| 12 | Provider swap | Switching provider or model version requires recalibration and a rerun of the comparison. The pairing check treats provider and resolved model version as recorded effective inputs. A backend is advertised as supported only after it passes the [conformance checks](#conformance-checks-for-a-supported-backend). |
-| 13 | What the model can and cannot lose | See [below](#what-the-model-can-and-cannot-lose). |
+| 11 | Calibration | See [Calibration binding](#8-calibration-binding-and-the-shadow-only-rule). The binding names the template id and the state layout (or D2 descriptor release). |
+| 12 | Provider swap | Switching provider or model version requires recalibration and a rerun of the comparison. The pairing check treats provider and resolved model version as recorded effective inputs. A backend is advertised as supported only after it passes the [conformance checks](#9-conformance-checks-for-a-supported-backend). |
+| 13 | What the model can and cannot lose | See [below](#7-what-the-model-can-and-cannot-lose). |
 
 ## 6. Isolation: the System One broker
 
@@ -166,8 +166,10 @@ The SUT asks; the broker decides what may be sent. The broker binds each call in
 ## 8. Calibration binding and the shadow-only rule
 
 - Fitted on **dev only**. Calibration fitting and band (threshold) selection are separated by cross-validation over dev splits.
-- A calibration is bound to: provider, **resolved model version**, question template and rubric text, descriptor set and memory release, and decoding settings. A change to any of these invalidates it.
-- **Shadow-only rule:** with no matching calibration, the provider runs shadow-only: answers are logged, every candidate is preserved.
+- A calibration is bound to: provider, **resolved model version** (and checkpoint revision where the provider reports only a family), **template id**, **state layout** (D2: descriptor release over the exact descriptor dict sent), memory release, and decoding settings. A change to any of these invalidates it.
+- **Shadow-only rule:** with no usable calibration, the provider runs shadow-only: answers are logged, every candidate is preserved. Shadow comes from the absence of a usable binding: a fit whose band does not meet the tolerance is written to `configs/calibration/rejected/`, and a use band outside (0, 1) is refused; there is no never-promote sentinel.
+- Bands are reported with nested case-grouped cross-validation (`sanctum_eval.calibration.nested_cv`): inner folds choose the calibrator and band, outer folds report; denominators and Wilson intervals accompany every rate.
+- Campaigns have a hard ceiling enforced before every HTTP attempt (calls, input and output tokens; retries count; usage recorded once per exchange).
 - Configuration is frozen before the acceptance run.
 - Live calibration has a total call and spend cap, retries included, recorded in the fit provenance with the resolved version and usage totals.
 
@@ -262,7 +264,8 @@ flowchart LR
 
 | | D6 possible conflict | D4 relevance |
 |---|---|---|
-| Template | `d6-noul-v1`: "Do these two evidence units assert incompatible values for the same fact, scope and version?" | `d4-noul-v1`: "Does this evidence unit support an answer to the query?" |
+| Target | a supported typed relation between the two units' assertions about the same subject and attribute: contradiction, policy_implementation_divergence, environment_difference or version_difference (the evaluator's label definition). Different environments or versions may explain a difference; they do not exclude the relation | the unit's span overlaps a necessary-evidence span |
+| Template | `d6-noul-v1` (baseline, narrower wording: "incompatible values for the same fact, scope and version"); `d6-noul-v2-relations` states the aligned target ([§15](#15-prompt-and-state-variants-under-test)) | `d4-noul-v1`: "Does this evidence unit support an answer to the query?"; `d4-noul-v2-support` under test |
 | Question id | `d6:<unit_a>|<unit_b>` | `d4:<unit>` |
 | State | the two units' text (bounded excerpt), source ids, versions, environments | the query and one unit's text excerpt, source id and version |
 | Placement | after the typed rules, before packing | after the rules ranker, before packing |
@@ -275,6 +278,32 @@ flowchart LR
 | Calibration labels (evaluator side, dev only) | gold relations: a candidate pair is positive when its units witness a gold relation | necessary-evidence spans: a unit is positive when it covers a gold span |
 
 **Consequence of the invariants.** D4 can only matter where the rules leave budget unused or where order matters to the caller; D6 can only add conflict flags. Neither can make a response lose evidence the rules would have returned, so their worst case is extra tokens or extra false conflicts, which the metrics count. Each calibration is bound to decision, provider, resolved model (and checkpoint revision for Laya), template and descriptor release.
+
+## 15. Prompt and state variants under test
+
+Every question template and state layout is a named, versioned entry; a calibration binds on both. Texts live in `configs/system_one_templates.yaml` (verbatim from the [prompt review](../reviews/system-one-prompt-review-full.md)); state layouts in `src/sanctum_run/round3_state.py`. **Live** means a calibration with a usable band exists and a run may apply it; **shadow** means answers are recorded and never applied; **diagnostic** means shadow-only by definition, never calibrated into a band. Results are in the campaign reports ([summary](../reports/system-one-prompt-campaign.md)); every number there is measured once.
+
+| Variant | Decision | Kind | Text or layout pointer | Status |
+|---|---|---|---|---|
+| `d2-noul-v1` | D2 | template | templates file | live: `typesafe-jev@jev-1.13.0`, `laya-local@laya-rl-agent` |
+| `d2-noul-v2-loss` | D2 | template (evidence-loss rubric) | templates file; review §3 | shadow |
+| `d2-descriptors-v2` | D2 | descriptor set | `configs/d2_descriptors_v2.yaml`; review §3 | shadow |
+| `d6-noul-v1` | D6 | template (baseline) | templates file | live for Jev (use band 0.61); rejected for Laya |
+| `d6-noul-v2-relations` | D6 | template (aligned target) | templates file; review §1 | shadow |
+| `d6-noul-v3-excerpts` | D6 | template on `r3-state-v2` | templates file; review §2 | shadow |
+| `d6-noul-v3-excerpts-compact`, `-compact-150` | D6 | template on `r3-state-v2-compact` / `-150` | templates file; `round3_state.py` | shadow |
+| `d6-laya-positive-v1` | D6 | template (short) | templates file; review §6 | shadow |
+| `d6-laya-negative-v1` | D6 | template (reversed polarity) | templates file; review §6 | diagnostic |
+| `d6-decomp-v1` | D6 | two questions per pair | templates file; review §5 | diagnostic |
+| `d6-choice-v1` | D6 | relation choice | templates file; review §5 | diagnostic |
+| `d4-noul-v1` | D4 | template (baseline) | templates file | shadow (fits rejected) |
+| `d4-noul-v2-support` | D4 | template | templates file; review §4 | shadow |
+| `d4-score-v1` | D4 | score | templates file; review §4 | diagnostic |
+| `r3-state-v1` | D6, D4 | state layout: text slices up to 1,200 chars per ref | `round3_state.py` | in use |
+| `r3-state-v2` | D6, D4 | state layout: labeled, assertion-bearing excerpts with offsets | `round3_state.py`; review §2 | shadow |
+| `r3-state-v2-compact`, `-compact-150` | D6, D4 | state layout: v2 fields, excerpt capped at 350 / 150 chars, qualifiers first | `round3_state.py` | shadow (small-context providers) |
+
+A variant becomes live only if its band clears the unchanged tolerance under nested case-grouped cross-validation, and only after the owner approves a live arm.
 
 ## Where this is referenced
 

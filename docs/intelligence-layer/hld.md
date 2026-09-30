@@ -377,6 +377,7 @@ DecisionResult
 - Train, calibrate, and test splits are grouped by project, task family, and time.
 - Report discrimination, class-specific errors, Brier/log loss, and risk-vs-coverage, not just ECE.
 - Model, rubric, options, data slice, and calibration map are versioned together.
+- In the lab, question templates and state layouts are named, versioned entries bound into each calibration; the variants under test and their status are listed in [System One providers §15](system-one-providers.md#15-prompt-and-state-variants-under-test).
 
 ---
 

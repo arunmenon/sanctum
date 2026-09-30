@@ -307,6 +307,8 @@ flowchart LR
     class R1,R2,R3 judge
 ```
 
+Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance that may reorder but never drop a rules-packed unit) are specified in [System One providers §14](system-one-providers.md#14-round-3-decisions-d6-conflict-d4-relevance).
+
 <a id="section-6-4"></a>
 
 ### 6.4 Decision catalog

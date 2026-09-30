@@ -242,6 +242,40 @@ Measured once (replacing vendor claims), Laya 0.3.22 English checkpoint `55cf4c4
 
 Full comparison with Jev: [Laya vs Jev report](../reports/system-one-laya-dev.md).
 
+## 14. Round 3 decisions (D6 conflict, D4 relevance)
+
+Round 3 runs after retrieval, on evidence units ([HLD §6.3](hld.md#section-6-3)). It reuses the provider interface, adapter, broker, calibration binding and shadow-only rule unchanged; each decision adds one template, one placement, one safe default and its own calibration. D5 (duplicates) stays exact-hash only. This is experiment E3, one decision at a time.
+
+```mermaid
+flowchart LR
+    R["Retrieved units"] --> RK["Rules ranker<br/>(lexical, per source)"]
+    RK --> D4{{"D4 relevance<br/>reorder, fill leftover budget"}}
+    D4 --> PK["Packing<br/>(rules-packed set always kept)"]
+    RK --> TR["typed_rules pairs<br/>flagged + bounded candidates"]
+    TR --> D6{{"D6 conflict<br/>on rule-produced pairs only"}}
+    D6 --> PK
+    PK --> OUT(["Response"])
+
+    classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
+    class D4,D6 judge
+```
+
+| | D6 possible conflict | D4 relevance |
+|---|---|---|
+| Template | `d6-noul-v1`: "Do these two evidence units assert incompatible values for the same fact, scope and version?" | `d4-noul-v1`: "Does this evidence unit support an answer to the query?" |
+| Question id | `d6:<unit_a>|<unit_b>` | `d4:<unit>` |
+| State | the two units' text (bounded excerpt), source ids, versions, environments | the query and one unit's text excerpt, source id and version |
+| Placement | after the typed rules, before packing | after the rules ranker, before packing |
+| What it judges | only pairs the typed rules produced: pairs they flag, plus a bounded set of candidate pairs they dropped as noise (shared attribute and different values, but no identity overlap) | at most `d4_max_units` units per request (config), highest rules rank first |
+| What it may change | promote a candidate pair to `possible_conflict` (both witnesses then reserved in packing); record calibrated p for flagged pairs | the order of packed units, and which rules-excluded units fill budget the rules left unused |
+| What it may never change | a rule-flagged pair is always flagged; D6 never hides, dismisses or confirms a conflict (confirmation is a reviewer's) | never removes a unit the rules-only packer includes (tested superset property); never raises the budget |
+| Safe default (uncertain, unavailable, invalid, truncated) | rules-only behaviour: flagged pairs stay flagged, candidates stay unflagged, all units kept | rules order, rules-packed set |
+| Cost bound | at most the pair cap per request (default 6 flagged plus 6 candidates), batched within the round's call limit and shared deadline | `d4_max_units` per request; on laya-local about 90 ms per unit (measured), so the cap matters |
+| Primary metrics | conflict witnesses kept, expected conflicts flagged, false conflicts flagged, relation-type accuracy | necessary-evidence recall within budget, precision proxy, harmful omissions, tokens returned |
+| Calibration labels (evaluator side, dev only) | gold relations: a candidate pair is positive when its units witness a gold relation | necessary-evidence spans: a unit is positive when it covers a gold span |
+
+**Consequence of the invariants.** D4 can only matter where the rules leave budget unused or where order matters to the caller; D6 can only add conflict flags. Neither can make a response lose evidence the rules would have returned, so their worst case is extra tokens or extra false conflicts, which the metrics count. Each calibration is bound to decision, provider, resolved model (and checkpoint revision for Laya), template and descriptor release.
+
 ## Where this is referenced
 
 [HLD §6.2 and §6.5](hld.md#section-6) · [Contracts Ex. 9](contracts-and-scenarios.md#example-9) · [Memory §9.5 step 5 and M11](memory-design.md#section-9-5) · [Lab E1](lab-spike.md#section-17) · [Spike plan](spike-plan.md)

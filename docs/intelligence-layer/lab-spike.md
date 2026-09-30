@@ -114,7 +114,7 @@ A rung is kept only if it beats the rung below it on the same traffic.
 | E1 | H1: does Jev route better? | Replace D2 scoring only | Adopt if non-inferior on evidence and better on cost/latency (latency is measured per profile, not a gate in the spike; see [System One providers](system-one-providers.md)) |
 | E2 | H2: do observation priors help? | Toggle observation-derived priors; vocabulary, rules, queries and source snapshots fixed | Non-inferior on evidence within an owner-agreed margin plus a predeclared benefit; intervals reported; small samples are inconclusive |
 | E2b | Storage | Same queries on tables+cache vs. graph DB | Pick on latency, rebuild cost, access enforcement |
-| E3 | H3: ranking / dedup / conflicts | One at a time | Adopt per component |
+| E3 | H3: ranking / dedup / conflicts | One at a time ([System One §14](system-one-providers.md#14-round-3-decisions-d6-conflict-d4-relevance): D6, then D4; D5 exact only) | Adopt per component |
 | E4 | H4: escalation | Add Tier 2 on the uncertain band | Adopt if risk-vs-coverage improves per cost |
 | E5 | Online learning | Logged exploration inside authorized set | Only after reward definitions are validated |
 | E6 | H5: does the vocabulary help? | With vs. without resolution and translation, same registry, authority, budget, ranker; paired retrieval on source snapshots; ablate resolution, selection, translation; compare with a plain alias table | Every live identity reviewed; zero wrong-entity activation on fixtures; recall gain on alias questions without loss on canonical and homonym cases |

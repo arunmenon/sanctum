@@ -221,7 +221,8 @@ class ItemJudgement:
 
 
 async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: dict[str, list[dict[str, Any]]],
-                       query: str, port: Any, deadline_ms: int) -> tuple[dict[str, ItemJudgement], list[DecisionResult], Optional[Calibration]]:
+                       query: str, port: Any, deadline_ms: int,
+                       item_meta: Optional[dict[str, dict[str, Any]]] = None) -> tuple[dict[str, ItemJudgement], list[DecisionResult], Optional[Calibration]]:
     """A Round 3 round (design page §14): the resolved template's question(s) per item; items carry
     provenance refs only and the broker reads the text. Returns judgements, receipt DecisionResults
     and the calibration used. Diagnostic templates and templates without a matching calibration
@@ -260,7 +261,7 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
         judgements[qid] = ItemJudgement(qid, None if template.diagnostic else p_raw, p, shadow)
         value = {"item": qid, "shadow": shadow, "refs": refs, "request_hash": digest, "usage": outcome.usage,
                  "calls": outcome.calls, "template": template.id, "diagnostic": template.diagnostic,
-                 "answers": answers}
+                 "answers": answers, **((item_meta or {}).get(qid) or {})}
         if p_raw is not None:
             value["p_raw"] = round(p_raw, 4)
             if template.polarity == "negative":

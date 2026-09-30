@@ -257,9 +257,11 @@ class Retriever:
                     "start": unit.span.start, "end": unit.span.end}
         pairs = list(prepared.flagged) + list(prepared.pair_candidates)
         items = {f"d6:{a.unit.evidence_id}|{b.unit.evidence_id}": [ref(a), ref(b)] for a, b, _ in pairs}
+        flagged_ids = {f"d6:{a.unit.evidence_id}|{b.unit.evidence_id}" for a, b, _ in prepared.flagged}
+        meta = {qid: {"rule_flagged": qid in flagged_ids} for qid in items}
         try:
             judgements, results, calibration = await decide_items(
-                self.round3_provider, "d6", items, request.query, port, self.arm.deadline_ms)
+                self.round3_provider, "d6", items, request.query, port, self.arm.deadline_ms, meta)
         except Exception:                     # a provider failure is never a conflict decision
             return [], [unavailable(self.round3_provider.name, time.monotonic())], True
         promoted = []

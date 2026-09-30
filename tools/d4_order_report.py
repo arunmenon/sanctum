@@ -49,20 +49,41 @@ def d4_order(response: EvidenceResponse, scores: dict[str, float]) -> EvidenceRe
     return response.model_copy(update={"evidence": [unit for _, unit in scored + rest]})
 
 
-def run_order_metrics(run_dir: Path, cases_dir: Path, ks=DEFAULT_K) -> dict:
-    golds = {g.request.request_id: g for g in (load_gold(p) for p in sorted(Path(cases_dir).glob("*.yaml")))}
+def _load(run_dir: Path) -> tuple[dict, dict]:
+    responses = {json.loads(l)["request_id"]: json.loads(l)
+                 for l in (Path(run_dir) / "responses.jsonl").read_text().splitlines() if l.strip()}
     receipts = {json.loads(l)["request_id"]: json.loads(l)
                 for l in (Path(run_dir) / "receipts.jsonl").read_text().splitlines() if l.strip()}
+    return responses, receipts
+
+
+def run_order_metrics(run_dirs, cases_dir: Path, ks=DEFAULT_K) -> dict:
+    """One row from one run dir, or from several dirs of the same row that scored disjoint cases
+    (a partial run plus its completion): per request, the dir whose receipt has D4 scores is used.
+    The rules order must agree wherever dirs overlap; disagreements are counted, not hidden."""
+    dirs = [Path(d) for d in (run_dirs if isinstance(run_dirs, (list, tuple)) else [run_dirs])]
+    golds = {g.request.request_id: g for g in (load_gold(p) for p in sorted(Path(cases_dir).glob("*.yaml")))}
+    chosen: dict[str, tuple[dict, dict]] = {}
+    order_mismatches = 0
+    for run_dir in dirs:
+        responses, receipts = _load(run_dir)
+        for request_id, response in responses.items():
+            receipt = receipts.get(request_id, {})
+            if request_id in chosen:
+                previous = chosen[request_id][0]
+                if [u["evidence_id"] for u in previous["evidence"]] != [u["evidence_id"] for u in response["evidence"]]:
+                    order_mismatches += 1
+                if d4_scores(chosen[request_id][1]) or not d4_scores(receipt):
+                    continue
+            chosen[request_id] = (response, receipt)
     result = {order: {"coverage": {k: [] for k in ks}, "ranks": [], "no_support": 0} for order in ("rules", "d4")}
     scored_requests = 0
-    for line in (Path(run_dir) / "responses.jsonl").read_text().splitlines():
-        if not line.strip():
-            continue
-        response = EvidenceResponse.model_validate(json.loads(line))
-        gold = golds.get(response.request_id)
+    for request_id, (raw, receipt) in sorted(chosen.items()):
+        gold = golds.get(request_id)
         if gold is None:
             continue
-        scores = d4_scores(receipts.get(response.request_id, {}))
+        response = EvidenceResponse.model_validate(raw)
+        scores = d4_scores(receipt)
         scored_requests += bool(scores)
         for order, resp in (("rules", response), ("d4", d4_order(response, scores))):
             for k in ks:
@@ -75,6 +96,8 @@ def run_order_metrics(run_dir: Path, cases_dir: Path, ks=DEFAULT_K) -> dict:
             else:
                 result[order]["ranks"].append(rank)
     result["scored_requests"] = scored_requests
+    result["scored_units"] = sum(len(d4_scores(receipt)) for _, receipt in chosen.values())
+    result["order_mismatches"] = order_mismatches
     return result
 
 
@@ -87,7 +110,7 @@ def render(runs: dict[str, dict], ks) -> str:
              "Computed from saved receipts only, no live calls. Rules order is the packed evidence as returned; "
              "D4 order sorts the same packed units by the D4 probability (the only change D4 may make). Coverage@K "
              "is over answerable cases (n); first-support rank is over cases with any supporting unit.", "",
-             "| run | order | scored requests | " + " | ".join(f"coverage@{k}" for k in ks)
+             "| run | order | scored requests (units) | " + " | ".join(f"coverage@{k}" for k in ks)
              + " | first support rank (mean, n) | answerable without support |",
              "|---|---|---|" + "---|" * len(ks) + "---|---|"]
     for name, metrics in runs.items():
@@ -99,19 +122,22 @@ def render(runs: dict[str, dict], ks) -> str:
                 cells.append("-" if mean is None else f"{mean:.3f} (n={len(m['coverage'][k])})")
             rank = _mean(m["ranks"])
             rank_cell = "-" if rank is None else f"{rank:.2f} (n={len(m['ranks'])})"
-            lines.append(f"| {name} | {order} | {metrics['scored_requests']} | " + " | ".join(cells)
+            lines.append(f"| {name} | {order} | {metrics['scored_requests']} ({metrics.get('scored_units', '-')}) | " + " | ".join(cells)
                          + f" | {rank_cell} | {m['no_support']} |")
     return "\n".join(lines + ["", f"> {CAVEAT}", ""])
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--run", type=Path, action="append", required=True)
+    parser.add_argument("--run", action="append", required=True, help="run dir, or comma-separated dirs of one row")
     parser.add_argument("--cases", type=Path, default=ROOT / "gold" / "dev")
     parser.add_argument("--k", type=int, action="append", default=None)
     parser.add_argument("--out", type=Path, default=ROOT / "docs" / "reports" / "system-one-d4-order.md")
     arguments = parser.parse_args()
     ks = tuple(arguments.k or DEFAULT_K)
-    runs = {run.name: run_order_metrics(run, arguments.cases, ks) for run in arguments.run}
+    runs = {}
+    for spec in arguments.run:                     # "dir" or "dir1,dir2" (a row and its completion)
+        dirs = [Path(part) for part in str(spec).split(",")]
+        runs[dirs[0].name + ("+completion" if len(dirs) > 1 else "")] = run_order_metrics(dirs, arguments.cases, ks)
     arguments.out.write_text(render(runs, ks), encoding="utf-8")
     print(f"wrote {arguments.out}")

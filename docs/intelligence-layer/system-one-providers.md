@@ -198,6 +198,37 @@ Broker request/response pairs are kept for the lifetime of the run directory, fo
 | Holdout exposure | The M5 holdout was run and rerun once, and its results were seen by the lead. The Jev claim also needs a fresh acceptance set of about 20 cases, authored by the holdout agent and unseen by the lead and SUT team before the run. |
 | Key hygiene | The key was shared in chat; the owner chose to proceed on synthetic data and rotate afterwards. Verification scrubs the SUT environment by construction and scans outputs for the configured key value, not only a prefix. |
 
+## 12. Batching
+
+- **One call per decision round**, with the round's questions grouped **per request only**, never across callers.
+- Split only on declared provider limits (`max_questions_per_call`, `max_options`), under one shared deadline and a per-round total call limit. A question beyond `max_options` or of an undeclared primitive is refused, never truncated or converted.
+- `state` is sent once per call, so the cost per question falls as the batch grows.
+- A cache keyed on the full calibration binding (provider, resolved model, template, descriptor release, query, source id) may reuse identical answers across arms and reruns at temperature 0.
+- Rounds 1 and 2 may merge into one call once D1/D3 shadow exists, since both need only the query plus policy output. Round 3 pairs (D6) would batch per request (future).
+
+Batch measurement, `typesafe-jev` (**measured once**, relaxed profile, laptop to hosted endpoint; full table in [the batch report](../reports/system-one-batches-typesafe-jev.md)):
+
+| Questions per call | Warm latency ms (median of 2) | Input tokens | Output tokens | Input tokens per question |
+|---|---|---|---|---|
+| 1 | 375 | 392 | 26 | 392 |
+| 2 | 315 | 428 | 49 | 214 |
+| 5 | 303 | 534 | 115 | 107 |
+| 10 | 314 | 712 | 227 | 71 |
+| 20 | 278 | 1,077 | 459 | 54 |
+
+Every call resolved `jev-latest` to `jev-1.13.0`; cold calls (new connection) took 320 to 568 ms. In this one measurement latency did not grow with batch size, and input cost per question fell about sevenfold from 1 to 20 questions. `max_questions_per_call: 20` is declared accordingly.
+
+## 13. Local Laya on CPU (`laya-local`)
+
+| Item | Rule |
+|---|---|
+| Endpoint | Unsloth Decision API at `http://localhost:8888/v1/systemone`; same adapter, no key |
+| Pinning | Model and runtime version pinned and recorded like any provider |
+| Confidence | Laya and Jev compute `confidence` differently: bands use calibrated `noul` only, calibration is per provider and never transferred |
+| Oversized input | The runtime is reported to truncate oversized inputs silently, so declared context (`max_state_chars`) and option budgets are enforced and over-limit payloads are refused rather than trusting a truncated answer |
+| Vendor claims | RAM, latency and checkpoint claims come from vendor documentation and are **unverified** here until measured |
+| Status | `experimental` until it passes the conformance checks |
+
 ## Where this is referenced
 
 [HLD §6.2 and §6.5](hld.md#section-6) · [Contracts Ex. 9](contracts-and-scenarios.md#example-9) · [Memory §9.5 step 5 and M11](memory-design.md#section-9-5) · [Lab E1](lab-spike.md#section-17) · [Spike plan](spike-plan.md)

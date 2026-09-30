@@ -12,6 +12,8 @@ dependencies = [
   # cl100k_base token counts for budgets (discrepancy register row 9). The encoding file is
   # fetched once into tiktoken's cache (TIKTOKEN_CACHE_DIR to pin its location offline).
   "tiktoken==0.9.0",
+  # System One HTTP adapter (src/sanctum_systemone); the version mcp 1.12.4 already resolves.
+  "httpx==0.28.1",
 ]
 
 [project.optional-dependencies]

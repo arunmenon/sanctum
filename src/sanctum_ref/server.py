@@ -30,6 +30,7 @@ META_REQUEST_ID = "lab/request_id"
 CALLER_TOOL = "caller_access"
 CAPABILITIES_TOOL = "hub_capabilities"
 CHANGES_TOOL = "change_events"
+SYSTEM_ONE_TOOL = "system_one.decide"
 
 
 class ProxyPort:
@@ -58,6 +59,13 @@ class ProxyPort:
         self.reader = reader if isinstance(reader, str) else None     # opaque, per verified caller
         groups = body.get("groups")
         return list(groups) if isinstance(groups, list) and "error" not in body else None
+
+    async def system_one_decide(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """One decision round through the runner's System One broker (it holds any key)."""
+        body = await self._call(SYSTEM_ONE_TOOL, payload)
+        if "error" in body and "provider" not in body:
+            return {"provider": "unknown", "unavailable_reason": "not_configured"}
+        return body
 
     async def change_events(self, after_seq: int) -> list[dict[str, Any]]:
         body = await self._call(CHANGES_TOOL, {"after_seq": after_seq})

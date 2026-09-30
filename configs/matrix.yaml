@@ -13,20 +13,20 @@ shared:            # identical in all arms; tools/config_diff.py refuses a compa
   failure_profile: from_run_manifest
 
 arms:
-  C1-naive:  {routing: fanout_all, assembly: concatenate, resolution: none,      translation: false, procedures: false, memory_store: none,   decision_provider: none}
-  C1-fair:   {routing: fanout_all, assembly: common,      resolution: none,      translation: false, procedures: false, memory_store: none,   decision_provider: none}
-  C2:        {routing: rules,      assembly: common,      resolution: none,      translation: false, procedures: registry_only, memory_store: none, decision_provider: none}
-  C3:        {routing: rules,      assembly: common,      resolution: none,      translation: false, procedures: registry_only, memory_store: none, decision_provider: named}
-  C4:        {routing: rules,      assembly: common,      resolution: denotes,   translation: true,  procedures: memory,        memory_store: relations, decision_provider: none}
-  C4a-equivalent: {routing: rules, assembly: common,      resolution: denotes,   translation: true,  procedures: memory,        memory_store: tables,    decision_provider: none}
-  C4a-label-only: {routing: rules, assembly: common,      resolution: label_only, translation: true, procedures: memory,        memory_store: tables,    decision_provider: none}
-  C5:        {routing: rules,      assembly: common,      resolution: denotes,   translation: true,  procedures: memory,        memory_store: relations, decision_provider: named}
+  C1-naive:  {routing: fanout_all, assembly: concatenate, resolution: none,      translation: false, procedures: false, memory_store: none,   decision_provider: none, provider: none}
+  C1-fair:   {routing: fanout_all, assembly: common,      resolution: none,      translation: false, procedures: false, memory_store: none,   decision_provider: none, provider: none}
+  C2:        {routing: rules,      assembly: common,      resolution: none,      translation: false, procedures: registry_only, memory_store: none, decision_provider: none, provider: none}
+  C3:        {routing: rules,      assembly: common,      resolution: none,      translation: false, procedures: registry_only, memory_store: none, decision_provider: named, provider: standin}
+  C4:        {routing: rules,      assembly: common,      resolution: denotes,   translation: true,  procedures: memory,        memory_store: relations, decision_provider: none, provider: none}
+  C4a-equivalent: {routing: rules, assembly: common,      resolution: denotes,   translation: true,  procedures: memory,        memory_store: tables,    decision_provider: none, provider: none}
+  C4a-label-only: {routing: rules, assembly: common,      resolution: label_only, translation: true, procedures: memory,        memory_store: tables,    decision_provider: none, provider: none}
+  C5:        {routing: rules,      assembly: common,      resolution: denotes,   translation: true,  procedures: memory,        memory_store: relations, decision_provider: named, provider: standin}
 
 comparisons:       # primary comparisons and the ONLY switches allowed to differ
   Q2_routing:            {a: C1-fair, b: C2,  may_differ: [routing, procedures]}
   Q3a_memory_package:    {a: C2,      b: C4,  may_differ: [resolution, translation, procedures, memory_store], label: package_effect}
   Q3a_semantics_ablation: {a: C4a-equivalent, b: C4a-label-only, may_differ: [resolution]}   # both on tables, so only semantics differ
   Q3b_storage_equivalence: {a: C4,    b: C4a-equivalent, may_differ: [memory_store], expect: equivalent_plans}
-  Q4_provider:           {a: C2,      b: C3,  may_differ: [decision_provider]}
-  Q4_provider_memory:    {a: C4,      b: C5,  may_differ: [decision_provider]}
+  Q4_provider:           {a: C2,      b: C3,  may_differ: [decision_provider, provider]}
+  Q4_provider_memory:    {a: C4,      b: C5,  may_differ: [decision_provider, provider]}
   descriptive_only:      {a: C1-naive, b: C1-fair, may_differ: [assembly], causal: false}

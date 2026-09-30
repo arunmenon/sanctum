@@ -32,7 +32,7 @@ from .assembly import assemble
 from .config import ArmConfig
 from .intent import analyze
 from .registry import Registry, RegistryUnavailable
-from .decision import d2_request
+from .providers import d2_request, unavailable
 from .memory import LabelTable, MemoryUnavailable, build_store, load_release
 from .resolution import resolve, resolve_label_only
 from .routing import SourcePlan, apply_memory, plan_sources
@@ -162,7 +162,7 @@ class Retriever:
 
         decisions = []
         if self.arm.decision_provider == "named":
-            decisions, decision_degraded = self._judge_usefulness(request, plans)
+            decisions, decision_degraded = await self._judge_usefulness(request, plans, port)
             degraded += decision_degraded
         deadline = time.monotonic() + min(request.deadline_ms, self.arm.deadline_ms) / 1000.0
         outcomes: dict[str, str] = {}
@@ -219,15 +219,19 @@ class Retriever:
             truncation=assembled.truncated_relevant, degraded_reasons=degraded)
         return response, receipt
 
-    def _judge_usefulness(self, request: RetrieveRequest, plans: list[SourcePlan]):
+    async def _judge_usefulness(self, request: RetrieveRequest, plans: list[SourcePlan], port: HubPort):
         """Round 2, D2 (HLD §6.3): one question per optional called source. A confident "not
         useful" skips it; uncertain keeps it; an unavailable layer keeps everything."""
         optional = sorted({plan.hub_id for plan in plans if plan.call and not plan.required}
                           - {plan.hub_id for plan in plans if plan.required})
         if self.provider is None:
             return [], ["decision_layer_unavailable"]
-        results = {hub_id: self.provider.decide(d2_request(hub_id, request.query, self.arm.deadline_ms))
-                   for hub_id in optional}
+        requests = [d2_request(hub_id, request.query, self.arm.deadline_ms) for hub_id in optional]
+        try:
+            answered = await self.provider.decide_batch(requests, port, self.arm.deadline_ms) if requests else []
+        except Exception:                      # a provider failure is never a routing decision
+            answered = [unavailable(self.provider.name, time.monotonic()) for _ in requests]
+        results = dict(zip(optional, answered))
         if any(result.status.value != "answered" for result in results.values()):
             return list(results.values()), ["decision_layer_unavailable"]
         skip = {hub_id for hub_id, result in results.items() if not result.value["call"]}

@@ -1,0 +1,55 @@
+# System One providers (docs/intelligence-layer/system-one-providers.md). Environment variable
+# NAMES only: base URLs, models and keys are resolved by the runner's broker or a lab tool,
+# never by the SUT. Capabilities are declarations; the pipeline never branches on a name.
+providers:
+  typesafe-jev:
+    kind: http
+    base_url_env: TYPESAFE_BASE_URL
+    model_env: TYPESAFE_MODEL          # default jev-latest; the resolved version is recorded
+    model: jev-latest
+    api_key_env: TYPESAFE_API_KEY
+    capabilities:
+      primitives: [noul, choice, score]
+      max_questions_per_call: 20
+      max_options: 20
+      max_state_chars: 20000
+      batching: true
+      reports_usage: true
+      hosted: true
+      data_classes_allowed: [synthetic]   # D-JEV
+      conformance: experimental          # until the conformance suite passes live
+  laya-local:
+    kind: http
+    base_url: http://localhost:8888      # Unsloth Decision API on CPU; no key
+    model: convaiinnovations/laya
+    capabilities:
+      primitives: [noul, choice]
+      max_questions_per_call: 10
+      max_options: 20
+      max_state_chars: 6000              # the runtime is reported to truncate silently; refuse above this
+      batching: true
+      reports_usage: false
+      hosted: false
+      data_classes_allowed: [synthetic]
+      conformance: experimental
+      confidence_thresholdable: false    # Laya and Jev compute confidence differently
+    notes: vendor claims (RAM, latency, checkpoints) unverified until measured
+  local-test:
+    kind: http
+    base_url_env: SANCTUM_SYSTEMONE_TEST_URL   # tests/helpers/systemone_server.py (tests only)
+    model: test-model-1
+    capabilities:
+      primitives: [noul, choice, score]
+      max_questions_per_call: 3
+      max_options: 5
+      max_state_chars: 20000
+      batching: true
+      reports_usage: true
+      data_classes_allowed: [synthetic]
+      conformance: supported
+  standin:
+    kind: standin
+    capabilities:
+      primitives: [noul]
+      data_classes_allowed: [synthetic, internal]
+      conformance: supported

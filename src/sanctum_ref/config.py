@@ -37,6 +37,7 @@ class ArmConfig:
     translation: bool
     memory_store: str
     decision_provider: str
+    provider: str
     response_tokens: int
     candidates: int
     calls: int
@@ -79,7 +80,8 @@ def load_arm(matrix_path: Path, config_id: str) -> ArmConfig:
         config_id=config_id, routing=switches["routing"], assembly=switches["assembly"],
         procedures=switches["procedures"], resolution=switches["resolution"],
         translation=bool(switches["translation"]), memory_store=switches["memory_store"],
-        decision_provider=switches["decision_provider"], response_tokens=int(budgets["response_tokens"]),
+        decision_provider=switches["decision_provider"], provider=str(switches.get("provider", "none")),
+        response_tokens=int(budgets["response_tokens"]),
         candidates=int(budgets["candidates"]), calls=int(budgets["calls"]),
         deadline_ms=int(budgets["deadline_ms"]), tokenizer=str(shared["tokenizer"]),
         exact_dedup=bool(shared["exact_dedup"]),

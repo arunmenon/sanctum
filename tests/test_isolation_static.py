@@ -106,7 +106,8 @@ def test_request_ids_do_not_encode_cases():
 # runner or hub internals, and never name gold, world, holdout, question-spec or private paths.
 import sys as _sys
 
-SANCTUM_REF_ALLOWED = {"sanctum_contracts", "sanctum_ref", "mcp", "anyio", "pydantic", "yaml", "tiktoken", "__future__"}
+SANCTUM_REF_ALLOWED = {"sanctum_contracts", "sanctum_ref", "sanctum_systemone", "mcp", "anyio", "pydantic", "yaml",
+                       "tiktoken", "__future__"}
 FORBIDDEN_LITERALS_REF = ("gold/", "gold\\", "world.yaml", "world/", "build/world", "private/", "holdout",
                           "questions/", "provenance.jsonl", "entity_refs.json", "tests/fixtures",
                           "principals.json", "SANCTUM_LAB_TOKEN_SECRET")
@@ -132,3 +133,19 @@ def test_nothing_imports_sanctum_ref_but_tools_and_tests():
     for pkg in ("sanctum_contracts", "sanctum_eval", "sanctum_hubs", "sanctum_run", "sanctum_stub", "sanctum_world"):
         for f in (SRC / pkg).rglob("*.py"):
             assert "sanctum_ref" not in _imports(f), f"{f.relative_to(ROOT)} imports sanctum_ref"
+
+
+def test_sanctum_systemone_is_neutral():
+    """The protocol core is shared by the SUT and the runner's broker; it imports nothing of ours
+    but itself and never reads a key from the environment."""
+    stdlib = set(_sys.stdlib_module_names)
+    for f in (SRC / "sanctum_systemone").rglob("*.py"):
+        extra = {name for name in _imports(f) if name not in stdlib} - {"sanctum_systemone", "httpx", "pydantic", "yaml", "__future__"}
+        assert not extra, f"{f.relative_to(ROOT)} imports {extra}"
+        assert "os.environ" not in f.read_text()
+
+
+def test_sut_never_names_a_provider_key():
+    for f in (SRC / "sanctum_ref").rglob("*.py"):
+        text = f.read_text()
+        assert "API_KEY" not in text and "os.environ" not in text and "getenv" not in text, f.relative_to(ROOT)

@@ -2,7 +2,7 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.2.1 (reorganized from v5.1). A design for proving the tenets, not a production specification; production hardening items are listed in the [hardening backlog](hardening-backlog.md). Lab work is experimental. Original section numbers are retained.
+> Status: proposed research design, version 5.2.1 (reorganized from v5.1). A design for proving the tenets at the research stage; production hardening is out of scope (see the [review history](review-history.md#v5-2-1)). Lab work is experimental. Original section numbers are retained.
 
 This proposal expands the engineering team's initial Sanctum proposal with policy-constrained evidence selection, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains Q1, rather than an assumed agreement.
 
@@ -669,7 +669,7 @@ Rules and graph priors with capped fan-out, response marked degraded ([Ex. 9](co
 | Q13 | May service names, native paths, descriptors, query logs, and coverage counts be stored in Sanctum and sent to Jev? | Security review; sanitized lab data until approved |
 | Q14 | Maximum acceptable stale-ACL window; which change feeds exist; retention for replay | Security + source owners |
 | Q15 | What do Deep Insights, Dobby, and KaaS actually expose: stable IDs, version reads, filters, deletion notices, permission-aware search? | Adapter survey in October; lab hubs mirror the answers |
-| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Missing must-consult evidence: `insufficient` with explicit gaps, following [Example 9](contracts-and-scenarios.md#example-9). Resolve procedure-conflict status explicitly before acceptance; this remains an open decision. v5.2.1: the status default is stated in [§7.4](hld.md#section-7-4); procedure-conflict handling and per-decision failure behavior are in the [hardening backlog](hardening-backlog.md). |
+| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Missing must-consult evidence: `insufficient` with explicit gaps, following [Example 9](contracts-and-scenarios.md#example-9). Resolve procedure-conflict status explicitly before acceptance; this remains an open decision. v5.2.1: the status default is stated in [§7.4](hld.md#section-7-4); procedure-conflict handling and per-decision failure behavior are out of scope at the research stage ([review history](review-history.md#v5-2-1)). |
 | Q17 | Can an evaluation identity query all pilot sources and retain evidence? Who owns labels and the fresh holdout? | Evaluation track, outside the tuning team |
 | Q18 | Who approves, deploys, and rolls back memory releases? | Sanctum platform team |
 

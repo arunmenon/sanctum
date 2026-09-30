@@ -36,7 +36,6 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 |---|---|
 | 7.4 Status defaults and conflicts that survive packing | [Architectural proposal](hld.md#section-7-4) |
 | 8.10 Attributed subjects: `Artifact ABOUT Entity` in operation | [Memory design](memory-design.md#section-8-10) |
-| Hardening backlog (production concerns outside the design) | [Hardening backlog](hardening-backlog.md) |
 | R-Holistic dispositions | [Review history](review-history.md#v5-2-1) |
 
 Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.

@@ -444,3 +444,18 @@ def test_template_state_kinds_decomposition_and_d2_descriptor_set(scenario_world
     assert "text" in decomp_request["state"]["items"]["d6:e1|e2#same_subject"][0]              # refs = v1
     v2 = state_sources(load_descriptors(ROOT / "configs" / "d2_descriptors_v2.yaml"), SOURCES)
     assert d2_request["state"]["sources"] == v2 and out["d2v2"]["descriptor_release"] == descriptor_release(v2)
+
+
+def test_compact_layout_caps_excerpts_and_keeps_qualifiers():
+    """r3-state-v2-compact: same fields, excerpt within the compact cap, qualifier lines admitted
+    first, offsets mapping back to the text in original order."""
+    from sanctum_run.round3_state import COMPACT_EXCERPT_CHARS, excerpt_of
+    text = "\n".join(["# Retry policy", "environment: prod", "release: R42"]
+                     + [f"note {i}: retry budget review item with more words here" for i in range(20)]
+                     + ["max_retries: 5"])
+    excerpt, spans, selected = excerpt_of(text, 0, len(text), "retry limit", COMPACT_EXCERPT_CHARS,
+                                          COMPACT_EXCERPT_CHARS, qualifiers_first=True)
+    assert len(excerpt) <= COMPACT_EXCERPT_CHARS + len(spans)
+    assert "environment: prod" in excerpt and "release: R42" in excerpt
+    assert all(text[s["start"]:s["end"]] in excerpt for s in spans)
+    assert spans == sorted(spans, key=lambda s: s["start"])

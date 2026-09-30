@@ -24,7 +24,7 @@ providers:
     model: convaiinnovations/laya
     capabilities:
       primitives: [noul, choice]
-      max_questions_per_call: 2           # Laya truncates total input (state plus instructions) near 500 tokens (measured)
+      max_questions_per_call: 1           # one item per call: Laya truncates total input near 500 tokens (measured)
       max_options: 20
       max_state_chars: 1500              # with one question, truncation starts at about 480 state tokens (2,000-2,500 chars)
       batching: true

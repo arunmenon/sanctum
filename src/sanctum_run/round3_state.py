@@ -28,9 +28,11 @@ from typing import Any, Optional
 
 STATE_V1 = "r3-state-v1"
 STATE_V2 = "r3-state-v2"
-STATE_LAYOUTS = (STATE_V1, STATE_V2)
+STATE_V2_COMPACT = "r3-state-v2-compact"   # small-context providers (Laya): same fields, qualifiers first
+STATE_LAYOUTS = (STATE_V1, STATE_V2, STATE_V2_COMPACT)
 MAX_EXCERPT_CHARS = 1200
 PREFIX_CHARS = 400
+COMPACT_EXCERPT_CHARS = 350
 
 ROLE_BY_SOURCE = {"codehub": "implemented_behavior", "skillhub": "procedure", "dochub": "reference",
                   "memoryhub": "session_note", "incidenthub": "incident"}
@@ -58,8 +60,11 @@ def _is_assertion(line: str) -> bool:
     return bool(ASSIGNMENT.search(line)) and bool(re.search(r"\d", line))
 
 
-def excerpt_of(text: str, start: int, end: int, query: str) -> tuple[str, list[dict[str, int]], list[str]]:
-    """(excerpt, spans, selected lines) per the module's excerpt policy."""
+def excerpt_of(text: str, start: int, end: int, query: str, max_chars: int = MAX_EXCERPT_CHARS,
+               prefix_chars: int = PREFIX_CHARS, qualifiers_first: bool = False) -> tuple[str, list[dict[str, int]], list[str]]:
+    """(excerpt, spans, selected lines) per the module's excerpt policy. With `qualifiers_first`
+    (compact layout) qualifier lines are admitted before other selected lines, so a tight cap never
+    drops a value's environment or release; output stays in original order."""
     lines = _lines(text, start, end)
     terms = query_terms(query)
     chosen: set[int] = set()
@@ -69,16 +74,24 @@ def excerpt_of(text: str, start: int, end: int, query: str) -> tuple[str, list[d
             chosen |= {index - 1, index, index + 1}
     chosen = {i for i in chosen if 0 <= i < len(lines) and lines[i][2].strip()}
     if chosen:
-        chosen |= {i for i, (_, _, line) in enumerate(lines) if line.strip() and QUALIFIER.search(line)}
-        selected, size = [], 0
-        for index in sorted(chosen):
+        qualifiers = {i for i, (_, _, line) in enumerate(lines) if line.strip() and QUALIFIER.search(line)}
+        chosen |= qualifiers
+        admission = sorted(chosen, key=lambda i: (i not in qualifiers, i)) if qualifiers_first else sorted(chosen)
+        kept, size = [], 0
+        for index in admission:
             line = lines[index]
-            if size + len(line[2]) + 1 > MAX_EXCERPT_CHARS:
+            if size + len(line[2]) + 1 > max_chars:
+                if qualifiers_first:
+                    continue                    # try shorter later lines within the cap
                 break
-            selected.append(line)
+            kept.append(index)
             size += len(line[2]) + 1
+        selected = [lines[i] for i in sorted(kept)]
+        if not selected:
+            prefix_end = min(end, start + prefix_chars)
+            selected = [(start, prefix_end, text[start:prefix_end])]
     else:
-        prefix_end = min(end, start + PREFIX_CHARS)
+        prefix_end = min(end, start + prefix_chars)
         selected = [(start, prefix_end, text[start:prefix_end])]
     spans = [{"start": a, "end": b} for a, b, _ in selected]
     return "\n".join(piece for _, _, piece in selected), spans, [piece for _, _, piece in selected]
@@ -111,7 +124,11 @@ def build_record(layout: str, ref: dict[str, Any], row: Any, query: str) -> dict
     if layout == STATE_V1:
         return {"source_id": ref["source_id"], "version": row.version, "environment": row.environment,
                 "text": row.text[start:end][:MAX_EXCERPT_CHARS]}
-    excerpt, spans, selected = excerpt_of(row.text, start, end, query)
+    if layout == STATE_V2_COMPACT:
+        excerpt, spans, selected = excerpt_of(row.text, start, end, query, COMPACT_EXCERPT_CHARS,
+                                              COMPACT_EXCERPT_CHARS, qualifiers_first=True)
+    else:
+        excerpt, spans, selected = excerpt_of(row.text, start, end, query)
     return {"source_id": ref["source_id"], "artifact_id": row.artifact_id, "version": row.version,
             "environment": row.environment, "subject": _subject(row.text, row.location),
             "attribute": _attribute(selected), "assertion_role": ROLE_BY_SOURCE.get(ref["source_id"]),

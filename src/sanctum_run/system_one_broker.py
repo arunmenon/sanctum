@@ -53,7 +53,7 @@ DECIDE_TOOL = "system_one.decide"
 QUESTION_TYPES = ("noul", "choice", "score")
 ROUND3 = {"d6": 2, "d4": 1}
 # the SUT's template registry names the Round 3 state kind; "refs" is layout v1, "excerpts" v2
-STATE_KINDS = {"refs": "r3-state-v1", "excerpts": "r3-state-v2"}
+STATE_KINDS = {"refs": "r3-state-v1", "excerpts": "r3-state-v2", "excerpts-compact": "r3-state-v2-compact"}
 # D2 templates whose descriptors differ from the default pinned set
 D2_DESCRIPTOR_SETS = {"d2-descriptors-v2": ROOT / "configs" / "d2_descriptors_v2.yaml"}          # Round 3 rounds and the refs each item carries
 

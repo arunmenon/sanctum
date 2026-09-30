@@ -216,7 +216,8 @@ def collect_d2(arguments, template):
     for gold in load_cases(arguments.cases):
         query = public_request(gold).query
         requests = [d2_request(hub, query, 60000) for hub in descriptors]
-        outcome = client.decide({"query": query, "sources": descriptors}, d2_questions(requests, template), 60.0, max_calls=2)
+        outcome = client.decide({"query": query, "sources": descriptors}, d2_questions(requests, template), 60.0,
+                                max_calls=len(descriptors))          # one per source on one-question providers
         key = outcome.unavailable_reason.value if outcome.unavailable_reason else "ok"
         outcomes[key] = outcomes.get(key, 0) + 1
         if outcome.model:

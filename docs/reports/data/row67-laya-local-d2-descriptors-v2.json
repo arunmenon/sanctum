@@ -1,0 +1,1561 @@
+{
+ "campaign_row": {
+  "calls": 240,
+  "input_tokens": 53872,
+  "output_tokens": 0
+ },
+ "ceilings": {
+  "calls": 5000,
+  "input_tokens": 10000000
+ },
+ "decision": "d2",
+ "diagnostic": false,
+ "git_commit": "699e4142485665b0b809461ac66344520f096256",
+ "items": {
+  "dev-001\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1309
+   }
+  },
+  "dev-001\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1065
+   }
+  },
+  "dev-001\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1231
+   }
+  },
+  "dev-001\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0865
+   }
+  },
+  "dev-002\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2053
+   }
+  },
+  "dev-002\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0885
+   }
+  },
+  "dev-002\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0892
+   }
+  },
+  "dev-002\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1133
+   }
+  },
+  "dev-003\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.139
+   }
+  },
+  "dev-003\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1246
+   }
+  },
+  "dev-003\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1381
+   }
+  },
+  "dev-003\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1095
+   }
+  },
+  "dev-004\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4355
+   }
+  },
+  "dev-004\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1883
+   }
+  },
+  "dev-004\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1671
+   }
+  },
+  "dev-004\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3026
+   }
+  },
+  "dev-005\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4763
+   }
+  },
+  "dev-005\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3116
+   }
+  },
+  "dev-005\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3206
+   }
+  },
+  "dev-005\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3144
+   }
+  },
+  "dev-006\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3053
+   }
+  },
+  "dev-006\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2111
+   }
+  },
+  "dev-006\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2022
+   }
+  },
+  "dev-006\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2065
+   }
+  },
+  "dev-007\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3192
+   }
+  },
+  "dev-007\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1661
+   }
+  },
+  "dev-007\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1844
+   }
+  },
+  "dev-007\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1812
+   }
+  },
+  "dev-008\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5088
+   }
+  },
+  "dev-008\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3108
+   }
+  },
+  "dev-008\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2984
+   }
+  },
+  "dev-008\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3165
+   }
+  },
+  "dev-009\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2831
+   }
+  },
+  "dev-009\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1484
+   }
+  },
+  "dev-009\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.155
+   }
+  },
+  "dev-009\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1838
+   }
+  },
+  "dev-010\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3717
+   }
+  },
+  "dev-010\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3406
+   }
+  },
+  "dev-010\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3406
+   }
+  },
+  "dev-010\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3246
+   }
+  },
+  "dev-011\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2707
+   }
+  },
+  "dev-011\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.228
+   }
+  },
+  "dev-011\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2011
+   }
+  },
+  "dev-011\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2191
+   }
+  },
+  "dev-012\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1502
+   }
+  },
+  "dev-012\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1053
+   }
+  },
+  "dev-012\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1087
+   }
+  },
+  "dev-012\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.11
+   }
+  },
+  "dev-013\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1155
+   }
+  },
+  "dev-013\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1005
+   }
+  },
+  "dev-013\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0944
+   }
+  },
+  "dev-013\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0971
+   }
+  },
+  "dev-014\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2851
+   }
+  },
+  "dev-014\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2389
+   }
+  },
+  "dev-014\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2408
+   }
+  },
+  "dev-014\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2095
+   }
+  },
+  "dev-015\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.278
+   }
+  },
+  "dev-015\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2712
+   }
+  },
+  "dev-015\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3046
+   }
+  },
+  "dev-015\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2359
+   }
+  },
+  "dev-016\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3249
+   }
+  },
+  "dev-016\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.312
+   }
+  },
+  "dev-016\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2875
+   }
+  },
+  "dev-016\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2986
+   }
+  },
+  "dev-017\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3678
+   }
+  },
+  "dev-017\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.292
+   }
+  },
+  "dev-017\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2484
+   }
+  },
+  "dev-017\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2647
+   }
+  },
+  "dev-018\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3045
+   }
+  },
+  "dev-018\tdochub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1623
+   }
+  },
+  "dev-018\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1481
+   }
+  },
+  "dev-018\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1551
+   }
+  },
+  "dev-019\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2976
+   }
+  },
+  "dev-019\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2315
+   }
+  },
+  "dev-019\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2307
+   }
+  },
+  "dev-019\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.264
+   }
+  },
+  "dev-020\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2641
+   }
+  },
+  "dev-020\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1559
+   }
+  },
+  "dev-020\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1673
+   }
+  },
+  "dev-020\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1936
+   }
+  },
+  "dev-021\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3515
+   }
+  },
+  "dev-021\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3184
+   }
+  },
+  "dev-021\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3645
+   }
+  },
+  "dev-021\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2922
+   }
+  },
+  "dev-022\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2869
+   }
+  },
+  "dev-022\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2222
+   }
+  },
+  "dev-022\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2013
+   }
+  },
+  "dev-022\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.194
+   }
+  },
+  "dev-023\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4336
+   }
+  },
+  "dev-023\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4791
+   }
+  },
+  "dev-023\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4391
+   }
+  },
+  "dev-023\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4517
+   }
+  },
+  "dev-024\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3927
+   }
+  },
+  "dev-024\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2743
+   }
+  },
+  "dev-024\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3073
+   }
+  },
+  "dev-024\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2866
+   }
+  },
+  "dev-025\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.123
+   }
+  },
+  "dev-025\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0872
+   }
+  },
+  "dev-025\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0998
+   }
+  },
+  "dev-025\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1047
+   }
+  },
+  "dev-026\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1403
+   }
+  },
+  "dev-026\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0985
+   }
+  },
+  "dev-026\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0939
+   }
+  },
+  "dev-026\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.0862
+   }
+  },
+  "dev-027\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3834
+   }
+  },
+  "dev-027\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1792
+   }
+  },
+  "dev-027\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.201
+   }
+  },
+  "dev-027\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2237
+   }
+  },
+  "dev-028\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4144
+   }
+  },
+  "dev-028\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1424
+   }
+  },
+  "dev-028\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1033
+   }
+  },
+  "dev-028\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1799
+   }
+  },
+  "dev-029\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4457
+   }
+  },
+  "dev-029\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3357
+   }
+  },
+  "dev-029\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2556
+   }
+  },
+  "dev-029\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.338
+   }
+  },
+  "dev-030\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3773
+   }
+  },
+  "dev-030\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1885
+   }
+  },
+  "dev-030\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1537
+   }
+  },
+  "dev-030\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1534
+   }
+  },
+  "dev-031\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4208
+   }
+  },
+  "dev-031\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2802
+   }
+  },
+  "dev-031\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3282
+   }
+  },
+  "dev-031\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3358
+   }
+  },
+  "dev-032\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3291
+   }
+  },
+  "dev-032\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2968
+   }
+  },
+  "dev-032\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3217
+   }
+  },
+  "dev-032\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.22
+   }
+  },
+  "dev-033\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.7509
+   }
+  },
+  "dev-033\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.604
+   }
+  },
+  "dev-033\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.514
+   }
+  },
+  "dev-033\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6467
+   }
+  },
+  "dev-034\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2433
+   }
+  },
+  "dev-034\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2071
+   }
+  },
+  "dev-034\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2154
+   }
+  },
+  "dev-034\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.184
+   }
+  },
+  "dev-035\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4577
+   }
+  },
+  "dev-035\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2902
+   }
+  },
+  "dev-035\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2877
+   }
+  },
+  "dev-035\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3502
+   }
+  },
+  "dev-036\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6775
+   }
+  },
+  "dev-036\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5858
+   }
+  },
+  "dev-036\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6482
+   }
+  },
+  "dev-036\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.628
+   }
+  },
+  "dev-037\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4918
+   }
+  },
+  "dev-037\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2948
+   }
+  },
+  "dev-037\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2813
+   }
+  },
+  "dev-037\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3571
+   }
+  },
+  "dev-038\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3728
+   }
+  },
+  "dev-038\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2079
+   }
+  },
+  "dev-038\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.192
+   }
+  },
+  "dev-038\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2095
+   }
+  },
+  "dev-039\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5708
+   }
+  },
+  "dev-039\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.287
+   }
+  },
+  "dev-039\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2728
+   }
+  },
+  "dev-039\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3797
+   }
+  },
+  "dev-040\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4994
+   }
+  },
+  "dev-040\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2462
+   }
+  },
+  "dev-040\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2742
+   }
+  },
+  "dev-040\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3407
+   }
+  },
+  "dev-041\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3129
+   }
+  },
+  "dev-041\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.241
+   }
+  },
+  "dev-041\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2341
+   }
+  },
+  "dev-041\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.281
+   }
+  },
+  "dev-042\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3847
+   }
+  },
+  "dev-042\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4748
+   }
+  },
+  "dev-042\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5257
+   }
+  },
+  "dev-042\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3713
+   }
+  },
+  "dev-043\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2603
+   }
+  },
+  "dev-043\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1722
+   }
+  },
+  "dev-043\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1617
+   }
+  },
+  "dev-043\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1538
+   }
+  },
+  "dev-044\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4551
+   }
+  },
+  "dev-044\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2887
+   }
+  },
+  "dev-044\tmemoryhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3116
+   }
+  },
+  "dev-044\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3447
+   }
+  },
+  "dev-051\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3272
+   }
+  },
+  "dev-051\tdochub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2121
+   }
+  },
+  "dev-051\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1816
+   }
+  },
+  "dev-051\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2078
+   }
+  },
+  "dev-052\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3816
+   }
+  },
+  "dev-052\tdochub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3959
+   }
+  },
+  "dev-052\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.265
+   }
+  },
+  "dev-052\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2613
+   }
+  },
+  "dev-053\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3013
+   }
+  },
+  "dev-053\tdochub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2456
+   }
+  },
+  "dev-053\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2325
+   }
+  },
+  "dev-053\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2285
+   }
+  },
+  "dev-054\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3714
+   }
+  },
+  "dev-054\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2408
+   }
+  },
+  "dev-054\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.254
+   }
+  },
+  "dev-054\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2817
+   }
+  },
+  "dev-055\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4508
+   }
+  },
+  "dev-055\tdochub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.1955
+   }
+  },
+  "dev-055\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2052
+   }
+  },
+  "dev-055\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2402
+   }
+  },
+  "dev-056\tcodehub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3053
+   }
+  },
+  "dev-056\tdochub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.243
+   }
+  },
+  "dev-056\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.253
+   }
+  },
+  "dev-056\tskillhub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2536
+   }
+  },
+  "dev-058\tcodehub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3537
+   }
+  },
+  "dev-058\tdochub": {
+   "label": 1,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2509
+   }
+  },
+  "dev-058\tmemoryhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2244
+   }
+  },
+  "dev-058\tskillhub": {
+   "label": 0,
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2394
+   }
+  }
+ },
+ "items_answered": 240,
+ "items_labelled": 204,
+ "items_unavailable": 0,
+ "model_call_outcomes": {
+  "ok": 60
+ },
+ "models": [
+  "laya-rl-agent"
+ ],
+ "nested_cv": {
+  "diagnostic": {
+   "isotonic": {
+    "auc": 0.6227,
+    "brier": 0.1576,
+    "log_loss": 0.7037,
+    "n": 204
+   }
+  },
+  "folds": [
+   {
+    "band": 0.09,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 1,
+    "judgments": 44,
+    "n": 44,
+    "positives": 9,
+    "skipped": 15
+   },
+   {
+    "band": 0.07,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 4,
+    "skipped": 9
+   },
+   {
+    "band": 0.05,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 7,
+    "skipped": 3
+   },
+   {
+    "band": 0.08,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 10,
+    "skipped": 12
+   },
+   {
+    "band": 0.04,
+    "calibrator": "source_intercepts",
+    "harmful_skips": 0,
+    "judgments": 40,
+    "n": 40,
+    "positives": 5,
+    "skipped": 7
+   }
+  ],
+  "summary": {
+   "auc": {
+    "folds": 5,
+    "mean": 0.7365,
+    "sd": 0.086
+   },
+   "brier": {
+    "folds": 5,
+    "mean": 0.1374,
+    "sd": 0.0266
+   },
+   "calibrators_selected": [
+    "source_intercepts",
+    "source_intercepts",
+    "source_intercepts",
+    "source_intercepts",
+    "source_intercepts"
+   ],
+   "log_loss": {
+    "folds": 5,
+    "mean": 0.4255,
+    "sd": 0.0581
+   },
+   "n": 204,
+   "positives": 35
+  },
+  "totals": {
+   "harmful_skip_rate_wilson95": [
+    0.0038,
+    0.1134
+   ],
+   "harmful_skips": 1,
+   "judgments": 204,
+   "skipped": 46
+  }
+ },
+ "provider": "laya-local",
+ "row": "6-7",
+ "signals": {
+  "p": {
+   "all": {
+    "brier_raw": 0.1469,
+    "n": 204,
+    "positives": 35,
+    "pr_auc": 0.3086,
+    "roc_auc": 0.6801
+   }
+  }
+ },
+ "state": "d2",
+ "template": "d2-descriptors-v2",
+ "tolerance": 0.05
+}

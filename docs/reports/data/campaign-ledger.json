@@ -139,6 +139,54 @@
    "provider": "laya-local",
    "row": "5",
    "template": "d6-choice-v1"
+  },
+  {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-noul-v1"
+  },
+  {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-noul-v2-loss"
+  },
+  {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-descriptors-v2"
+  },
+  {
+   "calls": 240,
+   "input_tokens": 60592,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-noul-v1"
+  },
+  {
+   "calls": 240,
+   "input_tokens": 80992,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-noul-v2-loss"
+  },
+  {
+   "calls": 240,
+   "input_tokens": 53872,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "6-7",
+   "template": "d2-descriptors-v2"
   }
  ]
 }

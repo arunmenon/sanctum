@@ -369,3 +369,36 @@ def test_round3_batches_carry_only_their_own_items(scenario_world, server, tmp_p
         assert set(request["state"]["items"]) == set(request["questions"])
     [call] = out["trace"].model_calls
     assert len(call.batch_pointers_sha256) == 3 and len(set(call.batch_pointers_sha256)) == 3
+
+
+async def _layouts(world, broker, out):
+    tokens = TokenService(world / "identity" / "principals.json", "broker-test-secret")
+    caller = tokens.issue_caller_token(PRINCIPAL)
+    async with HubGateway(world, released_hub_ids(DEFAULT_HUBS_CONFIG), tokens) as gateway:
+        proxy = await GatewayProxy.create(gateway, world)
+        gateway.system_one = broker
+        handle = gateway.handle("req-6", caller)
+        proxy.bind("req-6", caller, handle, query="retry backoff schedule")
+        with gateway.sut_call("req-6"):
+            found = await handle.call("codehub", "search_code", {"query": "retry backoff"})
+            r = found["results"][0]
+            row = gateway.stores["codehub"].at_version(r["artifact_id"], r["version"])
+            ref = {"source_id": "codehub", "artifact_id": r["artifact_id"], "version": r["version"],
+                   "start": 0, "end": len(row.text)}
+            for layout in ("r3-state-v1", "r3-state-v2", "r3-state-v9"):
+                out[layout] = await proxy.dispatch(DECIDE_TOOL, {
+                    "round": "d4", "state_layout": layout, "questions": {"d4:e1": NOUL},
+                    "items": {"d4:e1": {"refs": [ref]}}}, "req-6", caller)
+            out["text"] = row.text
+        proxy.unbind("req-6", handle)
+
+
+def test_round3_state_layouts_and_binding(scenario_world, server, tmp_path):  # noqa: F811
+    out = {}
+    anyio.run(_layouts, scenario_world, _broker(server, tmp_path), out)
+    assert out["r3-state-v1"]["descriptor_release"] == "none"
+    assert out["r3-state-v2"]["descriptor_release"] == "r3-state-v2"
+    assert out["r3-state-v9"]["invalid_ids"] == ["d4:e1"]                      # unknown layout: nothing sent
+    v1, v2 = (request["state"]["items"]["d4:e1"][0] for request in server.behavior.requests)
+    assert set(v1) == {"source_id", "version", "environment", "text"}
+    assert v2["artifact_id"] and v2["excerpt"] == "\n".join(out["text"][s["start"]:s["end"]] for s in v2["excerpt_spans"])

@@ -21,7 +21,9 @@ sent. Each call is bound independently of the SUT's claims:
 Round 3 rounds "d6" and "d4" carry evidence refs, not text: the broker re-reads each ref from the
 gateway's stores at its version, only when the bound caller may read that artifact and this
 request's own hub calls returned it, and slices at most 1,200 characters per ref. Any failing ref
-drops its question into `invalid_ids`. `descriptor_release` is "none" for these rounds.
+drops its question into `invalid_ids`. The item records follow the requested state layout
+(`round3_state`: "r3-state-v1" text slices, or "r3-state-v2" provenance-backed records with
+assertion-bearing excerpts); `descriptor_release` is "none" for v1 and the layout id for v2.
 
 The key is read here, on the runner side, from the environment or `.env`; the SUT process
 environment is scrubbed and never receives it. The tool result is `CallOutcome` JSON.
@@ -40,6 +42,8 @@ import httpx
 import yaml
 
 from sanctum_eval.trace import ModelCall
+
+from .round3_state import STATE_LAYOUTS, STATE_V1, build_record
 from sanctum_systemone import CallOutcome, ProviderSpec, SystemOneClient, UnavailableReason, load_provider_specs
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -48,7 +52,6 @@ DEFAULT_DESCRIPTORS = ROOT / "configs" / "d2_standin.yaml"
 DECIDE_TOOL = "system_one.decide"
 QUESTION_TYPES = ("noul", "choice", "score")
 ROUND3 = {"d6": 2, "d4": 1}          # Round 3 rounds and the refs each item carries
-MAX_REF_CHARS = 1200
 
 
 @dataclass(frozen=True)
@@ -149,10 +152,19 @@ class SystemOneBroker:
         if round_id in ROUND3:
             # evidence text reaches the model only through the broker's own reads of refs the bound
             # caller may read and this request fetched; the SUT supplies refs, never text
-            items, bad = self._round3_items(gateway, handle, round_id, questions, arguments.get("items"))
+            layout = arguments.get("state_layout") or STATE_V1
+            if layout not in STATE_LAYOUTS:
+                layout, questions_bad = STATE_V1, list(questions)       # unknown layout: nothing is sent
+            else:
+                questions_bad = []
+            items, bad = self._round3_items(gateway, handle, round_id, questions, arguments.get("items"),
+                                            layout, query)
+            bad = list(bad) + questions_bad
             refused = sorted(set(refused) | set(bad))
             state = {"query": query, "items": {qid: items[qid] for qid in sorted(items) if qid not in refused}}
-            release = "none"          # Round 3 calibration binds on the template (agreed with the SUT side)
+            # Round 3 calibration binds on template plus state layout: v1 keeps "none" (existing
+            # calibrations stay valid), v2 carries its layout id in descriptor_release
+            release = "none" if layout == STATE_V1 else layout
             items_state = state["items"]
             # each batch carries only its own items, so batches can split to fit max_state_chars
             state_for = lambda qids: {"query": query, "items": {qid: items_state[qid] for qid in qids}}  # noqa: E731
@@ -215,14 +227,14 @@ class SystemOneBroker:
             hashes.append(hashlib.sha256(json.dumps(pointers, sort_keys=True).encode()).hexdigest())
         return hashes
 
-    def _round3_items(self, gateway, handle, round_id: str, questions: dict, raw_items: Any
-                      ) -> tuple[dict[str, list[dict]], list[str]]:
+    def _round3_items(self, gateway, handle, round_id: str, questions: dict, raw_items: Any,
+                      layout: str = STATE_V1, query: str = "") -> tuple[dict[str, list[dict]], list[str]]:
         """qid -> the broker-read text of each ref; qids whose refs fail any check go to `bad`."""
         items_in = raw_items if isinstance(raw_items, dict) else {}
         items, bad = {}, []
         for qid in questions:
             refs = (items_in.get(qid) or {}).get("refs") if isinstance(items_in.get(qid), dict) else None
-            read = self._read_refs(gateway, handle, refs) if (
+            read = self._read_refs(gateway, handle, refs, layout, query) if (
                 qid.startswith(f"{round_id}:") and isinstance(refs, list) and len(refs) == ROUND3[round_id]) else None
             if read is None:
                 bad.append(qid)
@@ -230,7 +242,7 @@ class SystemOneBroker:
                 items[qid] = read
         return items, bad
 
-    def _read_refs(self, gateway, handle, refs: list) -> Optional[list[dict]]:
+    def _read_refs(self, gateway, handle, refs: list, layout: str = STATE_V1, query: str = "") -> Optional[list[dict]]:
         out = []
         for ref in refs:
             if handle is None or not isinstance(ref, dict):
@@ -245,8 +257,7 @@ class SystemOneBroker:
             row = gateway.read_for_request(handle, source_id, artifact_id, version)
             if row is None or end > len(row.text):
                 return None
-            out.append({"source_id": source_id, "version": version, "environment": row.environment,
-                        "text": row.text[start:end][:MAX_REF_CHARS]})
+            out.append(build_record(layout, {"source_id": source_id, "start": start, "end": end}, row, query))
         return out
 
     def _store(self, request_id: str, round_id: str, outcome: CallOutcome, exchanges: list[dict],

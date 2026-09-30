@@ -12,8 +12,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--build", type=Path, default=ROOT / "build" / "world")
     parser.add_argument("--world", type=Path, default=ROOT / "world")
+    parser.add_argument("--overlay", type=Path, action="append", default=[])
     arguments = parser.parse_args()
-    findings = lint(load_world(arguments.world / "world.yaml"), arguments.build, arguments.world)
+    findings = lint(load_world(arguments.world / "world.yaml", tuple(arguments.overlay)), arguments.build, arguments.world)
     for finding in findings:
         print(finding)
     print(f"{len(findings)} finding(s)")

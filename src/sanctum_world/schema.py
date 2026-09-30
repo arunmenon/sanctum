@@ -558,5 +558,26 @@ class World(_W):
         return asserted
 
 
-def load_world(path: Path) -> World:
-    return World.model_validate(yaml.safe_load(Path(path).read_text()))
+OVERLAY_LISTS = ("entities", "facts", "artifacts", "planted")
+
+
+def merge_overlay(base: dict, overlay: dict) -> dict:
+    """A world overlay (e.g. world/challenge-d6.yaml): its lists are appended to the base world's,
+    and `hubs.<hub>.names/places` to that hub's. It cannot change anything already authored."""
+    merged = {**base, **{key: list(base.get(key) or []) + list(overlay.get(key) or []) for key in OVERLAY_LISTS}}
+    hubs = {hub_id: dict(hub) for hub_id, hub in base["hubs"].items()}
+    for hub_id, extra in (overlay.get("hubs") or {}).items():
+        for part in ("names", "places"):
+            hubs[hub_id][part] = list(hubs[hub_id].get(part) or []) + list(extra.get(part) or [])
+    merged["hubs"] = hubs
+    unknown = set(overlay) - set(OVERLAY_LISTS) - {"hubs"}
+    if unknown:
+        raise ValueError(f"overlay may only add {OVERLAY_LISTS} and hub names/places, not {sorted(unknown)}")
+    return merged
+
+
+def load_world(path: Path, overlays: tuple = ()) -> World:
+    data = yaml.safe_load(Path(path).read_text())
+    for overlay in overlays:
+        data = merge_overlay(data, yaml.safe_load(Path(overlay).read_text()))
+    return World.model_validate(data)

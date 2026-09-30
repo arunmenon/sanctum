@@ -1,0 +1,738 @@
+# D6 challenge slice: an overlay on world/world.yaml, merged only when building
+# build/world-challenge (tools/build_world.py --overlay world/challenge-d6.yaml). Added after E3 for
+# measurement (discrepancy register row 25); never part of build/world. Every list here is appended to
+# the base world's list of the same name; `hubs.<hub>.names/places` append to that hub.
+entities:
+- id: svc.search-index
+  type: service
+  member_of: domain.platform
+- id: svc.mail-digest
+  type: service
+  member_of: domain.platform
+- id: svc.price-rounding
+  type: service
+  member_of: domain.payments
+- id: svc.report-export
+  type: service
+  member_of: domain.payments
+facts:
+- id: f.ch.search.shard-count.impl
+  entity: svc.search-index
+  fact_kind: implemented
+  attribute: shard_count
+  values:
+  - value: 12
+    from: R40
+    env: prod
+- id: f.ch.search.shard-count.procedure
+  entity: svc.search-index
+  fact_kind: procedure
+  attribute: shard_count
+  values:
+  - value: 16
+    from: R40
+- id: f.ch.search.shard-count.policy
+  entity: svc.search-index
+  fact_kind: policy
+  attribute: shard_count
+  values:
+  - value: 16
+    from: R40
+- id: f.ch.search.refresh-interval.impl
+  entity: svc.search-index
+  fact_kind: implemented
+  attribute: refresh_interval
+  values:
+  - value: 30
+    from: R40
+    env: prod
+- id: f.ch.search.refresh-interval.procedure
+  entity: svc.search-index
+  fact_kind: procedure
+  attribute: refresh_interval
+  values:
+  - value: 45
+    from: R40
+- id: f.ch.search.refresh-interval.policy
+  entity: svc.search-index
+  fact_kind: policy
+  attribute: refresh_interval
+  values:
+  - value: 45
+    from: R40
+- id: f.ch.search.merge-factor.impl
+  entity: svc.search-index
+  fact_kind: implemented
+  attribute: merge_factor
+  values:
+  - value: 10
+    from: R40
+    env: prod
+- id: f.ch.search.merge-factor.procedure
+  entity: svc.search-index
+  fact_kind: procedure
+  attribute: merge_factor
+  values:
+  - value: 8
+    from: R40
+- id: f.ch.search.merge-factor.policy
+  entity: svc.search-index
+  fact_kind: policy
+  attribute: merge_factor
+  values:
+  - value: 8
+    from: R40
+- id: f.ch.digest.digest-hour.impl
+  entity: svc.mail-digest
+  fact_kind: implemented
+  attribute: digest_hour
+  values:
+  - value: 6
+    from: R40
+    env: prod
+- id: f.ch.digest.digest-hour.procedure
+  entity: svc.mail-digest
+  fact_kind: procedure
+  attribute: digest_hour
+  values:
+  - value: 7
+    from: R40
+- id: f.ch.digest.digest-hour.policy
+  entity: svc.mail-digest
+  fact_kind: policy
+  attribute: digest_hour
+  values:
+  - value: 7
+    from: R40
+- id: f.ch.digest.sender-workers.impl
+  entity: svc.mail-digest
+  fact_kind: implemented
+  attribute: sender_workers
+  values:
+  - value: 3
+    from: R40
+    env: prod
+- id: f.ch.digest.sender-workers.procedure
+  entity: svc.mail-digest
+  fact_kind: procedure
+  attribute: sender_workers
+  values:
+  - value: 5
+    from: R40
+- id: f.ch.digest.sender-workers.policy
+  entity: svc.mail-digest
+  fact_kind: policy
+  attribute: sender_workers
+  values:
+  - value: 5
+    from: R40
+- id: f.ch.rounding.rounding-digits.impl
+  entity: svc.price-rounding
+  fact_kind: implemented
+  attribute: rounding_digits
+  values:
+  - value: 2
+    from: R40
+    env: prod
+- id: f.ch.rounding.rounding-digits.procedure
+  entity: svc.price-rounding
+  fact_kind: procedure
+  attribute: rounding_digits
+  values:
+  - value: 4
+    from: R40
+- id: f.ch.rounding.rounding-digits.policy
+  entity: svc.price-rounding
+  fact_kind: policy
+  attribute: rounding_digits
+  values:
+  - value: 4
+    from: R40
+- id: f.ch.rounding.margin-bps.impl
+  entity: svc.price-rounding
+  fact_kind: implemented
+  attribute: margin_bps
+  values:
+  - value: 35
+    from: R40
+    env: prod
+- id: f.ch.rounding.margin-bps.procedure
+  entity: svc.price-rounding
+  fact_kind: procedure
+  attribute: margin_bps
+  values:
+  - value: 25
+    from: R40
+- id: f.ch.rounding.margin-bps.policy
+  entity: svc.price-rounding
+  fact_kind: policy
+  attribute: margin_bps
+  values:
+  - value: 25
+    from: R40
+- id: f.ch.export.export-rows.impl
+  entity: svc.report-export
+  fact_kind: implemented
+  attribute: export_rows
+  values:
+  - value: 5000
+    from: R40
+    env: prod
+- id: f.ch.export.export-rows.procedure
+  entity: svc.report-export
+  fact_kind: procedure
+  attribute: export_rows
+  values:
+  - value: 10000
+    from: R40
+- id: f.ch.export.export-rows.policy
+  entity: svc.report-export
+  fact_kind: policy
+  attribute: export_rows
+  values:
+  - value: 10000
+    from: R40
+- id: f.ch.export.export-workers.impl
+  entity: svc.report-export
+  fact_kind: implemented
+  attribute: export_workers
+  values:
+  - value: 4
+    from: R40
+    env: prod
+- id: f.ch.export.export-workers.procedure
+  entity: svc.report-export
+  fact_kind: procedure
+  attribute: export_workers
+  values:
+  - value: 6
+    from: R40
+- id: f.ch.export.export-workers.policy
+  entity: svc.report-export
+  fact_kind: policy
+  attribute: export_workers
+  values:
+  - value: 6
+    from: R40
+- id: f.ch.export.archive-days.impl
+  entity: svc.report-export
+  fact_kind: implemented
+  attribute: archive_days
+  values:
+  - value: 90
+    from: R40
+    env: prod
+- id: f.ch.export.archive-days.procedure
+  entity: svc.report-export
+  fact_kind: procedure
+  attribute: archive_days
+  values:
+  - value: 60
+    from: R40
+- id: f.ch.export.archive-days.policy
+  entity: svc.report-export
+  fact_kind: policy
+  attribute: archive_days
+  values:
+  - value: 60
+    from: R40
+hubs:
+  codehub:
+    places:
+    - native: repo:platform/search-index
+      selects_for: svc.search-index
+      acl:
+      - platform-eng
+    - native: repo:platform/mail-digest
+      selects_for: svc.mail-digest
+      acl:
+      - platform-eng
+    - native: repo:payments/price-rounding
+      selects_for: svc.price-rounding
+      acl:
+      - payments-eng
+    - native: repo:payments/report-export
+      selects_for: svc.report-export
+      acl:
+      - payments-eng
+  skillhub:
+    names:
+    - native: Lookup Store
+      namespace: Platform
+      denotes: svc.search-index
+    - native: Morning Bulletin
+      namespace: Platform
+      denotes: svc.mail-digest
+    - native: Amount Display
+      namespace: Payments
+      denotes: svc.price-rounding
+    - native: Statement Files
+      namespace: Payments
+      denotes: svc.report-export
+  dochub:
+    places:
+    - native: space:TUNING
+      acl:
+      - payments-eng
+      - identity-eng
+      - platform-eng
+artifacts:
+- id: a.ch.code.shard-count
+  hub: codehub
+  kind: java_class
+  place: repo:platform/search-index
+  path: platform/search-index/src/main/java/com/kestrel/search/ShardPlan.java
+  title: ShardPlan.java
+  about:
+  - svc.search-index
+  body: "public final class ShardPlan {\n    public static final int SHARD_COUNT = {{fact:f.ch.search.shard-count.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.search.shard-count.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.search.shard-count.impl@R42/prod
+- id: a.ch.code.refresh-interval
+  hub: codehub
+  kind: java_class
+  place: repo:platform/search-index
+  path: platform/search-index/src/main/java/com/kestrel/search/RefreshPlan.java
+  title: RefreshPlan.java
+  about:
+  - svc.search-index
+  body: "public final class RefreshPlan {\n    public static final int REFRESH_INTERVAL_SECS = {{fact:f.ch.search.refresh-interval.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.search.refresh-interval.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.search.refresh-interval.impl@R42/prod
+- id: a.ch.code.merge-factor
+  hub: codehub
+  kind: java_class
+  place: repo:platform/search-index
+  path: platform/search-index/src/main/java/com/kestrel/search/MergePlan.java
+  title: MergePlan.java
+  about:
+  - svc.search-index
+  body: "public final class MergePlan {\n    public static final int MERGE_FACTOR = {{fact:f.ch.search.merge-factor.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.search.merge-factor.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.search.merge-factor.impl@R42/prod
+- id: a.ch.code.digest-hour
+  hub: codehub
+  kind: java_class
+  place: repo:platform/mail-digest
+  path: platform/mail-digest/src/main/java/com/kestrel/digest/DigestSchedule.java
+  title: DigestSchedule.java
+  about:
+  - svc.mail-digest
+  body: "public final class DigestSchedule {\n    public static final int DIGEST_HOUR_UTC = {{fact:f.ch.digest.digest-hour.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.digest.digest-hour.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.digest.digest-hour.impl@R42/prod
+- id: a.ch.code.sender-workers
+  hub: codehub
+  kind: java_class
+  place: repo:platform/mail-digest
+  path: platform/mail-digest/src/main/java/com/kestrel/digest/SenderPool.java
+  title: SenderPool.java
+  about:
+  - svc.mail-digest
+  body: "public final class SenderPool {\n    public static final int SENDER_WORKERS = {{fact:f.ch.digest.sender-workers.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.digest.sender-workers.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.digest.sender-workers.impl@R42/prod
+- id: a.ch.code.rounding-digits
+  hub: codehub
+  kind: java_class
+  place: repo:payments/price-rounding
+  path: payments/price-rounding/src/main/java/com/kestrel/rounding/RoundingRule.java
+  title: RoundingRule.java
+  about:
+  - svc.price-rounding
+  body: "public final class RoundingRule {\n    public static final int ROUNDING_DIGITS = {{fact:f.ch.rounding.rounding-digits.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.rounding.rounding-digits.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.rounding.rounding-digits.impl@R42/prod
+- id: a.ch.code.margin-bps
+  hub: codehub
+  kind: java_class
+  place: repo:payments/price-rounding
+  path: payments/price-rounding/src/main/java/com/kestrel/rounding/MarginRule.java
+  title: MarginRule.java
+  about:
+  - svc.price-rounding
+  body: "public final class MarginRule {\n    public static final int MARGIN_BPS = {{fact:f.ch.rounding.margin-bps.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.rounding.margin-bps.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.rounding.margin-bps.impl@R42/prod
+- id: a.ch.code.export-rows
+  hub: codehub
+  kind: java_class
+  place: repo:payments/report-export
+  path: payments/report-export/src/main/java/com/kestrel/export/ExportPaging.java
+  title: ExportPaging.java
+  about:
+  - svc.report-export
+  body: "public final class ExportPaging {\n    public static final int EXPORT_ROWS_PER_FILE = {{fact:f.ch.export.export-rows.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.export.export-rows.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.export.export-rows.impl@R42/prod
+- id: a.ch.code.export-workers
+  hub: codehub
+  kind: java_class
+  place: repo:payments/report-export
+  path: payments/report-export/src/main/java/com/kestrel/export/ExportPool.java
+  title: ExportPool.java
+  about:
+  - svc.report-export
+  body: "public final class ExportPool {\n    public static final int EXPORT_WORKERS = {{fact:f.ch.export.export-workers.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.export.export-workers.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.export.export-workers.impl@R42/prod
+- id: a.ch.code.archive-days
+  hub: codehub
+  kind: java_class
+  place: repo:payments/report-export
+  path: payments/report-export/src/main/java/com/kestrel/export/ArchivePolicy.java
+  title: ArchivePolicy.java
+  about:
+  - svc.report-export
+  body: "public final class ArchivePolicy {\n    public static final int ARCHIVE_DAYS = {{fact:f.ch.export.archive-days.impl}};\n\
+    }"
+  versions:
+  - ref: R40
+    env: prod
+    asserts:
+    - f.ch.export.archive-days.impl@R40/prod
+  - ref: R42
+    env: prod
+    asserts:
+    - f.ch.export.archive-days.impl@R42/prod
+- id: a.ch.skill.search
+  hub: skillhub
+  kind: skill
+  place: skills/platform/
+  path: skills/platform/lookup-store-tuning.md
+  name: Lookup Store
+  namespace: Platform
+  title: Lookup Store tuning
+  about:
+  - svc.search-index
+  body: 'Run the index with {{fact:f.ch.search.shard-count.procedure}} shards.
+
+    Set the index refresh interval to {{fact:f.ch.search.refresh-interval.procedure}}.
+
+    Use a merge factor of {{fact:f.ch.search.merge-factor.procedure}} for segment merging.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.search.shard-count.procedure@R40
+    - f.ch.search.refresh-interval.procedure@R40
+    - f.ch.search.merge-factor.procedure@R40
+- id: a.ch.doc.search
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Search tuning reference
+  about:
+  - svc.search-index
+  body: 'The index is split into {{fact:f.ch.search.shard-count.policy}} shards.
+
+    Index refresh interval: {{fact:f.ch.search.refresh-interval.policy}}.
+
+    Segment merging runs with merge factor {{fact:f.ch.search.merge-factor.policy}}.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.search.shard-count.policy@R40
+    - f.ch.search.refresh-interval.policy@R40
+    - f.ch.search.merge-factor.policy@R40
+- id: a.ch.skill.digest
+  hub: skillhub
+  kind: skill
+  place: skills/platform/
+  path: skills/platform/morning-bulletin-tuning.md
+  name: Morning Bulletin
+  namespace: Platform
+  title: Morning Bulletin tuning
+  about:
+  - svc.mail-digest
+  body: 'Send the daily digest at hour {{fact:f.ch.digest.digest-hour.procedure}} UTC.
+
+    Run {{fact:f.ch.digest.sender-workers.procedure}} sender workers for the digest.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.digest.digest-hour.procedure@R40
+    - f.ch.digest.sender-workers.procedure@R40
+- id: a.ch.doc.digest
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Digest tuning reference
+  about:
+  - svc.mail-digest
+  body: 'The digest goes out at {{fact:f.ch.digest.digest-hour.policy}}:00 UTC.
+
+    Digest delivery uses {{fact:f.ch.digest.sender-workers.policy}} workers.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.digest.digest-hour.policy@R40
+    - f.ch.digest.sender-workers.policy@R40
+- id: a.ch.skill.rounding
+  hub: skillhub
+  kind: skill
+  place: skills/payments/
+  path: skills/payments/amount-display-tuning.md
+  name: Amount Display
+  namespace: Payments
+  title: Amount Display tuning
+  about:
+  - svc.price-rounding
+  body: 'Round displayed amounts to {{fact:f.ch.rounding.rounding-digits.procedure}} digits.
+
+    Apply a margin of {{fact:f.ch.rounding.margin-bps.procedure}} basis points.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.rounding.rounding-digits.procedure@R40
+    - f.ch.rounding.margin-bps.procedure@R40
+- id: a.ch.doc.rounding
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Rounding tuning reference
+  about:
+  - svc.price-rounding
+  body: 'Amounts are rounded to {{fact:f.ch.rounding.rounding-digits.policy}} digits.
+
+    The pricing margin is {{fact:f.ch.rounding.margin-bps.policy}} bps.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.rounding.rounding-digits.policy@R40
+    - f.ch.rounding.margin-bps.policy@R40
+- id: a.ch.skill.export
+  hub: skillhub
+  kind: skill
+  place: skills/payments/
+  path: skills/payments/statement-files-tuning.md
+  name: Statement Files
+  namespace: Payments
+  title: Statement Files tuning
+  about:
+  - svc.report-export
+  body: 'Write {{fact:f.ch.export.export-rows.procedure}} rows per export file.
+
+    Run {{fact:f.ch.export.export-workers.procedure}} export workers in parallel.
+
+    Archive exports older than {{fact:f.ch.export.archive-days.procedure}} days.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.export.export-rows.procedure@R40
+    - f.ch.export.export-workers.procedure@R40
+    - f.ch.export.archive-days.procedure@R40
+- id: a.ch.doc.export
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Export tuning reference
+  about:
+  - svc.report-export
+  body: 'Each export file holds {{fact:f.ch.export.export-rows.policy}} rows.
+
+    Exports run on {{fact:f.ch.export.export-workers.policy}} workers.
+
+    Exports move to the archive after {{fact:f.ch.export.archive-days.policy}} days.'
+  versions:
+  - ref: v1
+    asserts:
+    - f.ch.export.export-rows.policy@R40
+    - f.ch.export.export-workers.policy@R40
+    - f.ch.export.archive-days.policy@R40
+- id: a.ch.note.search-history
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Index sizing history
+  about:
+  - svc.search-index
+  body: Until R41 the index used 8 shards; that sizing is retired.
+  versions:
+  - ref: v1
+    asserts: []
+- id: a.ch.note.search-units
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Refresh on dashboards
+  about:
+  - svc.search-index
+  body: Dashboards show the index refresh interval as 0.5 min.
+  versions:
+  - ref: v1
+    asserts: []
+- id: a.ch.note.digest-pilot
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Pilot tenants
+  about:
+  - svc.mail-digest
+  body: Pilot tenants receive the digest at hour 9 local time.
+  versions:
+  - ref: v1
+    asserts: []
+- id: a.ch.note.rounding-legacy
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Legacy checkout
+  about:
+  - svc.price-rounding
+  body: The 2019 checkout rounded amounts to 3 digits.
+  versions:
+  - ref: v1
+    asserts: []
+- id: a.ch.note.export-staging
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Staging exports
+  about:
+  - svc.report-export
+  body: The staging smoke export writes 200 rows per file.
+  versions:
+  - ref: v1
+    asserts: []
+- id: a.ch.note.export-sandbox
+  hub: dochub
+  kind: page
+  place: space:TUNING
+  title: Sandbox exports
+  about:
+  - svc.report-export
+  body: Sandbox exports run on 1 worker only.
+  versions:
+  - ref: v1
+    asserts: []
+planted:
+- id: p.d6-challenge
+  kind: rule_missed_relation
+  facts:
+  - f.ch.search.shard-count.impl
+  - f.ch.search.shard-count.procedure
+  - f.ch.search.shard-count.policy
+  - f.ch.search.refresh-interval.impl
+  - f.ch.search.refresh-interval.procedure
+  - f.ch.search.refresh-interval.policy
+  - f.ch.search.merge-factor.impl
+  - f.ch.search.merge-factor.procedure
+  - f.ch.search.merge-factor.policy
+  - f.ch.digest.digest-hour.impl
+  - f.ch.digest.digest-hour.procedure
+  - f.ch.digest.digest-hour.policy
+  - f.ch.digest.sender-workers.impl
+  - f.ch.digest.sender-workers.procedure
+  - f.ch.digest.sender-workers.policy
+  - f.ch.rounding.rounding-digits.impl
+  - f.ch.rounding.rounding-digits.procedure
+  - f.ch.rounding.rounding-digits.policy
+  - f.ch.rounding.margin-bps.impl
+  - f.ch.rounding.margin-bps.procedure
+  - f.ch.rounding.margin-bps.policy
+  - f.ch.export.export-rows.impl
+  - f.ch.export.export-rows.procedure
+  - f.ch.export.export-rows.policy
+  - f.ch.export.export-workers.impl
+  - f.ch.export.export-workers.procedure
+  - f.ch.export.export-workers.policy
+  - f.ch.export.archive-days.impl
+  - f.ch.export.archive-days.procedure
+  - f.ch.export.archive-days.policy
+  artifacts:
+  - a.ch.code.shard-count
+  - a.ch.code.refresh-interval
+  - a.ch.code.merge-factor
+  - a.ch.code.digest-hour
+  - a.ch.code.sender-workers
+  - a.ch.code.rounding-digits
+  - a.ch.code.margin-bps
+  - a.ch.code.export-rows
+  - a.ch.code.export-workers
+  - a.ch.code.archive-days
+  - a.ch.skill.search
+  - a.ch.doc.search
+  - a.ch.skill.digest
+  - a.ch.doc.digest
+  - a.ch.skill.rounding
+  - a.ch.doc.rounding
+  - a.ch.skill.export
+  - a.ch.doc.export
+  - a.ch.note.search-history
+  - a.ch.note.search-units
+  - a.ch.note.digest-pilot
+  - a.ch.note.rounding-legacy
+  - a.ch.note.export-staging
+  - a.ch.note.export-sandbox

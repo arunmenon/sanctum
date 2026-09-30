@@ -11,8 +11,8 @@ from sanctum_world.schema import load_world
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def derive_all(world_path: Path, build_dir: Path, specs_dir: Path, out_dir: Path) -> list[Path]:
-    world = load_world(world_path)
+def derive_all(world_path: Path, build_dir: Path, specs_dir: Path, out_dir: Path, overlays: tuple = ()) -> list[Path]:
+    world = load_world(world_path, tuple(overlays))
     index = BuildIndex(build_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
@@ -31,8 +31,9 @@ if __name__ == "__main__":
     parser.add_argument("--specs", type=Path, default=ROOT / "questions" / "specs" / "sample")
     parser.add_argument("--out", type=Path, default=ROOT / "gold" / "m1")
     parser.add_argument("--world", type=Path, default=ROOT / "world" / "world.yaml")
+    parser.add_argument("--overlay", type=Path, action="append", default=[])
     arguments = parser.parse_args()
-    paths = derive_all(arguments.world, arguments.build, arguments.specs, arguments.out)
+    paths = derive_all(arguments.world, arguments.build, arguments.specs, arguments.out, tuple(arguments.overlay))
     if not paths:
         sys.exit(f"no specs found in {arguments.specs}")
     print(f"derived {len(paths)} gold cases into {arguments.out}")

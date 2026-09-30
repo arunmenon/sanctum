@@ -1,5 +1,5 @@
 """D6 challenge slice (prompt review, measurement changes): rule-missed relations and hard
-negatives added to the world after E3. Evaluator side: gold is derived and frozen here, and a
+negatives in the overlay world/challenge-d6.yaml (built into its own build dir, never build/world). Evaluator side: gold is derived and frozen here, and a
 rules-only C4 run with D6 in shadow (local test provider) shows the slice is discriminative, i.e.
 its positives reach D6 as promotable candidates rather than rule-flagged pairs."""
 import json
@@ -16,10 +16,11 @@ from sanctum_run.runner import RunConfig, run
 from sanctum_world.gold import BuildIndex, QuestionSpec, derive
 from sanctum_world.schema import load_world
 from tests.helpers.systemone_server import ServerBehavior, SystemOneTestServer
-from tests.scenarios.conftest import scenario_world  # noqa: F401
+from sanctum_world.render import build
 
 ROOT = Path(__file__).resolve().parents[1]
 SPECS = ROOT / "questions" / "specs" / "challenge-d6"
+OVERLAY = ROOT / "world" / "challenge-d6.yaml"
 GOLD = ROOT / "gold" / "challenge-d6"
 
 
@@ -31,26 +32,44 @@ def _pair(relation):
     return frozenset({relation.witness_a.spans[0].artifact_id, relation.witness_b.spans[0].artifact_id})
 
 
-def test_slice_gold_is_frozen_and_counts(scenario_world):  # noqa: F811
-    world, index = load_world(ROOT / "world" / "world.yaml"), BuildIndex(scenario_world)
+@pytest.fixture(scope="module")
+def challenge_world(tmp_path_factory):
+    """The base world plus the challenge overlay, built apart from build/world."""
+    out = tmp_path_factory.mktemp("world-challenge") / "world"
+    build(ROOT / "world", 20260930, out, overlays=(OVERLAY,))
+    return out
+
+
+def test_overlay_leaves_existing_gold_identical(challenge_world):
+    world, index = load_world(ROOT / "world" / "world.yaml", (OVERLAY,)), BuildIndex(challenge_world)
+    for directory in ("sample", "dev", "scenarios"):
+        gold_dir = {"sample": "m1"}.get(directory, directory)
+        for path in sorted((ROOT / "questions" / "specs" / directory).glob("*.yaml")):
+            spec = QuestionSpec.model_validate(yaml.safe_load(path.read_text()))
+            assert load_gold(ROOT / "gold" / gold_dir / f"{spec.id}.yaml") == derive(world, challenge_world, spec,
+                                                                                    index=index), spec.id
+
+
+def test_slice_gold_is_frozen_and_counts(challenge_world):
+    world, index = load_world(ROOT / "world" / "world.yaml", (OVERLAY,)), BuildIndex(challenge_world)
     golds = _golds()
     for path in sorted(SPECS.glob("*.yaml")):
         spec = QuestionSpec.model_validate(yaml.safe_load(path.read_text()))
-        assert load_gold(GOLD / f"{spec.id}.yaml") == derive(world, scenario_world, spec, index=index)
+        assert load_gold(GOLD / f"{spec.id}.yaml") == derive(world, challenge_world, spec, index=index)
     positives = {_pair(r) for g in golds.values() for r in g.relations}
     assert len(golds) == 12 and len(positives) == 20
     assert any(p.kind == "rule_missed_relation" for p in world.planted)
 
 
 @pytest.fixture(scope="module")
-def shadow_run(scenario_world, tmp_path_factory):  # noqa: F811
+def shadow_run(challenge_world, tmp_path_factory):
     with SystemOneTestServer(ServerBehavior()) as server:
         previous = os.environ.get("SANCTUM_SYSTEMONE_TEST_URL")
         os.environ["SANCTUM_SYSTEMONE_TEST_URL"] = server.base_url
         try:
             result = run(ProcessSUT(["--config", "C4", "--round3", "d6", "--round3-provider", "local-test"]), RunConfig(
                 cases_dir=GOLD, out_dir=tmp_path_factory.mktemp("d6-challenge") / "run", seed=20260930, sut_name="ref",
-                config_id="C4+D6", world_build_dir=scenario_world, system_one_provider="local-test",
+                config_id="C4+D6", world_build_dir=challenge_world, system_one_provider="local-test",
                 system_one_profile="relaxed"))
         finally:
             if previous is None:

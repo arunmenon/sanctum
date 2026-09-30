@@ -480,6 +480,6 @@ def _planted_index(world: World, core_ids: dict[str, str]) -> dict:
 
 
 def build(world_dir: Path, seed: Optional[int], out_dir: Path,
-          hub_config_path: Path = DEFAULT_HUB_CONFIG) -> dict:
-    world = load_world(Path(world_dir) / "world.yaml")
+          hub_config_path: Path = DEFAULT_HUB_CONFIG, overlays: tuple = ()) -> dict:
+    world = load_world(Path(world_dir) / "world.yaml", tuple(overlays))
     return render(world, world.seed if seed is None else seed, out_dir, world_dir, hub_config_path)

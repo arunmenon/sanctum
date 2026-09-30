@@ -91,10 +91,13 @@ def test_dangling_artifact_and_principal_fail():
 def test_real_world_loads_with_required_shape():
     world = load_world(ROOT / "world" / "world.yaml")
     services = [entity for entity in world.entities if entity.type == "service"]
-    assert 4 <= len(services) <= 10      # 5 core + 4 D6 challenge-slice services (register row 25)
+    assert 4 <= len(services) <= 6
     assert world.releases == ["R40", "R41", "R42"] and [b.id for b in world.branches] == ["exp-branch"]
     assert 3 <= len(world.principals) <= 5
-    assert sorted(planted.kind for planted in world.planted) == sorted(PLANTED_KINDS)
+    # rule_missed_relation lives only in the D6 challenge overlay (world/challenge-d6.yaml)
+    assert sorted(planted.kind for planted in world.planted) == sorted(set(PLANTED_KINDS) - {"rule_missed_relation"})
+    challenge = load_world(ROOT / "world" / "world.yaml", (ROOT / "world" / "challenge-d6.yaml",))
+    assert sorted(planted.kind for planted in challenge.planted) == sorted(PLANTED_KINDS)
 
 
 def test_value_resolution_follows_releases_and_environments():

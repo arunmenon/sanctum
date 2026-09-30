@@ -1,0 +1,60 @@
+{
+ "all": {
+  "brier_raw": 0.2893,
+  "n": 84,
+  "positives": 12,
+  "pr_auc": 0.1012,
+  "roc_auc": 0.2708
+ },
+ "answered": 84,
+ "campaign": {
+  "calls": 83,
+  "input_tokens": 29828,
+  "output_tokens": 0
+ },
+ "candidates": {
+  "brier_raw": 0.3226,
+  "n": 22,
+  "positives": 0,
+  "pr_auc": null,
+  "roc_auc": null
+ },
+ "cases": "gold/dev",
+ "ceilings": {
+  "calls": 3000,
+  "input_tokens": 10000000
+ },
+ "decision": "d6",
+ "git_commit": "94402e2a9fb82ec3f3bf4e9e68698849b6c599b8",
+ "labelled": 84,
+ "model_call_outcomes": {
+  "ok": 28
+ },
+ "models": [
+  "laya-rl-agent"
+ ],
+ "nested_cv": {
+  "bands": [
+   1.0,
+   1.0,
+   1.0,
+   1.0,
+   1.0
+  ],
+  "candidate_promotions": 0,
+  "false_candidate_promotions": 0,
+  "inner_folds": 4,
+  "outer_folds": 5
+ },
+ "provider": "laya-local",
+ "rule_flagged": {
+  "brier_raw": 0.2774,
+  "n": 62,
+  "positives": 12,
+  "pr_auc": 0.1412,
+  "roc_auc": 0.2817
+ },
+ "template": "d6-noul-v1",
+ "tolerance": 0.2,
+ "unavailable_items": 0
+}

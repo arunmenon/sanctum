@@ -1,0 +1,60 @@
+{
+ "all": {
+  "brier_raw": 0.1539,
+  "n": 84,
+  "positives": 12,
+  "pr_auc": 0.5298,
+  "roc_auc": 0.8044
+ },
+ "answered": 84,
+ "campaign": {
+  "calls": 28,
+  "input_tokens": 33107,
+  "output_tokens": 2248
+ },
+ "candidates": {
+  "brier_raw": 0.117,
+  "n": 22,
+  "positives": 0,
+  "pr_auc": null,
+  "roc_auc": null
+ },
+ "cases": "gold/dev",
+ "ceilings": {
+  "calls": 30,
+  "input_tokens": 40000
+ },
+ "decision": "d6",
+ "git_commit": "94402e2a9fb82ec3f3bf4e9e68698849b6c599b8",
+ "labelled": 84,
+ "model_call_outcomes": {
+  "ok": 28
+ },
+ "models": [
+  "jev-1.13.0"
+ ],
+ "nested_cv": {
+  "bands": [
+   0.5,
+   0.63,
+   0.5,
+   0.65,
+   0.51
+  ],
+  "candidate_promotions": 0,
+  "false_candidate_promotions": 0,
+  "inner_folds": 4,
+  "outer_folds": 5
+ },
+ "provider": "typesafe-jev",
+ "rule_flagged": {
+  "brier_raw": 0.167,
+  "n": 62,
+  "positives": 12,
+  "pr_auc": 0.5676,
+  "roc_auc": 0.7925
+ },
+ "template": "d6-noul-v1",
+ "tolerance": 0.2,
+ "unavailable_items": 0
+}

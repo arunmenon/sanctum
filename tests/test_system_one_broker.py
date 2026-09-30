@@ -402,3 +402,45 @@ def test_round3_state_layouts_and_binding(scenario_world, server, tmp_path):  # 
     v1, v2 = (request["state"]["items"]["d4:e1"][0] for request in server.behavior.requests)
     assert set(v1) == {"source_id", "version", "environment", "text"}
     assert v2["artifact_id"] and v2["excerpt"] == "\n".join(out["text"][s["start"]:s["end"]] for s in v2["excerpt_spans"])
+
+
+async def _templates(world, broker, out):
+    tokens = TokenService(world / "identity" / "principals.json", "broker-test-secret")
+    caller = tokens.issue_caller_token(PRINCIPAL)
+    async with HubGateway(world, released_hub_ids(DEFAULT_HUBS_CONFIG), tokens) as gateway:
+        proxy = await GatewayProxy.create(gateway, world)
+        gateway.system_one = broker
+        handle = gateway.handle("req-7", caller)
+        proxy.bind("req-7", caller, handle, query="retry backoff")
+        with gateway.sut_call("req-7"):
+            found = await handle.call("codehub", "search_code", {"query": "retry backoff"})
+            r = found["results"][0]
+            ref = {"source_id": "codehub", "artifact_id": r["artifact_id"], "version": r["version"], "start": 0, "end": 60}
+            pair = {"refs": [ref, ref]}
+            out["excerpts"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d6", "template": "d6-noul-v3-excerpts", "state_kind": "excerpts",
+                "questions": {"d6:e1|e2": NOUL}, "items": {"d6:e1|e2": pair}}, "req-7", caller)
+            out["decomp"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d6", "template": "d6-decomp-v1", "state_kind": "refs",
+                "questions": {"d6:e1|e2#same_subject": NOUL, "d6:e1|e2#values_differ": NOUL,
+                              "d6:e1|e2#choice": {"type": "choice", "instructions": "relation?",
+                                                  "criteria": {"contradiction": "x", "none": "y"}}},
+                "items": {"d6:e1|e2#same_subject": pair, "d6:e1|e2#values_differ": pair, "d6:e1|e2#choice": pair}},
+                "req-7", caller)
+            out["d2v2"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d2", "template": "d2-descriptors-v2", "questions": {"d2:codehub": NOUL}}, "req-7", caller)
+        proxy.unbind("req-7", handle)
+
+
+def test_template_state_kinds_decomposition_and_d2_descriptor_set(scenario_world, server, tmp_path):  # noqa: F811
+    from sanctum_run.system_one_broker import state_sources
+
+    out = {}
+    anyio.run(_templates, scenario_world, _broker(server, tmp_path, capabilities={"max_questions_per_call": 5}), out)
+    excerpt_request, decomp_request, d2_request = server.behavior.requests
+    assert out["excerpts"]["descriptor_release"] == "r3-state-v2"
+    assert "excerpt" in excerpt_request["state"]["items"]["d6:e1|e2"][0]
+    assert set(out["decomp"]["answers"]) == {"d6:e1|e2#same_subject", "d6:e1|e2#values_differ", "d6:e1|e2#choice"}
+    assert "text" in decomp_request["state"]["items"]["d6:e1|e2#same_subject"][0]              # refs = v1
+    v2 = state_sources(load_descriptors(ROOT / "configs" / "d2_descriptors_v2.yaml"), SOURCES)
+    assert d2_request["state"]["sources"] == v2 and out["d2v2"]["descriptor_release"] == descriptor_release(v2)

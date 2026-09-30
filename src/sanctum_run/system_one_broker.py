@@ -51,7 +51,11 @@ DEFAULT_PROVIDERS = ROOT / "configs" / "system_one_providers.yaml"
 DEFAULT_DESCRIPTORS = ROOT / "configs" / "d2_standin.yaml"
 DECIDE_TOOL = "system_one.decide"
 QUESTION_TYPES = ("noul", "choice", "score")
-ROUND3 = {"d6": 2, "d4": 1}          # Round 3 rounds and the refs each item carries
+ROUND3 = {"d6": 2, "d4": 1}
+# the SUT's template registry names the Round 3 state kind; "refs" is layout v1, "excerpts" v2
+STATE_KINDS = {"refs": "r3-state-v1", "excerpts": "r3-state-v2"}
+# D2 templates whose descriptors differ from the default pinned set
+D2_DESCRIPTOR_SETS = {"d2-descriptors-v2": ROOT / "configs" / "d2_descriptors_v2.yaml"}          # Round 3 rounds and the refs each item carries
 
 
 @dataclass(frozen=True)
@@ -152,7 +156,7 @@ class SystemOneBroker:
         if round_id in ROUND3:
             # evidence text reaches the model only through the broker's own reads of refs the bound
             # caller may read and this request fetched; the SUT supplies refs, never text
-            layout = arguments.get("state_layout") or STATE_V1
+            layout = arguments.get("state_layout") or STATE_KINDS.get(arguments.get("state_kind") or "refs")
             if layout not in STATE_LAYOUTS:
                 layout, questions_bad = STATE_V1, list(questions)       # unknown layout: nothing is sent
             else:
@@ -171,7 +175,10 @@ class SystemOneBroker:
             pointers = {qid: (arguments.get("items") or {}).get(qid, {}).get("refs") for qid in state["items"]}
             pointers_sha256 = hashlib.sha256(json.dumps(pointers, sort_keys=True).encode()).hexdigest()
         else:
-            sources = state_sources(self.descriptors, self.allowed_sources)
+            descriptors = self.descriptors
+            if arguments.get("template") in D2_DESCRIPTOR_SETS:          # a template with its own pinned set
+                descriptors = load_descriptors(D2_DESCRIPTOR_SETS[arguments["template"]])
+            sources = state_sources(descriptors, self.allowed_sources)
             release = descriptor_release(sources)
             # questions about a source outside the gateway's view are never sent
             refused = sorted(set(refused) | {qid for qid in questions

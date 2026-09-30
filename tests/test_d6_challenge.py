@@ -99,3 +99,32 @@ def test_positives_reach_d6_as_candidates_not_rule_flags(shadow_run):
     assert len(candidate_pos) * 2 >= len(positives)          # at least half exposed to D6 as candidates
     assert len(candidate_pos) > len(flagged_pos)              # the rules miss most of them
     assert len(candidate_neg) >= 15                           # hard negatives the rules also surface
+
+
+def test_overlay_only_adds_challenge_artifacts(challenge_world, tmp_path):
+    """The challenge build equals a build of the pre-slice world (fd19e4f's world.yaml) plus the
+    overlay's own artifacts: every existing row (id, text, version, metadata) is byte-identical."""
+    import shutil
+    import subprocess
+
+    base_dir = tmp_path / "world-pre"
+    shutil.copytree(ROOT / "world", base_dir, ignore=shutil.ignore_patterns("challenge-d6.yaml"))
+    (base_dir / "world.yaml").write_bytes(subprocess.run(
+        ["git", "show", "fd19e4f:world/world.yaml"], cwd=ROOT, capture_output=True, check=True).stdout)
+    base_build = tmp_path / "base"
+    build(base_dir, 20260930, base_build)
+
+    def rows(build_dir):
+        out = {}
+        for path in sorted((build_dir / "hubs").glob("*/artifacts.jsonl")):
+            for line in path.read_text().splitlines():
+                row = json.loads(line)
+                out[(path.parent.name, row["artifact_id"], row["version"])] = line
+        return out
+
+    base_rows, challenge_rows = rows(base_build), rows(challenge_world)
+    assert all(challenge_rows.get(key) == line for key, line in base_rows.items())
+    added = {artifact_id for _, artifact_id, _ in set(challenge_rows) - set(base_rows)}
+    artifact_map = json.loads((challenge_world / "private" / "artifact_map.json").read_text())
+    overlay_ids = {row["artifact_id"] for world_id, row in artifact_map.items() if world_id.startswith("a.ch.")}
+    assert added == overlay_ids and len(overlay_ids) == 24

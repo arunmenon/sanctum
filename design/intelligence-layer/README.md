@@ -6,6 +6,8 @@ This document set expands the engineering team's initial Sanctum proposal. It de
 
 The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains Q1. The architectural expansion and lab do not imply approval or replacement of that proposal.
 
+**Version: v5.2** (proposed). v5.2 adds an execution context, a governed assertion envelope, one evidence-preservation contract and an operational `ABOUT` layer, in response to the holistic review; see the [review history](review-history.md#v5-2).
+
 ## Start here
 
 An agent asks what a service does on a gateway timeout. Relevant information may live in code, a reviewed domain skill, documents, or earlier agent sessions. Those sources may use different names and disagree because they describe different versions or kinds of fact.

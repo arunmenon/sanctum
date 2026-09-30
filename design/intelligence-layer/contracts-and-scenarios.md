@@ -384,7 +384,7 @@ flowchart TB
     end
     subgraph D["Dobby (must-consult) times out"]
         direction LR
-        d1["Other sources return"] --> d2["Mark authoritative<br/>source missing"] --> d3(["evidence_status: insufficient<br/>dobby: timeout<br/>(not 'no answer')"])
+        d1["Other sources return"] --> d2["Mark authoritative<br/>source missing"] --> d3(["evidence_status: partial<br/>(insufficient if nothing<br/>obtainable remains)<br/>dobby: timeout<br/>(not 'no answer')"])
     end
 
     classDef safe fill:#fff4e5,stroke:#e67e22,color:#000
@@ -393,7 +393,7 @@ flowchart TB
     class c2,c3 policy
 ```
 
-**Takeaway.** Every failure has a defined, visible behavior. Graph failure does not turn into "call every backend," which would amplify an outage. A timeout is never reported as "the source had nothing."
+**Takeaway.** Every failure has a defined, visible behavior. Graph failure does not turn into "call every backend," which would amplify an outage. A timeout is never reported as "the source had nothing." The status for the missing must-consult source follows the evidence-preservation contract ([§12.4](contracts-and-scenarios.md#section-12-4), v5.2): `partial` with `required_source_unavailable` while other requested facts have evidence, `insufficient` when none remain.
 
 For the decision-layer failure, a System One timeout, error, invalid output or data-class refusal each yields `unavailable`, the safe default (keep the source) and `decision_layer_unavailable`; see [System One providers and the Jev handshake](system-one-providers.md).
 
@@ -671,8 +671,14 @@ EvidenceResponse
 | `no_coverage` | response | No registered source covers the entity ([Ex. 8](contracts-and-scenarios.md#example-8)) |
 | `decision_layer_unavailable`, `memory_unavailable` | response (`degraded_reasons`) | Fallback paths ([Ex. 9](contracts-and-scenarios.md#example-9)) |
 | `receipt_incomplete` | response | Receipt persistence degraded ([§9.5](memory-design.md#section-9-5)) |
+| `conflict_witness_omitted` (v5.2) | response, interpretation | A flagged conflict's witness did not fit; the conflict record is kept and the witness is in `omitted` ([§12.4](contracts-and-scenarios.md#section-12-4)) |
+| `displaced_by_conflict_reservation` (v5.2) | `omitted` entry | A unit left out to reserve a D6-promoted conflict's witnesses, within the bounded share ([§12.4](contracts-and-scenarios.md#section-12-4)) |
+| `budget_exhausted` (v5.2) | decision, response | The ledger could not reserve a call; the decision took its safe default ([§5.4](hld.md#section-5-4)) |
+| `freshness_unknown` (v5.2) | source | Change-feed gap or stale metadata; memory-derived selectors not used ([§9.6](memory-design.md#section-9-6)) |
 
-**Reference closure.** Every ID referenced in `interpretations`, `conflicts`, or `duplicates` is present in the response or listed in `omitted` with a reason.
+**Reference closure.** Every ID referenced in `interpretations`, `conflicts`, or `duplicates` is present in the response or listed in `omitted` with a reason. A conflict record is never dropped because a witness is omitted (v5.2).
+
+**Budget totals (v5.2).** `budget` reports the ledger's totals for the request (calls, model tokens, time and serialized tokens), not only the response tokens.
 
 <a id="section-12-3"></a>
 
@@ -689,6 +695,63 @@ EvidenceResponse
 | Error semantics (timeout vs. empty) | Honest gaps ([Ex. 8](contracts-and-scenarios.md#example-8), 9) |
 | Optional: `write`, `status(operation_id)` | Write path ([Ex. 11](contracts-and-scenarios.md#example-11)) |
 
+**Capability-aware identity, filter and temporal contract (v5.2).** Adapters normalize what a source can honestly promise, and Sanctum plans only on what is declared. Each capability is declared `supported`, `partial` or `unsupported`, with the partial semantics spelled out; nothing is fabricated to fill a gap.
+
+| Capability | What `supported` means | Honest partial or unsupported behavior |
+|---|---|---|
+| Identity stability | `artifact_id` is native and stable across renames and reindexing | The adapter issues a snapshot identity valid only within the declared retention window; receipts mark it as adapter-issued |
+| Addressability | Any returned unit can be fetched again by `(artifact_id, version, span)` | Units are served as retrieved; replay of that unit is reported as unavailable |
+| Immutable version reads | `fetch(artifact_id, version)` returns the same bytes for the life of the version | Only current reads; `as_of` requests get `unsupported_for_as_of` for that source |
+| Snapshot retention | Snapshot tokens stay readable for a declared period | Freshness and replay are reported as unknown beyond it |
+| Selector semantics | Each filter is typed: equality, prefix, range or membership, with its value domain | Untyped filters are not composed with other selectors; a query that needs them runs unfiltered within scope and says so |
+| Subject attribution | Units carry the source's own subject fields (for example a service field) with their provenance | Subjects stay unknown ([§8.10](memory-design.md#section-8-10)) |
+| Change feed | Ordered events with a watermark and gap detection | Freshness is bounded by the declared polling interval, and marked unknown after a gap ([§9.6](memory-design.md#section-9-6)) |
+
+A missing version is empty, never a placeholder string. Selectors from different sources are composed only when their semantics match; an equality selector is never treated as a prefix. Evidence handles for re-reads (for example by an inference gateway) name the exact fetched version, not only the artifact.
+
+
 **Sanctum's own capability manifest (v5.1).** Sanctum publishes the modes, features, reason-code list version, and replay levels it supports, each as `supported`, `partial`, or `unsupported`. In the pilot: `verify` is `partial`; `synthesize` and writes are `unsupported`; replay is `recompute_on_candidates`.
+
+
+<a id="section-12-4"></a>
+
+### 12.4 Evidence-preservation contract (v5.2)
+
+One contract says what each decision does when it cannot decide normally. The conditions:
+
+- **uncertain**: the answer is outside the decision's use band;
+- **invalid**: the output fails validation;
+- **denied**: a dependency is outside the caller's access;
+- **failed**: a dependency timed out, errored or was unavailable;
+- **budget exhausted**: the ledger cannot reserve the call ([§5.4](hld.md#section-5-4)).
+
+For every decision, the outcome of any of these conditions is no worse, for evidence, than the rules-only path.
+
+| Decision | Uncertain | Invalid | Denied | Failed | Budget exhausted |
+|---|---|---|---|---|---|
+| D1 intent | balanced `general` weights | as uncertain | n/a | as uncertain, `decision_layer_unavailable` | as uncertain |
+| D2 source usefulness | keep the source | keep the source | no call; source reported `skipped` with `required_source_denied` if must-consult, else not a candidate | keep the source | keep the source if its call can be reserved; otherwise `skipped` with `insufficient_budget` |
+| D3 ambiguity | escalate within budget, else `partial` with `ambiguous_term` | as uncertain | n/a | as uncertain, `decision_layer_unavailable` | `partial` with `ambiguous_term` |
+| D4 relevance | keep the unit, rules rank | rules order | unit never retrieved; no change | rules order | rules order |
+| D5 duplicate | keep both | keep both | n/a | keep both | keep both |
+| D6 possible conflict | rule-flagged pairs stay `possible_conflict`; candidate pairs stay unflagged and are recorded | as uncertain | the pair cannot form; the visible unit is kept alone | as uncertain | as uncertain |
+| D7 claim support | `insufficient` | `insufficient` | `insufficient` with `required_source_denied` | `insufficient` | `insufficient` |
+| D8 write target | no side effect | no side effect | no side effect | no side effect | no side effect |
+| D9 supersession | never hide evidence | never hide | never hide | never hide | never hide |
+
+**Conflict records are kept even when witnesses do not fit.** A flagged conflict is a response object, not a packing side effect. Packing reserves both witnesses of each flagged conflict first ([§7.4](hld.md#section-7-4)). If both cannot fit, the conflict record is still returned: the witnesses that fit are served, and each one that does not is listed in `omitted` with reason `conflict_witness_omitted`. The interpretation's status is then at most `partial`, with `insufficient_budget`. A witness may never enter the response through ordinary filling while its conflict flag is dropped. Reference closure ([§12.2](contracts-and-scenarios.md#section-12-2)) covers conflicts the same way it covers duplicates.
+
+**D6 promotion is bounded.** A pair promoted by D6 to `possible_conflict` gets witness reservation only within a declared share of the response budget (`d6_reservation_share`, a release-pinned setting). When a promotion would need more than that share, the pair is still returned as a conflict record with its witnesses omitted as above; no rules-packed unit is displaced beyond the share, and each unit that is displaced within it is listed in `omitted` with reason `displaced_by_conflict_reservation`.
+
+**Status defaults are reconciled.** Status is judged per interpretation against the requested facts:
+
+| Situation | `evidence_status` | Reasons |
+|---|---|---|
+| All requested facts have obtainable evidence in the response | `sufficient` | |
+| Some requested facts have evidence; others do not (missing, denied, failed, unfit) | `partial` | the specific reasons (`required_source_unavailable`, `required_source_denied`, `insufficient_budget`, `conflict_witness_omitted`, ...) |
+| No requested fact has obtainable evidence left | `insufficient` | the specific reasons, or `no_coverage` |
+| The request could not be evaluated (policy or registry unavailable) | `unknown`, or an error | fail closed ([Ex. 9](contracts-and-scenarios.md#example-9)) |
+
+A missing must-consult source therefore yields `insufficient` only when nothing obtainable remains for the requested facts, and `partial` with `required_source_unavailable` (or `_denied`) otherwise. `sufficient` is never returned while a must-consult source's facts are missing. This replaces the earlier per-example defaults (Q16).
 
 ---

@@ -155,7 +155,7 @@ Five node types, unchanged in kind from v4, with sharper edges.
 | `Entity -MEMBER_OF-> Entity` | Explicit membership (service in domain), with scope and provenance | Reviewed | ✓ |
 | `Source -COVERS {declared, measured, descriptor, as_of}-> Entity` | Declared and measured coverage, kept separate | Manifests, probing | ✓ pinned |
 | `Source -AUTHORITATIVE_FOR {fact_kind, scope}-> Entity` | Declared ownership of a kind of fact | Registry | ✓ |
-| `Artifact -ABOUT-> Entity` | Artifact discusses the entity | Evidence assembly, source structure | ✓ |
+| `Artifact -ABOUT-> Entity` | Artifact discusses the entity; attributed per evidence unit with basis and provenance ([§8.10](memory-design.md#section-8-10), v5.2) | Adapter-declared subject fields, reviewed proposals from source structure | ✓ |
 | `Artifact -DUPLICATE_OF {exact}-> Artifact` | Same content; provenance kept per copy | Evidence assembly | ✓ |
 | `Artifact -VERSION_OF {branch, environment, effective}-> Artifact` | Lineage with applicability | Adapters | ✓ |
 | `Procedure -APPLIES_TO-> Entity` | Rule applies to questions about this entity | Registry, reviewed | ✓ |
@@ -253,6 +253,42 @@ flowchart LR
 **What would shrink it further.** E6 compares the vocabulary against a plain alias table (M12). If the table performs the same, and E2 shows priors add nothing, memory reduces to a registry, an alias table, and a duplicate/version table.
 
 ---
+
+<a id="section-8-10"></a>
+
+### 8.10 Attributed subjects: `Artifact ABOUT Entity` in operation (v5.2)
+
+Names resolve the question's subject and places filter the search, but the subject of each piece of **evidence** also needs a governed answer. Without it, assembly has to guess subjects from paths, acronyms and headers, which is hub vocabulary, not identity. This section makes `ABOUT` an operational relation from retrieval through packing.
+
+**Binding.** Every evidence unit carries `subjects[]`, each a canonical subject reference with its provenance:
+
+```text
+SubjectBinding
+  entity_ref                 # canonical entity, or unknown
+  basis = declared_field | reviewed_about | selects_for_place | unknown
+  source_field?              # the native field that stated it (e.g. a service field)
+  assertion_ref?             # the reviewed ABOUT or SELECTS_FOR assertion used
+  confidence = attested | inferred_from_place
+```
+
+| Basis | Where it comes from | Allowed use |
+|---|---|---|
+| `declared_field` | The source's own attributed subject field, normalized by the adapter ([§12.3](contracts-and-scenarios.md#section-12-3)) | Subject comparison, conflict pairing, grouping |
+| `reviewed_about` | An accepted `Artifact ABOUT Entity` assertion in the pinned release | Same as above |
+| `selects_for_place` | The unit came from a place with an accepted `SELECTS_FOR` to the entity | Grouping and ranking only; a place is not an identity, so it never alone makes two units the same subject for conflict pairing |
+| `unknown` | None of the above | Kept, shown, never assumed to match any subject |
+
+Bindings are computed at assembly from the unit's own fields and the pinned release. They never come from the question: resolving the query to `svc payment-auth` does not make every retrieved unit about `svc payment-auth`.
+
+**Consumption.** Assembly compares canonical subject references, not lexical signatures:
+
+- Two units are candidates for a conflict only if they share an attested subject (`declared_field` or `reviewed_about`) and the same attribute. Units bound only through a place, or with unknown subjects, can still be judged by D6 as candidate pairs; they are never auto-flagged by the rules.
+- Separated interpretations ([§9.2](memory-design.md#section-9-2)) take the units attested to their entity. Units with unknown subjects are listed under every interpretation they were retrieved for, marked unknown, rather than dropped or merged.
+- Composite subjects (one skill about two services) carry two bindings. Each binding is used independently; the artifact never becomes a name for either ([§8.5](memory-design.md#section-8-5)).
+
+**Unknown subjects are preserved.** A unit whose subject cannot be attested stays in the candidate pool and in the response with `subjects: [unknown]`. It is never treated as compatible with every subject, never silently attached to the resolved entity, and never removed for lacking a subject. Recurring unknowns for a source become coverage and governance signals ([§9.10](memory-design.md#section-9-10)), not automatic `ABOUT` assertions.
+
+**Governance.** `Artifact ABOUT Entity` assertions that assembly relies on for `reviewed_about` use the assertion envelope ([§9.11](memory-design.md#section-9-11)) like any other assertion: proposals from source structure or observed evidence, scoped owner approval, release pinning. Adapter-declared subject fields need no review, but the mapping from the native field value to a canonical entity is a reviewed `DENOTES`.
 
 <a id="section-9"></a>
 
@@ -484,6 +520,13 @@ flowchart LR
 - Rollback is a new audit event. Old receipts keep the release they actually used, annotated as withdrawn. Rollback never restores revoked access.
 - For the pilot, a simple versioned manifest in existing storage is enough; no new control-plane service.
 
+**Coherence under concurrent change (v5.2).** A pinned release gives configuration consistency. Correctness while sources and permissions change needs four more rules.
+
+- **Releases are content-addressed dependency closures.** A release id is the digest of its contents: every assertion and envelope ([§9.11](memory-design.md#section-9-11)), procedures, registry and authority, descriptors and coverage, decision configuration, and the calibration bindings it names. Nothing a request uses for routing is loaded from outside the release; descriptors sent to a model come from the pinned release.
+- **A policy epoch travels with the release.** The release is immutable; the policy epoch is live. It advances on every revocation, unsharing or authority change. The execution context pins both ([§5.4](hld.md#section-5-4)) and rechecks the epoch before evidence leaves Sanctum.
+- **Change feeds carry watermarks.** Each source's feed has an ordered sequence per reader and a watermark. A gap, a reset or a feed error is never read as "no changes": the source's freshness becomes unknown until reconciliation (a full list or snapshot comparison) closes the gap. Invalidations are applied relative to the pinned release, so a later request cannot inherit a stale selector.
+- **Freshness has limits.** Each source declares how stale its metadata may be before routing stops trusting it. Beyond that limit, or while freshness is unknown, the source is still called if eligible, but memory-derived selectors and descriptors for it are not used, and the response reports `freshness_unknown` for that source. Where a coherent read across sources cannot be guaranteed, the response says so instead of implying a single snapshot.
+
 <a id="section-9-7"></a>
 
 ### 9.7 Governance
@@ -603,3 +646,38 @@ flowchart LR
 **In one line:** Sanctum's memory improves with use, but every improvement is proposed with evidence, tested against data it did not choose, and approved by the owners it affects. It cannot change its own rules or grade its own homework.
 
 ---
+
+<a id="section-9-11"></a>
+
+### 9.11 The governed assertion envelope (v5.2)
+
+Every assertion memory holds uses the same envelope, whatever it asserts: `DENOTES`, `SELECTS_FOR`, `MEMBER_OF`, `ABOUT`, `AUTHORITATIVE_FOR`, a procedure, a descriptor, a coverage value. Publication validates the envelope. Governance can stay an owner-operated publication process; the envelope is what makes it enforceable.
+
+```text
+AssertionEnvelope
+  assertion_id, kind, subject_ref, object_ref, payload
+  namespace                     # (org, source, namespace) the native side belongs to
+  applicability                 # scope in which it holds: tenants, projects, environments, effective time
+  metadata_permission           # who may see that this assertion exists (separate from applicability)
+  provenance                    # origin (manifest, source structure, proposal id), captured_at, inputs and versions
+  reviewers[]                   # identities, each with the role they approved as
+  delegations[]                 # delegation records that authorized a reviewer to act for an owner
+  dependencies[]                # other assertions it requires (e.g. a procedure's DENOTES and SELECTS_FOR)
+  lifecycle = proposed | shadow | accepted | deprecated | rejected
+  lifecycle_history[]           # transitions with actor and time
+```
+
+**Three scopes are kept apart.** `namespace` says whose vocabulary the native side is; `applicability` says where the assertion holds; `metadata_permission` says who may learn that it exists. A readable storage place is never evidence that a name is visible: name visibility is checked against the name's own `metadata_permission`, not inferred from access to a place that selects for the entity.
+
+**Publication checks.** A release is published only if every accepted assertion in it passes:
+
+| Check | Rule |
+|---|---|
+| Reviewer authority | The reviewers match the ownership table in [§9.7](memory-design.md#section-9-7) for this kind: both owners for `DENOTES`, or a delegation valid at approval time |
+| Identity uniqueness | No accepted `DENOTES` from the same term to two entities in overlapping applicability |
+| Dependency closure | Every dependency is accepted, in the same release, with applicability that covers this assertion's |
+| Procedure capability | Every source a procedure requires declares the capabilities its action uses ([§12.3](contracts-and-scenarios.md#section-12-3)) |
+| Lifecycle eligibility | Only `accepted` assertions are operational; `shadow` items are published as shadow ([§8.7](memory-design.md#section-8-7)) |
+| Permission consistency | An assertion's `metadata_permission` is no wider than the metadata permission of the native term it describes |
+
+A failed check blocks the release, not just the assertion, because a dependency closure with a hole is not coherent.

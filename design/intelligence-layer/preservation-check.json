@@ -48,7 +48,7 @@
       "source_sha256": "817eaaee7f968a12963f66a1f77a15c668fdf0681d901ed14fbdc5e840345e6f",
       "editorial_changes": 0,
       "rendered_sha256": "6e66ee3a4ff189a86c586b18620aa270aa9839e61e6456202d5e57378585e580",
-      "v5_3_note": "v5.3: policy layer replaced by assumed inputs; four routing stages; two pillars"
+      "v5_3_note": "v5.3: policy as assumed inputs; four routing stages; v5.3.1: data class input and latency note added"
     },
     {
       "section": 6,
@@ -62,7 +62,8 @@
       "page": "hld.md",
       "source_sha256": "bfa3b173da5145034fe9f30ad1f6bd634b8259312ff8c0b1db0c5499ff469be3",
       "editorial_changes": 0,
-      "rendered_sha256": "da00114e7b31284ae1214674fa1bbac7ea86aec5dd5d3e139113ba0121f12f7d"
+      "rendered_sha256": "da00114e7b31284ae1214674fa1bbac7ea86aec5dd5d3e139113ba0121f12f7d",
+      "v5_3_note": "v5.3.1: one applicability field on evidence units; packing mechanics reduced to one sentence"
     },
     {
       "section": 8,
@@ -116,7 +117,7 @@
       "source_sha256": "e5959c6ba6ce77cb036aac969dae334834098c141658374b9b603dbc737b4cb6",
       "editorial_changes": 0,
       "rendered_sha256": "0f7f6badda7494f9586e9f30d4b9c8e9b991f613d33ffbaf5badaf77099738dd",
-      "v5_3_note": "v5.3: 14.1 reduced to data classes as an assumed input"
+      "v5_3_note": "Removed in v5.3.1: data class to §5, explanation to §5.1, latency budget out of scope (research stage)"
     },
     {
       "section": 15,
@@ -168,7 +169,7 @@
       "source_sha256": "0726a24b2756c8dfa08f1c60e88819c38a5973511bf44f11ca94985c6ad7e055",
       "editorial_changes": 2,
       "rendered_sha256": "62d5c5ed70be312a2b56dd119728b3e92ff6225dfda7fc44bff74cfbb1506307",
-      "v5_3_note": "v5.3: security, tenancy, write, replay and approval decisions dropped"
+      "v5_3_note": "v5.3.1: reduced to Q4, cost versus completeness (the D2 margin)"
     },
     {
       "section": 22,

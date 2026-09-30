@@ -20,7 +20,7 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 11 | Read path in detail | [Sanctum intelligence layer — architectural proposal](hld.md#section-11) |
 | 12 | Contracts | [Sanctum contracts and worked scenarios](contracts-and-scenarios.md#section-12) |
 | 13 | Write path and reconciliation (post-pilot) | Removed in v5.3: out of scope (research stage); see [review history](review-history.md#v5-3) |
-| 14 | Cross-cutting | [Sanctum intelligence layer — architectural proposal](hld.md#section-14) |
+| 14 | Cross-cutting | Removed in v5.3.1: data class moved to §5 assumed inputs, per-request explanation to §5.1 Assemble, latency budget out of scope; see [review history](review-history.md#v5-3-1) |
 | 15 | Replay levels | Removed in v5.3: out of scope (research stage); see [review history](review-history.md#v5-3) |
 | 16 | Evaluation | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`) |
 | 17 | Experiments | Lab: hypothesis-validation spike (`docs/experiments/lab-spike.md`) |
@@ -56,7 +56,7 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 5 Assumed inputs (allowed set, required subset, no model authorization, visible names) | [Architectural proposal](hld.md#section-5) |
 | 5.1 Four routing stages: Understand, Select, Retrieve, Assemble | [Architectural proposal](hld.md#section-5-1) |
 | 5.2 Two pillars inside a given boundary | [Architectural proposal](hld.md#section-5-2) |
-| 14.1 Data classes (assumed input) | [Architectural proposal](hld.md#section-14-1) |
+| 14.1 Data classes (assumed input), moved in v5.3.1 to §5 | [Architectural proposal](hld.md#section-5) |
 | 13, 15 removed; Examples 10, 11 and Fixtures 21, 22 reduced to one line | [Review history](review-history.md#v5-3) |
 
-Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.
+Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and the §5 data-class input; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.

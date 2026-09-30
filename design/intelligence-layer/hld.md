@@ -2,9 +2,9 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.3 (reorganized from v5.1). Scope: routing intelligence. Policy and access control are assumed inputs, not designed here ([§5](hld.md#section-5)). Lab work is experimental. Original section numbers are retained where sections survive.
+> Status: proposed research design, version 5.3.1 (reorganized from v5.1). Scope: routing intelligence. Policy and access control are assumed inputs, not designed here ([§5](hld.md#section-5)). Lab work is experimental. Original section numbers are retained where sections survive.
 
-This proposal expands the engineering team's initial Sanctum proposal with evidence routing inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains Q1, rather than an assumed agreement.
+This proposal expands the engineering team's initial Sanctum proposal with evidence routing inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains open, rather than an assumed agreement.
 
 **Review focus:** the routing stages, the memory and ontology, evidence and fact-kind authority semantics, failure honesty, and the questions in §21. The lab investigates the design's hypotheses; its implementation does not establish production readiness.
 
@@ -109,7 +109,7 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 - G1. Return the smallest set of **valid** evidence from the allowed sources that supports the query, within budget, and **say when it is partial or insufficient**.
 - G2. Call the fewest backends likely to be needed, **without silently omitting a required source**.
 - G3. Surface conflicts and provenance explicitly.
-- G4. Keep the fast path cheap (≤ 300 ms Sanctum overhead in `fast` mode, measured end to end; [§14](hld.md#section-14)).
+- G4. Keep the fast path cheap. Latency is measured end to end, not a design target at this stage ([§5.1](hld.md#section-5-1)).
 - G5. Explain each response (which sources were selected or skipped, and why) so routing can be evaluated against a rules baseline.
 - G6. Onboard a backend through an adapter contract and a manifest, not core-path edits.
 
@@ -146,6 +146,7 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 1. The router receives an **allowed set** of sources for the caller and a **required subset**, and never widens either.
 2. **No model output is an authorization decision.** A model only chooses among allowed, optional candidates.
 3. **Names the caller cannot see are not resolved for them** ([§9.2](memory-design.md#section-9-2)).
+4. **Which providers may see which data classes is given.** Provider eligibility by data class is an input, not designed here.
 
 Access control, identity and credentials are assumed, not designed or validated by this MVP.
 
@@ -179,7 +180,7 @@ flowchart LR
     class AS,S3,B io
 ```
 
-The explanation in Assemble (every source selected or skipped, with its reason) is part of the response, because it is how routing is evaluated against a baseline.
+The explanation in Assemble (every source selected or skipped, with its reason, and the decisions behind it) is part of the response and is recorded per request, because it is how routing is evaluated against a baseline. Latency is measured end to end and reported, not a design target at this stage.
 
 **Color key used throughout:** blue = cascade (typed decisions), green = memory and ontology (advises), grey = given inputs and plumbing. Red, where it remains in older diagrams, marks a given rule a model never challenges.
 
@@ -403,21 +404,17 @@ DecisionResult
 
 ```text
 EvidenceUnit
-  evidence_id, source_id, artifact_id, source_version
-  native_ref, span/offsets, content_hash, text, kind (code|doc|skill|memory|ticket)
+  evidence_id, source_id, artifact_id, native_ref, span/offsets, content_hash, text
+  kind (code|doc|skill|memory|ticket)
   role (implemented_behavior | intended_procedure | observed_event | reference | session_history)
-  applicability                                   # v5.1: required by §7.5
-    branch?, environment?, effective_from?, effective_to?
+  applicability                                   # v5.3.1: one field
+    version?, branch?, environment?, period?      # what the unit applies to
     applicability_status = known | partial | unknown
-  occurred_at?, recorded_at?, retrieved_at
-  classification, authority_assertion_ref?
-  subjects[]                                      # v5.2.1: attested subject bindings (memory §8.10)
-  exact_token_count, tokenizer_id
+  subjects[]                                      # attested subject bindings (memory §8.10)
+  authority_assertion_ref?, exact_token_count, tokenizer_id
 ```
 
-Four times are kept apart: when it happened (`occurred_at`), when it is valid (`applicability.effective_from/to`), when it was recorded (`recorded_at`), when Sanctum fetched it (`retrieved_at`) (F11).
-
-`applicability` carries the branch, environment and effective-time context that [§7.5](hld.md#section-7-5) needs before any version can be removed. Adapters fill what the source actually exposes; anything missing stays empty and `applicability_status` says so. Sanctum never fabricates version context.
+`applicability` says which version, branch or environment, and which period, the unit applies to; it is what [§7.5](hld.md#section-7-5) uses to keep the applicable version for a query (including an `as_of` question) and to keep a newer but inapplicable artifact from replacing it. Adapters fill what the source actually exposes; anything missing stays empty and `applicability_status` says so. Sanctum never fabricates version context.
 
 <a id="section-7-2"></a>
 
@@ -463,21 +460,7 @@ When "implemented" and "intended" disagree, that is usually a real finding, not 
 
 ### 7.4 Packing into the budget
 
-```mermaid
-flowchart LR
-    C["Ranked units<br/>(e.g. 11)"] --> R1["Reserve room for<br/>provenance + both sides<br/>of every conflict"]
-    R1 --> R2["Fill remaining budget<br/>in rank order,<br/>whole units only"]
-    R2 --> CHK{"Needed evidence<br/>still present?"}
-    CHK -- yes --> OK(["evidence_status:<br/>sufficient"])
-    CHK -- no --> P(["evidence_status:<br/>partial or insufficient<br/>+ reason insufficient_budget"])
-
-    classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
-    classDef safe fill:#fff4e5,stroke:#e67e22,color:#000
-    class R1,R2 judge
-    class P safe
-```
-
-Caps per request: max candidates, max conflict pairs, max bytes, max model calls. Tokens are counted on the serialized response with a declared tokenizer.
+Packing reserves room for both witnesses of every flagged conflict, then fills the remaining budget in rank order with whole units, counting tokens on the serialized response with a declared tokenizer.
 
 **Status defaults (v5.2.1).** Status is judged per interpretation against the requested facts: `sufficient` when every requested fact has obtainable evidence in the response; `partial` when some do and others are missing, denied, failed or did not fit, with the specific reasons; `insufficient` only when nothing obtainable remains for the requested facts. A missing must-consult source therefore gives `partial` with `required_source_unavailable` while other requested facts are covered, never `sufficient`.
 
@@ -528,55 +511,6 @@ sequenceDiagram
 
 ---
 
-<a id="section-14"></a>
-
-## 14. Cross-cutting
-
-<a id="section-14-1"></a>
-
-### 14.1 Data classes (assumed input)
-
-Which providers may see which data classes is an input: provider eligibility by data class is given, not designed here ([System One providers §5](system-one-providers.md#5-the-handshake-thirteen-points)).
-
-<a id="section-14-2"></a>
-
-### 14.2 Latency budget, fast mode
-
-```mermaid
-gantt
-    title Sanctum overhead in fast mode (targets, to validate)
-    dateFormat X
-    axisFormat %L ms
-    section Registry
-    Allowed set + registry lookup :p1, 0, 20
-    section Memory + rules
-    Graph lookup + Round 1 rules  :g1, after p1, 20
-    section Judgment
-    Round 2, one Jev call         :j1, after g1, 150
-    section Backends
-    Fan-out (reported separately) :crit, b1, after j1, 1
-    section Assembly
-    Dedup + ranker + packing      :a1, after b1, 80
-```
-
-| Stage | Target p95 |
-|---|---|
-| Allowed set + registry lookup | 20 ms |
-| Graph lookup, Round 1 rules | 20 ms |
-| Round 2, one Jev call | 150 ms |
-| Assembly: exact dedup, existing ranker, packing | 80 ms |
-| **Sanctum overhead** | **the stage targets above, measured end to end** |
-
-Backend time is reported separately. Stage p95s do not add into an end-to-end p95, so the real number comes from whole-path measurement. `escalated` and `synthesize` modes have their own SLOs.
-
-<a id="section-14-3"></a>
-
-### 14.3 Observability
-
-Per request: candidates, selected and skipped subset with reasons, dispositions, provider and versions, per-source status, tokens, cost, latency split (Sanctum / backend / total), degraded reasons. Dashboards include **entities with no coverage** ([Ex. 8](contracts-and-scenarios.md#example-8)), **open conflicts by entity** ([Ex. 3](contracts-and-scenarios.md#example-3)), **unresolved terms** ([Ex. 14](contracts-and-scenarios.md#example-14)).
-
----
-
 <a id="section-20"></a>
 
 ## 20. Anticipated questions
@@ -619,14 +553,6 @@ Rules and graph priors with capped fan-out, response marked degraded ([Ex. 9](co
 
 | # | Decision | Proposed default |
 |---|---|---|
-| Q1 | Is this HLD standalone, or must it stay compatible with the earlier C6 contract? | Standalone; record differences explicitly |
-| Q2 | Pilot journey and backends | Kestrel planning on one payments service; Deep Insights + Dobby + KaaS |
-| Q4 | Cost of omitting a needed source vs. calling an extra one | Set per question family with the adopter |
-| Q7 | Owner of evaluation labels | Evaluation track, with domain reviewers |
-| Q8 | Who owns canonical entities and entity types | Sanctum platform team |
-| Q10 | Where Sanctum memory is stored | Existing Sanctum persistence; separate from Engram (E2b) |
-| Q15 | What do Deep Insights, Dobby, and KaaS actually expose: stable IDs, version reads, filters, deletion notices, permission-aware search? | Adapter survey in October; lab hubs mirror the answers |
-| Q16 | If a required source fails or a procedure conflicts, may the pilot return `partial`, or must it fail? | Status follows [§7.4](hld.md#section-7-4): `partial` while other requested facts have evidence, `insufficient` when none remain. Procedure-conflict status remains open. |
-| Q17 | Who owns evaluation labels and the fresh holdout? | Evaluation track, outside the tuning team |
+| Q4 | Cost versus completeness: how much tolerance for an extra source call versus a missed optional fact? This is the margin decision for D2. | Set per question family with the adopter |
 
 ---

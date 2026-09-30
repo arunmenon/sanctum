@@ -4,9 +4,9 @@
 
 This document set expands the engineering team's initial Sanctum proposal. It develops an evidence router that works inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. The accompanying lab is a spike to investigate the underlying hypotheses. Its findings will inform design choices and possible follow-on work.
 
-The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains Q1. The architectural expansion and lab do not imply approval or replacement of that proposal.
+The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains open. The architectural expansion and lab do not imply approval or replacement of that proposal.
 
-**Version: v5.3** (proposed). It supersedes v5.2.2 and narrows the design to routing intelligence; see the [review history](review-history.md#v5-3).
+**Version: v5.3.1** (proposed). It supersedes v5.3: one applicability field on evidence units, no latency budget, section 14 folded into §5, and one open question; see the [review history](review-history.md#v5-3-1).
 
 **Scope: routing intelligence.** The design covers two pillars: the cascade (Understand, Select, Retrieve, Assemble, with typed decisions from rules, then System One, then an LLM only if unsure) and the memory and ontology that advise it. Both operate inside a given allowed set of sources and a required subset. Access control, identity, credentials, writes, replay and approval workflows are assumed or out of scope at the research stage, not designed here.
 
@@ -52,7 +52,7 @@ The source HLD describes existing Sanctum as an MCP endpoint across Engram, Dobb
 4. Which hypotheses merit the spike, and what evidence would justify retaining each mechanism?
 5. Who owns source attestations, evaluation, approved data use, and unresolved decisions?
 
-Detailed Q1–Q18 decisions remain in the HLD. Dates and the older monthly rollout sketch live on the execution page and are not delivery commitments.
+The one open decision (cost versus completeness, the D2 margin) is in HLD §21. Dates and the older monthly rollout sketch live on the execution page and are not delivery commitments.
 
 ## Publication and maintenance
 

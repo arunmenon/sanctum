@@ -2,7 +2,7 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.3 (reorganized from v5.1). Scope: routing intelligence. Lab work is experimental. Original section numbers are retained where sections survive.
+> Status: proposed research design, version 5.3.1 (reorganized from v5.1). Scope: routing intelligence. Lab work is experimental. Original section numbers are retained where sections survive.
 
 This page preserves the source's review dispositions, the v5.1 change record, and the holistic review (R-Holistic) with its v5.2.1 dispositions. “Accepted” in these historical tables means a finding was accepted/addressed in that document; it does not establish stakeholder approval, executable verification, or production acceptance.
 
@@ -33,16 +33,16 @@ This page preserves the source's review dispositions, the v5.1 change record, an
 | F05 | Calibration and labels | **Accepted** | [§6.5](hld.md#section-6-5), [§6.7](hld.md#section-6-7) |
 | F06 | Duplicates used to skip sources | **Accepted** | [Ex. 2](contracts-and-scenarios.md#example-2) |
 | F07 | Authority too coarse | **Accepted, right-sized** | [§7.2](hld.md#section-7-2) fact-kind authority |
-| F08 | Metadata sensitivity | **Accepted** | [§8.6](memory-design.md#section-8-6) scoped IDs, [§9.7](memory-design.md#section-9-7) governance, [§14.1](hld.md#section-14-1) |
+| F08 | Metadata sensitivity | **Accepted** | [§8.6](memory-design.md#section-8-6) scoped IDs, [§9.7](memory-design.md#section-9-7) governance, §14.1 (removed in v5.3.1) |
 | F09 | Mixed-signal Beta | **Accepted** | [§9.10](memory-design.md#section-9-10) separate signals, [Ex. 13](contracts-and-scenarios.md#example-13) |
 | F10 | Routing as subset decision | **Accepted** | [§9.10](memory-design.md#section-9-10), E5 |
 | F11 | Ranking and time semantics | **Accepted** | [§7.1](hld.md#section-7-1), [§7.3](hld.md#section-7-3), [§7.5](hld.md#section-7-5), [Ex. 4](contracts-and-scenarios.md#example-4) |
 | F12 | Token packing | **Accepted** | [§7.4](hld.md#section-7-4), [Ex. 3](contracts-and-scenarios.md#example-3) |
 | F13 | Model weakening governance | **Accepted** | §13 (removed in v5.3), [Ex. 11](contracts-and-scenarios.md#example-11) |
 | F14 | Write idempotency | **Accepted, deferred to write note** | §13 (removed in v5.3), [Ex. 11](contracts-and-scenarios.md#example-11) |
-| F15 | Token passthrough | **Accepted** | [§5.3](hld.md#section-5-3), [§14.1](hld.md#section-14-1) |
-| F16 | Untrusted evidence | **Accepted** | [Ex. 10](contracts-and-scenarios.md#example-10), [§14.1](hld.md#section-14-1) |
-| F17 | Latency arithmetic | **Accepted** | [§6.3](hld.md#section-6-3), [§14.2](hld.md#section-14-2) |
+| F15 | Token passthrough | **Accepted** | [§5.3](hld.md#section-5-3), §14.1 (removed in v5.3.1) |
+| F16 | Untrusted evidence | **Accepted** | [Ex. 10](contracts-and-scenarios.md#example-10), §14.1 (removed in v5.3.1) |
+| F17 | Latency arithmetic | **Accepted** | [§6.3](hld.md#section-6-3), §14.2 (removed in v5.3.1) |
 | F18 | Replay guarantees | **Accepted, right-sized** | [§11](hld.md#section-11), §15 (removed in v5.3) |
 | F19 | Degradation | **Accepted** | [Ex. 9](contracts-and-scenarios.md#example-9) |
 | F20 | Bundled comparisons | **Accepted** | §16.2 (lab) ladder |
@@ -85,7 +85,7 @@ v5.1 is a contract-consistency patch. It changes no architecture. It closes gaps
 | 3 | `frozen_corpus` appeared as a replay level but not in the response enum | Declared a research execution profile, not a wire value | §15 (removed in v5.3) |
 | 4 | Prose used statuses (`unresolved`, `insufficient_budget`, `unsupported_for_as_of`) not in the [§12.2](contracts-and-scenarios.md#section-12-2) enums | Enums stay closed; detail moves to versioned reason codes | [§12.2](contracts-and-scenarios.md#section-12-2), [§9.3](memory-design.md#section-9-3), [Ex. 4](contracts-and-scenarios.md#example-4), [Fixture 19](contracts-and-scenarios.md#fixtures-16-25) |
 | 5 | No response shape for separated interpretations ([§9.2](memory-design.md#section-9-2)) | `interpretations[]` in the response; `caller_profile` in the request | [§12.0](contracts-and-scenarios.md#section-12-0), [§12.2](contracts-and-scenarios.md#section-12-2) |
-| 6 | No request contract; credentials could be read as tool arguments | `RetrieveRequest` defined; credentials only in transport or session | [§12.0](contracts-and-scenarios.md#section-12-0), [§14.1](hld.md#section-14-1) |
+| 6 | No request contract; credentials could be read as tool arguments | `RetrieveRequest` defined; credentials only in transport or session | [§12.0](contracts-and-scenarios.md#section-12-0), §14.1 (removed in v5.3.1) |
 | 7 | Sanctum did not advertise partial support | Sanctum capability manifest with supported / partial / unsupported | [§12.3](contracts-and-scenarios.md#section-12-3) |
 | 8 | Lab configs let C1 and C4a be unfair controls | C1-fair, C1-naive, C4a-equivalent, C4a-label-only; hybrid DocHub before H5 conclusions; adapter survey and Kestrel-shaped questions in the minimum | §17.2 (lab) |
 
@@ -199,4 +199,27 @@ Every removal, each **out of scope (research stage)**:
 | Approval-scope bullet in name resolution | Memory §9.2 |
 
 **Reworded, kept:** HLD §0, §3 (G1, G5, non-goals), §4 (principle 1), §5.1, §5.2, §5.3, §6.1 (given rules), §6.2, §6.4 (D2 wording), §7.3, §7.5 (copies keep attribution), §11, §14.1 (one line), §14.2 (registry lookup), §14.3, §20, §21 Q16 and Q17; contracts Ex. 1, Ex. 6, Ex. 9, Ex. 12, §12.0, §12.1, §12.2, §12.3, worked trace block 2; memory §9.2 (visibility as an assumed-input-dependent rule), §9.7, §9.10; System One providers §1 and handshake point 9 and the broker's data-class row (assumed input).
+
+---
+
+<a id="v5-3-1"></a>
+
+## v5.3.1: small trim
+
+**v5.3.1 supersedes v5.3.** Moved, kept in the design:
+
+- Data class as an assumed input: from HLD §14.1 to the §5 assumed inputs (item 4).
+- Recording what was selected, skipped and why, per request: from HLD §14.3 into the §5.1 Assemble text.
+- "Latency is measured, not a design target at this stage": one line in §5.1, and G4 reworded.
+- Packing mechanics in §7.4 reduced to one sentence; the status-default and conflict-retention rules are unchanged.
+- Evidence unit (§7.1): one `applicability` field (version, branch or environment, period) replaces the four timestamps; historical (`as_of`) and newer-but-inapplicable behavior in §7.5 unchanged.
+
+Removed, each **out of scope (research stage)**:
+
+| Removed | Where it was |
+|---|---|
+| The four evidence timestamps (`occurred_at`, `recorded_at`, `retrieved_at`, `applicability.effective_from/to`) | HLD §7.1 |
+| Packing flow diagram and per-request caps list | HLD §7.4 |
+| Section 14 (cross-cutting), including the §14.2 fast-mode latency budget table, stage targets and gantt chart | HLD §14 |
+| Decisions Q1, Q2, Q7, Q8, Q10, Q15, Q16, Q17 (compatibility, pilot journey, label ownership, entity ownership, memory storage, adapter survey, failure semantics now answered by §7.4, holdout ownership); Q4 kept as the one cost-versus-completeness question | HLD §21 |
 

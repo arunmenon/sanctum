@@ -21,11 +21,12 @@ class ModelCall(BaseModel):
     profile: str                         # strict | relaxed
     round: str
     questions: list[str]
-    outcome: str                         # ok | timeout | error | invalid_output | refused
-    reason: Optional[str] = None         # why unavailable, for every outcome except ok
+    outcome: str                         # ok | unavailable
+    reason: Optional[str] = None         # the CallOutcome unavailable_reason, when unavailable
     elapsed_ms: float
     usage: Optional[dict] = None
-    request_sha256: Optional[str] = None
+    calls: int = 0                       # HTTP calls made, retries included
+    invalid_ids: list[str] = []          # questions refused, dropped or answered invalidly
 
 
 class ObservedTrace(BaseModel):

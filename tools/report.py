@@ -166,10 +166,10 @@ def render_system_one(runs: list["RunView"]) -> list[str]:
         if not calls:
             continue
         system_one = run.manifest.get("system_one") or {}
-        latencies = [call["elapsed_ms"] for call in calls if call["outcome"] != "refused"]
+        latencies = [call["elapsed_ms"] for call in calls if call.get("calls")]    # calls that reached the provider
         outcomes = defaultdict(int)
         for call in calls:
-            outcomes[call["outcome"]] += 1
+            outcomes[call.get("reason") or call["outcome"]] += 1
         rows.append(f"| {run.config_id} | {system_one.get('provider', calls[0]['provider'])} | "
                     f"{', '.join(system_one.get('resolved_models') or sorted({c['model'] for c in calls if c.get('model')})) or '-'} | "
                     f"{system_one.get('profile', calls[0]['profile'])} | {len(calls)} | "
@@ -181,7 +181,7 @@ def render_system_one(runs: list["RunView"]) -> list[str]:
             "Runner-side broker observations, separate from source calls. Latency includes broker, network, "
             "validation, batching and retries; from a laptop to a hosted endpoint it is not evidence about the "
             "fast path.", "",
-            "| config | provider | resolved model | profile | calls | outcomes | p50 ms | p95 ms |",
+            "| config | provider | resolved model | profile | tool calls | outcomes | p50 ms | p95 ms |",
             "|---|---|---|---|---|---|---|---|", *rows, ""]
 
 

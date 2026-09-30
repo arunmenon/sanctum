@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import time
 from contextlib import AsyncExitStack
@@ -30,7 +31,9 @@ from sanctum_hubs.tokens import TokenService
 
 from .gateway import HubGateway, TokenMode, released_hub_ids
 from .sut import SUTContext, SystemUnderTest
-from .system_one_broker import DEFAULT_PROVIDERS as DEFAULT_SYSTEM_ONE_PROVIDERS, SystemOneBroker, load_provider, load_secret
+from .system_one_broker import DEFAULT_DESCRIPTORS as DEFAULT_SYSTEM_ONE_DESCRIPTORS
+from .system_one_broker import DEFAULT_PROVIDERS as DEFAULT_SYSTEM_ONE_PROVIDERS
+from .system_one_broker import SystemOneBroker, load_descriptors, load_provider, load_secret
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_HUBS_CONFIG = ROOT / "configs" / "hubs.yaml"
@@ -71,6 +74,7 @@ class RunConfig:
     system_one_profile: str = "strict"
     data_class: str = "synthetic"
     system_one_providers_path: Path = DEFAULT_SYSTEM_ONE_PROVIDERS
+    system_one_descriptors_path: Path = DEFAULT_SYSTEM_ONE_DESCRIPTORS    # pinned D2 descriptors
 
 
 @dataclass
@@ -122,13 +126,11 @@ def _failure_injector(config: RunConfig) -> FailureInjector:
 
 
 def _system_one_broker(config: RunConfig, hub_ids: list[str]) -> SystemOneBroker:
-    provider, profile = load_provider(config.system_one_provider, config.system_one_profile,
-                                      config.system_one_providers_path)
-    descriptors = {hub_id: json.loads((config.world_build_dir / "hubs" / hub_id / "capabilities.json").read_text())
-                   for hub_id in hub_ids}
-    return SystemOneBroker(provider=provider, profile=profile, data_class=config.data_class,
-                           allowed_sources=list(hub_ids), descriptors=descriptors,
-                           store_dir=Path(config.out_dir) / "system_one", secret=load_secret(provider.credential_env))
+    spec, profile = load_provider(config.system_one_provider, config.system_one_profile,
+                                  config.system_one_providers_path)
+    return SystemOneBroker(spec=spec, profile=profile, data_class=config.data_class, allowed_sources=list(hub_ids),
+                           descriptors=load_descriptors(config.system_one_descriptors_path),
+                           store_dir=Path(config.out_dir) / "system_one", secret=load_secret(spec.api_key_env))
 
 
 def _system_one_manifest(config: RunConfig, traces: list[dict]) -> Optional[dict]:
@@ -136,9 +138,10 @@ def _system_one_manifest(config: RunConfig, traces: list[dict]) -> Optional[dict
     if config.system_one_provider is None:
         return None
     calls = [call for trace in traces for call in trace.get("model_calls", [])]
-    provider, _profile = load_provider(config.system_one_provider, config.system_one_profile,
-                                       config.system_one_providers_path)
-    return {"provider": provider.name, "requested_model": provider.model, "profile": config.system_one_profile,
+    spec, _profile = load_provider(config.system_one_provider, config.system_one_profile,
+                                   config.system_one_providers_path)
+    return {"provider": spec.name, "requested_model": spec.requested_model(dict(os.environ)),
+            "profile": config.system_one_profile,
             "data_class": config.data_class, "resolved_models": sorted({c["model"] for c in calls if c.get("model")}),
             "model_calls": len(calls)}
 

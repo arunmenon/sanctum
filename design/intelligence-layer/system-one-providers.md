@@ -272,7 +272,7 @@ flowchart LR
 
 ## 13. The two integrated providers
 
-Both speak the same protocol through the same adapter and broker; neither is special-cased in the pipeline.
+Both speak the same protocol through the same adapter and broker; neither is special-cased in the pipeline. They illustrate the two profiles of §2.1; the properties below were established for these deployments, and a different deployment of either is profiled again.
 
 **TypeSafe Jev (`typesafe-jev`, hosted).**
 
@@ -298,7 +298,7 @@ Both speak the same protocol through the same adapter and broker; neither is spe
 | Choice temperature | The runtime warns that choice temperature is clamped for 11 or more options; D2 uses `noul` only |
 | Input window | Small total input (state plus instructions): one question per call and a small `max_state_chars`, so Round 3 uses the compact layouts |
 | Primitives | `noul` and `choice`; `score` is not offered and is refused without a call |
-| Cost and latency | On CPU, latency grows with each added question and batching does not lower cost per question, so per-request caps on units matter more than on a hosted backend |
+| Cost and latency | In this deployment latency grows with each added question and batching does not lower cost per question, so per-request caps on units matter more than for a profile that amortises state |
 | Status | `experimental` until the conformance checks pass on repeated runs |
 
 

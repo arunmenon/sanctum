@@ -72,6 +72,6 @@ flowchart LR
     OCT --> NOV --> DEC
 ```
 
-**Weekly demo track.** Each week, trace one [§10](../../design/intelligence-layer/contracts-and-scenarios.md#section-10) example live: scope → sources called and skipped with reasons → evidence with roles → conflicts → receipt. Then re-run it with one change (a failure, a policy change, a new source).
+**Weekly demo track.** Each week, trace one [§13](../../design/intelligence-layer/contracts-and-scenarios.md#section-13) example live: scope → sources called and skipped with reasons → evidence with roles → conflicts → receipt. Then re-run it with one change (a failure, a policy change, a new source).
 
 ---

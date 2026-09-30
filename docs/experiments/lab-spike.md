@@ -93,7 +93,7 @@ A rung is kept only if it beats the rung below it on the same traffic.
 
 ### 16.4 Gates
 
-1. **Contract gates** (must pass regardless of quality): no unauthorized access or egress, no governance bypass, declared replay behavior, explicit partial results. The examples and fixtures in [§10](../../design/intelligence-layer/contracts-and-scenarios.md#section-10) become test cases.
+1. **Contract gates** (must pass regardless of quality): no unauthorized access or egress, no governance bypass, declared replay behavior, explicit partial results. The examples and fixtures in [§13](../../design/intelligence-layer/contracts-and-scenarios.md#section-13) become test cases.
 2. **Quality gates:** non-inferiority within a predeclared margin, paired clustered intervals.
 3. **Economic gates:** cost per successful task, backend load, latency by mode.
 
@@ -110,7 +110,7 @@ A rung is kept only if it beats the rung below it on the same traffic.
 | ID | Question | Change vs. B* | Decision rule |
 |---|---|---|---|
 | E0b | H0: is a unified layer better than direct hubs? | Agent-level: agent with direct hub access vs. agent using Sanctum (C0 vs. C2/C4, [§17.2](lab-spike.md#section-17-2)) | Proceed only if evidence per token and answer quality improve |
-| E0 | Is the harness trustworthy? | None; run [§10](../../design/intelligence-layer/contracts-and-scenarios.md#section-10) examples as fixtures | Every fixture has an explicit, deterministic outcome |
+| E0 | Is the harness trustworthy? | None; run [§13](../../design/intelligence-layer/contracts-and-scenarios.md#section-13) examples as fixtures | Every fixture has an explicit, deterministic outcome |
 | E1 | H1: does Jev route better? | Replace D2 scoring only | Adopt if non-inferior on evidence and better on cost/latency (latency is measured per profile, not a gate in the spike; see [System One providers](../../design/intelligence-layer/system-one-providers.md)) |
 | E2 | H2: do observation priors help? | Toggle observation-derived priors; vocabulary, rules, queries and source snapshots fixed | Non-inferior on evidence within an owner-agreed margin plus a predeclared benefit; intervals reported; small samples are inconclusive |
 | E2b | Storage | Same queries on tables+cache vs. graph DB | Pick on latency, rebuild cost, access enforcement |
@@ -157,14 +157,14 @@ One fictional org, written once as a structured file. Everything else is generat
 | Planted situation | Tests |
 |---|---|
 | Services `payment-auth`, `identity-auth`, `ledger`, `checkout` | Normal routing |
-| Both auth services are called "Auth Service" in some hubs | Ambiguity ([Fixture 16](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-16-25)) |
+| Both auth services are called "Auth Service" in some hubs | Ambiguity ([Fixture 14](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-14-21)) |
 | Each hub uses its own name for payment-auth (`PA-svc`, *Auth Service*, space *PA*) | Vocabulary ([Example 5](../../design/intelligence-layer/contracts-and-scenarios.md#example-5)) |
 | Retry limit changes 3 → 5 in release R42; the skill still says 3 | Conflict ([Example 3](../../design/intelligence-layer/contracts-and-scenarios.md#example-3)) |
-| Releases R40–R42, plus an experimental branch | Versions ([Example 4](../../design/intelligence-layer/contracts-and-scenarios.md#example-4), [Fixture 24](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-16-25)) |
+| Releases R40–R42, plus an experimental branch | Versions ([Example 4](../../design/intelligence-layer/contracts-and-scenarios.md#example-4), [Fixture 20](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-14-21)) |
 | Same policy page in DocHub and the CodeHub wiki | Exact duplicates ([Example 2](../../design/intelligence-layer/contracts-and-scenarios.md#example-2)) |
-| A skill that discusses two services | Composite subjects ([Fixture 17](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-16-25)) |
+| A skill that discusses two services | Composite subjects ([Fixture 15](../../design/intelligence-layer/contracts-and-scenarios.md#fixtures-14-21)) |
 | A new service no hub covers | Honest gaps ([Example 8](../../design/intelligence-layer/contracts-and-scenarios.md#example-8)) |
-| A page containing instructions to "ignore other sources" | Untrusted content ([Example 10](../../design/intelligence-layer/contracts-and-scenarios.md#example-10)) |
+| A page containing instructions to "ignore other sources" | Untrusted content (an untrusted-content case) |
 | A restricted space visible only to some principals | Scope and disclosure (Fixtures 16, 21) |
 
 #### The hubs
@@ -177,14 +177,14 @@ Each hub is a small MCP server that mimics the **shape and vocabulary** of the r
 | SkillHub | Dobby | Skill tree in markdown, its own names | Skill search; PR-governed flag |
 | DocHub | KaaS | Chunked pages in spaces | Keyword/embedding search; no version reads for some spaces |
 | MemoryHub | Engram | Session notes using `PA-svc` | Session search, scoped to principal |
-| IncidentHub | future source | Incident reports | Held back to test onboarding ([Example 12](../../design/intelligence-layer/contracts-and-scenarios.md#example-12)) |
+| IncidentHub | future source | Incident reports | Held back to test onboarding ([Example 10](../../design/intelligence-layer/contracts-and-scenarios.md#example-10)) |
 
 All hubs share four properties:
 
 - **Honest search.** Real keyword retrieval (e.g. SQLite FTS or BM25), so an unknown alias genuinely misses. A hub that "understands" everything would hide the problem Sanctum is meant to solve.
 - **Per-principal ACLs**, so scope and disclosure can be tested.
 - **Failure knobs:** latency, timeouts, errors, per hub.
-- **Declared capabilities** (version reads, filters), matching the adapter contract ([§12.3](../../design/intelligence-layer/contracts-and-scenarios.md#section-12-3)).
+- **Declared capabilities** (version reads, filters), matching the adapter contract ([§14.4](../../design/intelligence-layer/contracts-and-scenarios.md#section-14-4)).
 
 #### The question set
 

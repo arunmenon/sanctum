@@ -129,7 +129,7 @@ response { model,                               # resolved version, e.g. <family
 | D5 duplicate | none | none | Exact hash only; never a model |
 | D6 possible conflict | `noul` per bounded pair (`choice` over relation types and decomposition diagnostic only) | `d6:<pair>` | Round 3 ([§12](#12-round-3-decisions-d6-conflict-d4-relevance)). Add-only on rule-produced pairs; never displaces rules-packed evidence |
 | Route preference | `choice` over sources | `route` | Diagnostic only. Bands use per-source `noul`, never `choice.confidence` |
-| Memory proposal ranking ([M11](memory-design.md#section-9-10)) | `choice` over mapping labels | `m11:<proposal>` | Future design. Ranks review order only; never establishes identity; D2 calibration never reused |
+| Memory proposal ranking ([M11](memory-design.md#section-12-10)) | `choice` over mapping labels | `m11:<proposal>` | Future design. Ranks review order only; never establishes identity; D2 calibration never reused |
 
 ## 5. The handshake: thirteen points
 
@@ -182,7 +182,7 @@ The SUT asks; the broker decides what may be sent. The broker binds each call in
 
 | Can the model... | Answer |
 |---|---|
-| Remove a must-consult source? | **No.** Must-consult sources are never candidates (precedence ladder, [memory §9.4](memory-design.md#section-9-4)). |
+| Remove a must-consult source? | **No.** Must-consult sources are never candidates (precedence ladder, [memory §12.4](memory-design.md#section-12-4)). |
 | Drop a source when uncertain or failed? | **No.** Uncertain, unavailable or invalid → preserve the candidate. |
 | Widen access, change authority, or add a source? | **No.** It only chooses among allowed optional candidates. |
 | Skip an optional source that held the only necessary evidence? | **Yes.** A confident wrong "not useful" is a real loss, so harmful omissions are measured directly and source-call savings count only within the agreed evidence-quality tolerance. |
@@ -332,6 +332,6 @@ A variant is in one of three states: **live** (a calibration with a usable band 
 
 ## Where this is referenced
 
-[HLD §6.2 and §6.5](hld.md#section-6) · [Contracts Ex. 9](contracts-and-scenarios.md#example-9) · [Memory §9.5 step 5 and M11](memory-design.md#section-9-5)
+[HLD §6.2 and §6.5](hld.md#section-6) · [Contracts Ex. 9](contracts-and-scenarios.md#example-9) · [Memory §12.5 step 5 and M11](memory-design.md#section-12-5)
 
 Lab companion (owner decisions for the spike, measurements, variant statuses and reports): `docs/experiments/system-one-lab.md`, outside this design set.

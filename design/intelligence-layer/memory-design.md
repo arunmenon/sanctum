@@ -2,27 +2,27 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, reorganized from v5.1. Lab work is experimental. Original section numbers are retained.
+> Status: proposed research design, version v5.3.1. Lab work is experimental.
 
-This page preserves the detailed memory design supporting the [HLD](hld.md). It explains what the router knows about sources, how identities differ from subjects and locations, and how mappings and procedures are governed. These are proposed architectural behaviors; individual mechanisms require the evidence described in the lab spike (lab).
+This page preserves the detailed memory design supporting the [HLD](hld.md). It explains what the router knows about sources, how identities differ from subjects and locations, and how mappings and procedures are governed. These are proposed architectural behaviors; individual mechanisms require experimental evidence.
 
-Read §8 for the representation and §9 for construction, use, governance, and improvement. Schema and scenario references link to their owning pages. The physical storage choice remains an experimental question.
+Read §11 for the representation and §12 for construction, use, governance, and improvement. Schema and scenario references link to their owning pages. The physical storage choice remains an experimental question.
 
 ---
 
-<a id="section-8"></a>
+<a id="section-11"></a>
 
-## 8. Sanctum memory: what it holds
+## 11. What memory holds
 
-<a id="section-8-1"></a>
+<a id="section-11-1"></a>
 
-### 8.1 In one sentence
+### 11.1 In one sentence
 
 Sanctum's memory remembers **where knowledge lives, what each source calls things, who owns which kind of fact, how to query each source, how copies and versions relate, and how past routing turned out**, so the router makes a better first guess. It is a librarian's notebook about the shelves, not the books.
 
-<a id="section-8-2"></a>
+<a id="section-11-2"></a>
 
-### 8.2 Not to be confused with Engram
+### 11.2 Not to be confused with Engram
 
 Engram is one of the knowledge sources Sanctum routes to. Sanctum's memory is a separate, lightweight store that belongs to the router.
 
@@ -34,13 +34,13 @@ Engram is one of the knowledge sources Sanctum routes to. Sanctum's memory is a 
 | Used by | Agents, through Sanctum | Only Sanctum's router and evidence assembly |
 | Size | Grows with every agent action | Grows with the number of sources, terms and artifacts |
 
-Sanctum borrows **patterns** from ADR-0009 (rebuildable projection over an append-only log, provenance on everything), not data. Engram is one input feed ([§9.1](memory-design.md#section-9-1)), like the other sources.
+Sanctum borrows **patterns** from ADR-0009 (rebuildable projection over an append-only log, provenance on everything), not data. Engram is one input feed ([§12.1](memory-design.md#section-12-1)), like the other sources.
 
 Sanctum memory does not live inside Engram's store: the router's memory should not sit inside one of the sources it ranks, an Engram outage must not disable routing to the other sources, and the two have different access, retention and availability rules. Fixture: an Engram outage cannot disable the three-source pilot.
 
-<a id="section-8-3"></a>
+<a id="section-11-3"></a>
 
-### 8.3 Five kinds of memory
+### 11.3 Five kinds of memory
 
 ```mermaid
 flowchart TB
@@ -75,13 +75,13 @@ Two distinctions keep this clear:
 - **Semantic vs. procedural.** Vocabulary says what things *are* and what they are *called*. Procedures say what to *do*.
 - **Sanctum's procedures vs. Dobby's.** Dobby owns business procedures *about payments*, for agents. Sanctum owns routing procedures *about sources*, for the router. A Dobby content edit does not change Sanctum routing policy.
 
-<a id="section-8-4"></a>
+<a id="section-11-4"></a>
 
-### 8.4 A thin ontology in three layers
+### 11.4 A thin ontology in three layers
 
 | Layer | Examples | Changes | Changed by |
 |---|---|---|---|
-| **Stable contract** | Node and edge types, edge endpoint rules, allowed uses ([§8.7](memory-design.md#section-8-7)), procedure grammar ([§9.4](memory-design.md#section-9-4)); fact kinds `implemented`, `procedure`, `observed`, `reference`, `session` as a versioned controlled vocabulary | Rarely | ADR |
+| **Stable contract** | Node and edge types, edge endpoint rules, allowed uses ([§11.7](memory-design.md#section-11-7)), procedure grammar ([§12.4](memory-design.md#section-12-4)); fact kinds `implemented`, `procedure`, `observed`, `reference`, `session` as a versioned controlled vocabulary | Rarely | ADR |
 | **Entity types** | `domain`, `service`, `api`, `method`, `repo`, `team`, `topic`, `other` | Occasionally | Proposal + review |
 | **Instances and assertions** | `payment-auth`; "Engram's `PA-svc` denotes payment-auth"; must-consult rules | Constantly | Harvesting, traffic, reviewers |
 
@@ -89,9 +89,9 @@ Two distinctions keep this clear:
 - Storage-compatible is not behavior-compatible. **A new or reclassified type gets no operational meaning** (procedures, authority) until reviewed. Reclassifying `other` → `service` cannot silently activate a procedure (M10).
 - Changing the meaning of a fact kind that affects authority needs semantic review.
 
-<a id="section-8-5"></a>
+<a id="section-11-5"></a>
 
-### 8.5 Names, subjects, and places are different things
+### 11.5 Names, subjects, and places are different things
 
 This is the most important rule in the vocabulary. A source label can be one of three very different things (M01):
 
@@ -129,11 +129,11 @@ flowchart LR
 
 A skill *about* payment-auth is not a *name* for payment-auth. A repo *containing* payment-auth is not payment-auth. Only `DENOTES` establishes identity.
 
-<a id="section-8-6"></a>
+<a id="section-11-6"></a>
 
-### 8.6 Schema v0
+### 11.6 Schema v0
 
-Five node types, unchanged in kind from v4, with sharper edges.
+Five node types.
 
 **Nodes**
 
@@ -155,7 +155,7 @@ Five node types, unchanged in kind from v4, with sharper edges.
 | `Entity -MEMBER_OF-> Entity` | Explicit membership (service in domain), with scope and provenance | Reviewed | ✓ |
 | `Source -COVERS {declared, measured, descriptor, as_of}-> Entity` | Declared and measured coverage, kept separate | Manifests, probing | ✓ pinned |
 | `Source -AUTHORITATIVE_FOR {fact_kind, scope}-> Entity` | Declared ownership of a kind of fact | Registry | ✓ |
-| `Artifact -ABOUT-> Entity` | Artifact discusses the entity; bound per evidence unit ([§8.10](memory-design.md#section-8-10), v5.2.1) | Evidence assembly, source structure | ✓ |
+| `Artifact -ABOUT-> Entity` | Artifact discusses the entity; bound per evidence unit ([§11.10](memory-design.md#section-11-10)) | Evidence assembly, source structure | ✓ |
 | `Artifact -DUPLICATE_OF {exact}-> Artifact` | Same content; provenance kept per copy | Evidence assembly | ✓ |
 | `Artifact -VERSION_OF {branch, environment, effective}-> Artifact` | Lineage with applicability | Adapters | ✓ |
 | `Procedure -APPLIES_TO-> Entity` | Rule applies to questions about this entity | Registry, reviewed | ✓ |
@@ -167,9 +167,9 @@ Five node types, unchanged in kind from v4, with sharper edges.
 
 **Research backlog:** operational `RELATES_TO`, `QueryPattern`, `ROUTED_TO`, `CONTRADICTS` with review status, `Claim`.
 
-<a id="section-8-7"></a>
+<a id="section-11-7"></a>
 
-### 8.7 Allowed uses of each relation
+### 11.7 Allowed uses of each relation
 
 One matrix, enforced in code (M03). Every candidate records *how* it was resolved.
 
@@ -185,9 +185,9 @@ One matrix, enforced in code (M03). Every candidate records *how* it was resolve
 
 **Direction convention.** Following SKOS, `A broad B` means *B is broader than A*. Imports must use the same convention; fixtures check direction.
 
-<a id="section-8-8"></a>
+<a id="section-11-8"></a>
 
-### 8.8 A real neighborhood: payment-auth
+### 11.8 A real neighborhood: payment-auth
 
 ```mermaid
 flowchart LR
@@ -240,11 +240,11 @@ flowchart LR
     class DI,DO,KA,EN,t4,t2n,t1,t3,e1,e2,e3,a1,a2,p1 mem
 ```
 
-**Reading it:** two sources have *names* for the service (`PA-svc`, *Auth Service*), both reviewed as denoting it. Two sources have *places* that hold material about it, used only as search filters. The Dobby skill is *about* the service and the retries topic; it is not a name. The service is an explicit member of the payments domain, which is how the domain-level must-consult rule reaches it. The [worked trace](contracts-and-scenarios.md#worked-trace) follows one question through this neighborhood end to end (v5.2.2).
+**Reading it:** two sources have *names* for the service (`PA-svc`, *Auth Service*), both reviewed as denoting it. Two sources have *places* that hold material about it, used only as search filters. The Dobby skill is *about* the service and the retries topic; it is not a name. The service is an explicit member of the payments domain, which is how the domain-level must-consult rule reaches it. The [worked trace](contracts-and-scenarios.md#worked-trace) follows one question through this neighborhood end to end.
 
-<a id="section-8-9"></a>
+<a id="section-11-9"></a>
 
-### 8.9 Why a graph, and why not smaller?
+### 11.9 Why a graph, and why not smaller?
 
 **Why a graph shape.** The router's questions hop across relationships: *name → entity → domain → owner*, *artifact → copies → applicable version*, *entity → procedures*. A graph expresses these directly and explains each routing choice.
 
@@ -254,9 +254,9 @@ flowchart LR
 
 ---
 
-<a id="section-8-10"></a>
+<a id="section-11-10"></a>
 
-### 8.10 Attributed subjects: `Artifact ABOUT Entity` in operation (v5.2.1)
+### 11.10 Attributed subjects: `Artifact ABOUT Entity` in operation
 
 Names resolve the question's subject and places filter the search; each piece of **evidence** also needs a subject that is not guessed from paths, acronyms or headers.
 
@@ -266,13 +266,13 @@ Names resolve the question's subject and places filter the search; each piece of
 
 **Unknown subjects are preserved.** A unit whose subject cannot be attested stays in the response with `subjects: [unknown]`. It is never treated as matching every subject, never silently attached to the resolved entity, and never dropped for lacking one.
 
-<a id="section-9"></a>
+<a id="section-12"></a>
 
-## 9. Sanctum memory: how it is built, used, governed, and improved
+## 12. How memory is built and used
 
-<a id="section-9-1"></a>
+<a id="section-12-1"></a>
 
-### 9.1 Where the knowledge comes from
+### 12.1 Where the knowledge comes from
 
 Sanctum does **not** extract facts from content. It needs *who has what, what it is called, and where it lives*, which mostly exists as structure inside the sources.
 
@@ -294,7 +294,7 @@ flowchart LR
         r3[("Artifact relations")]
         r4[("Observations")]
     end
-    REL[("Memory release<br/>(immutable, §9.6)")]
+    REL[("Memory release<br/>(immutable, §12.6)")]
     f1 --> r1
     f2 --> r2
     f2 --> r3
@@ -324,16 +324,16 @@ flowchart LR
 
 **Revocation (M07).** For the pilot, a periodic reconciliation plus a deny-on-revocation hook is enough; no streaming platform is needed. Unsharing a collection invalidates its descriptors, selectors, and terms.
 
-<a id="section-9-2"></a>
+<a id="section-12-2"></a>
 
-### 9.2 Resolving names: identity, ambiguity, no guessing
+### 12.2 Resolving names: identity, ambiguity, no guessing
 
 ```mermaid
 flowchart TB
     Q["Query term, e.g. 'Auth Service'"] --> L["Label index lookup<br/>(within caller's visible scope)"]
     L --> C{"How many accepted<br/>DENOTES candidates?"}
     C -- "exactly one" --> ONE["Resolved<br/>(record origin: DENOTES v3)"]
-    C -- "none" --> NONE["Unresolved<br/>→ bounded fallback (§9.3)<br/>→ log for improvement loop"]
+    C -- "none" --> NONE["Unresolved<br/>→ bounded fallback (§12.3)<br/>→ log for improvement loop"]
     C -- "two or more" --> CTX{"Does request context<br/>identify a namespace?<br/>(project, repo, space)"}
     CTX -- yes --> ONE
     CTX -- no --> AMB["Ambiguous"]
@@ -355,9 +355,9 @@ Rules (M01, M02):
 - Scope is three separate things: the name's **namespace**, the assertion's **applicability**, and **permission** to see the metadata.
 - Which names a caller can see is an assumed input ([HLD §5](hld.md#section-5)). Given that input, a readable place is not proof that a name is visible: visibility follows the name's own metadata permission, never the caller's access to a place that selects for the entity.
 
-<a id="section-9-3"></a>
+<a id="section-12-3"></a>
 
-### 9.3 Per-source query plans
+### 12.3 Per-source query plans
 
 Once a question is resolved (or not), Sanctum builds a **bounded query plan per source** rather than rewriting the question (M05):
 
@@ -376,9 +376,9 @@ Once a question is resolved (or not), Sanctum builds a **bounded query plan per 
 
 A deterministic post-resolution ambiguity check runs after step 1; no extra model round is added.
 
-<a id="section-9-4"></a>
+<a id="section-12-4"></a>
 
-### 9.4 Procedures: a small grammar and a precedence ladder
+### 12.4 Procedures: a small grammar and a precedence ladder
 
 Procedures are data interpreted by a small, allowlisted interpreter (M04). No scripts, model instructions, or raw query fragments.
 
@@ -419,20 +419,20 @@ flowchart TB
     class L5 judge
 ```
 
-**Time handling** in the pilot is a fixed adapter-capability guard (level 2), not a configurable procedure. This resolves the v4 inconsistency between [§8.5](memory-design.md#section-8-5) and [§9.3](memory-design.md#section-9-3).
+**Time handling** in the pilot is a fixed adapter-capability guard (level 2), not a configurable procedure.
 
-<a id="section-9-5"></a>
+<a id="section-12-5"></a>
 
-### 9.5 How the router uses memory, with failure behavior
+### 12.5 How the router uses memory, with failure behavior
 
 ```mermaid
 flowchart TB
-    S1["<b>1. Resolve names</b> · DENOTES, §9.2"] --> S2
+    S1["<b>1. Resolve names</b> · DENOTES, §12.2"] --> S2
     S2["<b>2. Find neighborhood</b> · coverage, MEMBER_OF, authority"] --> S3
-    S3["<b>3. Apply procedures</b> · precedence ladder, §9.4"] --> S4
+    S3["<b>3. Apply procedures</b> · precedence ladder, §12.4"] --> S4
     S4["<b>4. Build priors</b> · pinned descriptors (observations after E2)"] --> S5
     S5["<b>5. Jev judges usefulness</b> · optional sources only (D2)"] --> S6
-    S6["<b>6. Plan and fan out</b> · per-source query plans, §9.3"] --> S7
+    S6["<b>6. Plan and fan out</b> · per-source query plans, §12.3"] --> S7
     S7["<b>7. Clean evidence</b> · exact copies, applicable versions (D5, D9)"] --> S8
     S8["<b>8. Record</b> · release ID, resolutions, procedures, plans, results"]
 
@@ -457,14 +457,14 @@ Step 5 is answered by a System One provider through a runner-side broker; the de
 
 **The four indirect paths to authority.** Memory never grants credentials, but it could still act like authority through:
 
-1. **Identity → membership → ownership:** a wrong identity applies the wrong owner. Guarded by reviewed `DENOTES` and `MEMBER_OF` ([§8.7](memory-design.md#section-8-7)).
-2. **Procedure → mandatory source or filter:** guarded by the ladder ([§9.4](memory-design.md#section-9-4)).
-3. **Descriptor → skipped source:** guarded by pinning descriptors and keeping D2 to optional sources ([§9.7](memory-design.md#section-9-7)).
+1. **Identity → membership → ownership:** a wrong identity applies the wrong owner. Guarded by reviewed `DENOTES` and `MEMBER_OF` ([§11.7](memory-design.md#section-11-7)).
+2. **Procedure → mandatory source or filter:** guarded by the ladder ([§12.4](memory-design.md#section-12-4)).
+3. **Descriptor → skipped source:** guarded by pinning descriptors and keeping D2 to optional sources ([§12.7](memory-design.md#section-12-7)).
 4. **Version link → hidden conflict witness:** guarded by applicability rules ([§7.5](hld.md#section-7-5)).
 
-<a id="section-9-6"></a>
+<a id="section-12-6"></a>
 
-### 9.6 Memory releases
+### 12.6 Memory releases
 
 Every request runs against **one coherent, immutable memory release** (M08).
 
@@ -495,25 +495,25 @@ flowchart LR
 - In the pilot, **rollback is of the whole release**. A single mapping can be the unit of review; activation and rollback operate on its dependency closure.
 - Rollback is a new audit event. Old receipts keep the release they actually used, annotated as withdrawn. Rollback never restores revoked access.
 - For the pilot, a simple versioned manifest in existing storage is enough; no new control-plane service.
-- A change-feed gap or error means freshness unknown, never "no changes" (v5.2.1).
+- A change-feed gap or error means freshness unknown, never "no changes".
 
-<a id="section-9-7"></a>
+<a id="section-12-7"></a>
 
-### 9.7 Governance
+### 12.7 Governance
 
-**Only reviewed names establish identity.** A `DENOTES`, `SELECTS_FOR`, `MEMBER_OF`, authority declaration or procedure becomes operational only when it is reviewed and published in a memory release; the system may propose, never accept. Proposed and shadow items are computed and logged but have no operational effect ([§8.7](memory-design.md#section-8-7)); rejected proposals are kept so the same mistake is not re-proposed. Who approves which assertion, and the approval workflow, are out of scope at the research stage.
+**Only reviewed names establish identity.** A `DENOTES`, `SELECTS_FOR`, `MEMBER_OF`, authority declaration or procedure becomes operational only when it is reviewed and published in a memory release; the system may propose, never accept. Proposed and shadow items are computed and logged but have no operational effect ([§11.7](memory-design.md#section-11-7)); rejected proposals are kept so the same mistake is not re-proposed.
 
 **Descriptors (M06).** Generated from attributed fields only: entity, fact kind, artifact types, time range, observed evidence, freshness, uncertainty. Source text is data, not instructions. Descriptors cannot assert authority ("complete and authoritative"). They are scope-filtered and subject to egress rules before reaching Jev.
 
-<a id="section-9-8"></a>
+<a id="section-12-8"></a>
 
-### 9.8 Does memory have enough context?
+### 12.8 Does memory have enough context?
 
 | Question shape | v0 behavior | What closes the gap |
 |---|---|---|
 | Names a service, method, repo | Resolves ([Example 1](contracts-and-scenarios.md#example-1)) | – |
 | Uses a source-specific name | Resolves if `DENOTES` exists ([Example 5](contracts-and-scenarios.md#example-5)) | Reviewed names |
-| Same name, two meanings | Separated interpretations ([Fixture 16](contracts-and-scenarios.md#fixtures-16-25)) | Request context |
+| Same name, two meanings | Separated interpretations ([Fixture 14](contracts-and-scenarios.md#fixtures-14-21)) | Request context |
 | Names a concept or process | Weak | `topic` entities with coverage |
 | Names nothing | LLM decomposition ([Example 6](contracts-and-scenarios.md#example-6)) | – |
 | No source covers it | Honest gap ([Example 8](contracts-and-scenarios.md#example-8)) | Onboarding |
@@ -527,9 +527,9 @@ flowchart LR
 | Jev uncertain-band rate by entity | Thin descriptors, ambiguous intent, poor evidence, or model behavior (log hypotheses; do not assign one cause) |
 | `other`-type growth | Missing entity type |
 
-<a id="section-9-9"></a>
+<a id="section-12-9"></a>
 
-### 9.9 Schema evolution and reconstruction
+### 12.9 Schema evolution and reconstruction
 
 1. **Memory is a projection of assertions.** Change the projector, rebuild.
 2. **Assertions carry enough to be reinterpreted later** (M10): stable native IDs, origin namespace, input and schema versions, applicable times, capture time, reviewer, and permitted source metadata.
@@ -538,11 +538,11 @@ flowchart LR
 5. **A reconstruction window is declared.** Beyond it, or after permitted deletion, replay capability is reported as lost; references and hashes alone cannot reproduce missing content. Minimal non-sensitive tombstones are kept where permitted.
 6. **New types and edges need reader-compatibility and semantic migration tests**, not just an additive database change.
 
-<a id="section-9-10"></a>
+<a id="section-12-10"></a>
 
-### 9.10 How memory improves: a gated loop
+### 12.10 How memory improves: a gated loop
 
-**Memory improves through a proposed, tested, approved loop.** Gaps observed in traffic become proposals with evidence; proposals are tested against data they did not choose; only reviewed changes reach the next release. The approval workflow itself is out of scope at the research stage; the evaluation discipline below is in scope.
+**Memory improves through a proposed, tested, approved loop.** Gaps observed in traffic become proposals with evidence; proposals are tested against data they did not choose; only reviewed changes reach the next release.
 
 ```mermaid
 flowchart LR
@@ -564,10 +564,10 @@ flowchart LR
 **Keeping evaluation honest (M13).** A frozen set can still be overfit by repeated tuning against it.
 
 - Three separate pools: **discovery** traffic (where proposals come from), **development replay** (for iteration), and an **owner-controlled acceptance holdout** refreshed with later samples. Evaluator access is logged; exposed holdouts are rotated.
-- The eligible population is fixed and includes rejected, ambiguous, failed, and unresolved requests. A proposal cannot improve its numbers by declaring hard questions out of scope.
+- The eligible population is fixed and includes rejected, ambiguous, failed, and unresolved requests. A proposal cannot improve its numbers by excluding hard questions.
 - Counterfactual claims ("this would have found evidence in a skipped source") require **paired retrieval** of the original and translated queries against a recorded source snapshot (M12). Unsupported counterfactuals are marked unmeasurable.
 - The loop cannot alter policy, benchmark membership, success definitions, or its own gate.
-- Report fresh-sample results after approval, not only the replay used to obtain approval.
+- Report fresh-sample results after approval, not only the replay run to obtain approval.
 
 **Signals stay separate** (F09): availability, support, adoption, and task outcome measure different things and are never merged into one score.
 

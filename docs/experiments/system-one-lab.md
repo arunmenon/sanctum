@@ -79,7 +79,7 @@ Every call resolved `jev-latest` to `jev-1.13.0`; cold calls took 320 to 568 ms.
 
 ### Local Laya on CPU
 
-Tests: [design §13 (self-hosted provider example)](../../design/intelligence-layer/system-one-providers.md#13-example-a-self-hosted-provider-laya-on-cpu-laya-local). Laya 0.3.22, English checkpoint `55cf4c4e`, Apple M1 Pro (10 cores, 16 GB) ([report](../reports/system-one-laya-dev.md), [batches](../reports/system-one-batches-laya-local.md)):
+Tests: [Providers §13 (the two integrated providers)](../../design/intelligence-layer/system-one-providers.md#13-the-two-integrated-providers). Laya 0.3.22, English checkpoint `55cf4c4e`, Apple M1 Pro (10 cores, 16 GB) ([report](../reports/system-one-laya-dev.md), [batches](../reports/system-one-batches-laya-local.md)):
 
 | Measure | Value |
 |---|---|

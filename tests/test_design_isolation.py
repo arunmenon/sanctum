@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DESIGN = ROOT / "design"
 EXPECTED = {"hld.md", "memory-design.md", "contracts-and-scenarios.md", "system-one-providers.md", "README.md",
-            "section-map.md", "review-history.md", "preservation-check.json"}
+            "section-map.md"}
 LAB_TARGETS = re.compile(r"(^|/)(docs/reports|docs/experiments|reports|experiments|runs|holdout|acceptance)(/|$)")
 LINK = re.compile(r"\]\(([^)\s]+)\)|href=[\"']([^\"']+)[\"']")
 COMMIT = re.compile(r"(?<![0-9a-zA-Z_./-])[0-9a-f]{7,40}(?![0-9a-zA-Z_-])")
@@ -45,3 +45,20 @@ def test_design_has_no_measurements_or_commit_citations():
 def test_lab_pages_link_back_to_design():
     lab = (ROOT / "docs" / "experiments" / "system-one-lab.md").read_text(encoding="utf-8")
     assert "../../design/intelligence-layer/system-one-providers.md#" in lab
+
+
+HISTORY_PHRASES = ("removed", "out of scope (research stage)", "superseded", "supersedes", "previous version",
+                   "formerly", "no longer", "used to", "(lab)")
+VERSION = re.compile(r"\bv\d+\.\d+(?:\.\d+)*\b", re.IGNORECASE)
+CURRENT_VERSION = "v5.3.1"
+
+
+def test_design_carries_no_history():
+    """The design reads as the current design: no history phrases, no other version strings."""
+    for path in _files():
+        text = path.read_text(encoding="utf-8")
+        lowered = text.lower()
+        for phrase in HISTORY_PHRASES:
+            assert phrase not in lowered, f"{path.relative_to(ROOT)} contains {phrase!r}"
+        others = {match.lower() for match in VERSION.findall(text)} - {CURRENT_VERSION}
+        assert not others, f"{path.relative_to(ROOT)} names versions {sorted(others)}"

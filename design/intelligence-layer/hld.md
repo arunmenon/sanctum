@@ -2,25 +2,23 @@
 
 [Overview and reading guide](README.md) · [Section map](section-map.md)
 
-> Status: proposed research design, version 5.3.1 (reorganized from v5.1). Scope: routing intelligence. Policy and access control are assumed inputs, not designed here ([§5](hld.md#section-5)). Lab work is experimental. Original section numbers are retained where sections survive.
+> Status: proposed research design, version v5.3.1. Scope: routing intelligence. Policy and access control are assumed inputs, not designed here ([§5](hld.md#section-5)). Lab work is experimental.
 
 This proposal expands the engineering team's initial Sanctum proposal with evidence routing inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. It is a research design for discussion. The original team proposal has not been supplied as part of this restructuring; compatibility with it remains open, rather than an assumed agreement.
 
-**Review focus:** the routing stages, the memory and ontology, evidence and fact-kind authority semantics, failure honesty, and the questions in §21. The lab investigates the design's hypotheses; its implementation does not establish production readiness.
+**Review focus:** the routing stages, the memory and ontology, evidence and fact-kind authority semantics, failure honesty, and the questions in §10. The lab investigates the design's hypotheses; its implementation does not establish production readiness.
 
 ## Memory in the overall architecture
 
 Sanctum memory connects source names, canonical subjects, storage locations, procedures, and evidence relationships. A name identifying a service, a document discussing that service, and a repository containing its material have different meanings. Only reviewed identity mappings establish identity. Memory advises routing within the given allowed set and remains separate from Engram's agent memory.
 
-The complete [memory design](memory-design.md) owns ontology, resolution, procedures, governance, releases, and the improvement loop. [Contracts and scenarios](contracts-and-scenarios.md) owns wire details and the complete behavioral examples. The spike (lab) owns the hypotheses and evaluation protocol; the execution page (lab) separates experimental work from possible adoption.
-
-The numbered sections below retain their v5.1 identifiers. Gaps in numbering indicate material moved to a companion page, not omitted content.
+The complete [memory design](memory-design.md) owns ontology, resolution, procedures, governance, releases, and the improvement loop. [Contracts and scenarios](contracts-and-scenarios.md) owns wire details and the complete behavioral examples. The lab owns the hypotheses and evaluation protocol.
 
 ---
 
-<a id="section-0"></a>
+<a id="section-1"></a>
 
-## 0. One-page summary
+## 1. Summary
 
 **What Sanctum is today.** One MCP endpoint between agent harnesses (inner and outer loop) and several knowledge backends: Engram (agent memory), Dobby (SME-reviewed domain skills), Deep Insights (code and repo knowledge), KaaS (RAG over documents). Today it fans a question out and returns what comes back.
 
@@ -53,19 +51,19 @@ flowchart LR
 
 **Research stance.** Every intelligent piece must beat a strong rules-only baseline on the same traffic before it is switched on. If rules are enough, we keep rules.
 
-**How memory improves.** Through a closed loop: observe traffic, diagnose gaps, propose fixes, test them on a frozen benchmark, promote by risk. It learns, but it cannot change its own rules or grade its own homework ([§9.10](memory-design.md#section-9-10)).
+**How memory improves.** Through a closed loop: observe traffic, diagnose gaps, propose fixes, test them on a frozen benchmark, promote by risk. It learns, but it cannot change its own rules or grade its own homework ([§12.10](memory-design.md#section-12-10)).
 
-**What is small in v0.** Memory v0 has five node types, populated only from source structure, reviewed configuration, and exact matches, for one pilot service, and ships as versioned releases. Learned priors, non-identity mappings and automatic promotion are backlog ([§8.9](memory-design.md#section-8-9), §18 (lab)).
+**What is small in v0.** Memory v0 has five node types, populated only from source structure, reviewed configuration, and exact matches, for one pilot service, and ships as versioned releases. Learned priors, non-identity mappings and automatic promotion are backlog ([§11.9](memory-design.md#section-11-9)).
 
-**The rule to remember.** A *name* for a thing, a document *about* a thing, and a *place* where material about a thing lives are three different relations. Only reviewed names establish identity ([§8.5](memory-design.md#section-8-5)).
+**The rule to remember.** A *name* for a thing, a document *about* a thing, and a *place* where material about a thing lives are three different relations. Only reviewed names establish identity ([§11.5](memory-design.md#section-11-5)).
 
-**How we test it.** A Sanctum Lab runs Sanctum against simulated knowledge hubs built from one synthetic world, with auto-derived gold answers, before moving to a thin slice of real traffic (§17.2 (lab)).
+**How we test it.** A Sanctum Lab runs Sanctum against simulated knowledge hubs built from one synthetic world, with auto-derived gold answers, before moving to a thin slice of real traffic.
 
 ---
 
-<a id="section-1"></a>
+<a id="section-2"></a>
 
-## 1. Problem
+## 2. Problem
 
 An agent's context per turn is roughly fixed. Only the ephemeral part carries knowledge, and every connected MCP server competes for it.
 
@@ -102,7 +100,7 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 
 <a id="section-3"></a>
 
-## 3. Goals and non-goals
+## 3. Goals
 
 ### Goals
 
@@ -119,13 +117,13 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 - NG2. Sanctum does not replace a backend's own retrieval or indexing.
 - NG3. Sanctum does not mirror backend content.
 - NG4. No model output is an authorization decision.
-- NG5. The MVP is read-only; access control, writes and replay are out of scope.
+- NG5. The MVP is read-only; access control is an assumed input, and writes and replay are not part of this design.
 
 ---
 
 <a id="section-4"></a>
 
-## 4. Design principles
+## 4. Principles
 
 1. **Allowed set before prediction.** The allowed set is given before any judgment; models only rank options inside it (F01).
 2. **Decisions, not generations.** Every intelligent step is a typed question, and every answer can also be `unknown`, `abstained`, `unavailable`, or `invalid` (F02, F04).
@@ -141,11 +139,11 @@ Re-ranking fixes **relevance**. It does not establish **validity**, remove **red
 
 ## 5. Architecture
 
-**Assumed inputs (v5.3).** This design takes three things as given and does not design or validate them:
+**Assumed inputs.** This design takes four things as given and does not design or validate them:
 
 1. The router receives an **allowed set** of sources for the caller and a **required subset**, and never widens either.
 2. **No model output is an authorization decision.** A model only chooses among allowed, optional candidates.
-3. **Names the caller cannot see are not resolved for them** ([§9.2](memory-design.md#section-9-2)).
+3. **Names the caller cannot see are not resolved for them** ([§12.2](memory-design.md#section-12-2)).
 4. **Which providers may see which data classes is given.** Provider eligibility by data class is an input, not designed here.
 
 Access control, identity and credentials are assumed, not designed or validated by this MVP.
@@ -315,9 +313,9 @@ flowchart LR
     class R1,R2,R3 judge
 ```
 
-Each D2 template names its state layout. A **descriptor-only** layout (the query plus each allowed source's pinned descriptor) and an **ontology-enriched** layout (the same plus permitted, provenance-backed memory metadata about the query's resolved names for that source, with unknown coverage preserved as unknown) are distinct variants with separate calibrations; graph neighbourhoods reach the model only through the enriched layout ([System One providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
+Each D2 template names its state layout. A **descriptor-only** layout (the query plus each allowed source's pinned descriptor) and an **ontology-enriched** layout (the same plus permitted, provenance-backed memory metadata about the query's resolved names for that source, with unknown coverage preserved as unknown) are distinct variants with separate calibrations; graph neighbourhoods reach the model only through the enriched layout ([Providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
 
-Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance that may reorder but never drop a rules-packed unit) are specified in [System One providers §12](system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance).
+Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance that may reorder but never drop a rules-packed unit) are specified in [Providers §12](system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance).
 
 <a id="section-6-4"></a>
 
@@ -332,7 +330,6 @@ Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance t
 | D5 | Duplicate | Exact: same hash + version. Semantic: proposal only | Exact only | Keep both |
 | D6 | Possible conflict | P(two units assert a material typed relation about the same subject and attribute) | Bounded flag on rule-produced pairs | Rule-flagged pairs stay `possible_conflict`; candidate pairs stay unflagged |
 | D7 | Claim support | supported / contradicted / insufficient | Later | `insufficient` |
-| D8 | Write target | Out of scope (research stage) | – | – |
 | D9 | Supersession | Explicit version lineage first | Lineage only | Never hide evidence |
 
 <a id="section-6-5"></a>
@@ -389,14 +386,14 @@ DecisionResult
 - Train, calibrate, and test splits are grouped by project, task family, and time.
 - Report discrimination, class-specific errors, Brier/log loss, and risk-vs-coverage, not just ECE.
 - Model, rubric, options, data slice, and calibration map are versioned together.
-- Question templates and state layouts are named, versioned entries bound into each calibration ([System One providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
+- Question templates and state layouts are named, versioned entries bound into each calibration ([Providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
 - **Activation.** Each decision names its no-model control: D2 a source-specific prior; D4 a predeclared source or role prior, or the existing ranker; D6 a predeclared source-pair or relation prior. A model is activated only when the decision's named metric improves over both its rules baseline and its no-model control within the unchanged error tolerance, and the metric must be able to observe the effect (D4: ordering or useful additions; D6: eligible rule-missed relations).
 
 ---
 
 <a id="section-7"></a>
 
-## 7. Evidence, authority, and time
+## 7. Evidence and authority
 
 <a id="section-7-1"></a>
 
@@ -407,10 +404,10 @@ EvidenceUnit
   evidence_id, source_id, artifact_id, native_ref, span/offsets, content_hash, text
   kind (code|doc|skill|memory|ticket)
   role (implemented_behavior | intended_procedure | observed_event | reference | session_history)
-  applicability                                   # v5.3.1: one field
+  applicability                                   # one field
     version?, branch?, environment?, period?      # what the unit applies to
     applicability_status = known | partial | unknown
-  subjects[]                                      # attested subject bindings (memory §8.10)
+  subjects[]                                      # attested subject bindings (memory §11.10)
   authority_assertion_ref?, exact_token_count, tokenizer_id
 ```
 
@@ -462,15 +459,15 @@ When "implemented" and "intended" disagree, that is usually a real finding, not 
 
 Packing reserves room for both witnesses of every flagged conflict, then fills the remaining budget in rank order with whole units, counting tokens on the serialized response with a declared tokenizer.
 
-**Status defaults (v5.2.1).** Status is judged per interpretation against the requested facts: `sufficient` when every requested fact has obtainable evidence in the response; `partial` when some do and others are missing, denied, failed or did not fit, with the specific reasons; `insufficient` only when nothing obtainable remains for the requested facts. A missing must-consult source therefore gives `partial` with `required_source_unavailable` while other requested facts are covered, never `sufficient`.
+**Status defaults.** Status is judged per interpretation against the requested facts: `sufficient` when every requested fact has obtainable evidence in the response; `partial` when some do and others are missing, denied, failed or did not fit, with the specific reasons; `insufficient` only when nothing obtainable remains for the requested facts. A missing must-consult source therefore gives `partial` with `required_source_unavailable` while other requested facts are covered, never `sufficient`.
 
-**Conflicts survive packing (v5.2.1).** A flagged conflict is a response object, not a packing side effect. When both witnesses cannot fit, the conflict record is still returned, the witness that does not fit is listed in `omitted` with reason `conflict_witness_omitted`, and the interpretation is at most `partial`. A witness never enters through ordinary filling with its flag dropped, and a D6 promotion never displaces rules-packed evidence.
+**Conflicts survive packing.** A flagged conflict is a response object, not a packing side effect. When both witnesses cannot fit, the conflict record is still returned, the witness that does not fit is listed in `omitted` with reason `conflict_witness_omitted`, and the interpretation is at most `partial`. A witness never enters through ordinary filling with its flag dropped, and a D6 promotion never displaces rules-packed evidence.
 
 <a id="section-7-5"></a>
 
 ### 7.5 Version applicability and exact copies
 
-`VERSION_OF` establishes **lineage**, not **applicability** (M09). Before any version is removed from the working set:
+`VERSION_OF` establishes **lineage**, not **applicability** (M09). Before any version is dropped from the working set:
 
 - The evidence unit must carry **branch, environment, and effective time**.
 - The query's time and environment must be known (explicit `as_of`, or the default "current production").
@@ -484,9 +481,9 @@ Automatic *ingestion* of lineage and copies is fine. Automatic *hiding* requires
 
 ---
 
-<a id="section-11"></a>
+<a id="section-8"></a>
 
-## 11. Read path in detail
+## 8. Read path
 
 ```mermaid
 sequenceDiagram
@@ -511,9 +508,9 @@ sequenceDiagram
 
 ---
 
-<a id="section-20"></a>
+<a id="section-9"></a>
 
-## 20. Anticipated questions
+## 9. Anticipated questions
 
 **"Isn't this too big for where we are?"**
 The HLD describes the target shape so decisions stay consistent. The pilot is small: rules-first, one Jev call, graph v0 on existing storage, read-only, three backends, and access control taken as given. Everything else waits on an experiment.
@@ -522,16 +519,16 @@ The HLD describes the target shape so decisions stay consistent. The pilot is sm
 The router's questions are multi-hop ([Ex. 1](contracts-and-scenarios.md#example-1), 4, 5). Physically, v0 may well be tables; E2b decides.
 
 **"Is this Engram?"**
-No. Engram is one of the sources. Sanctum memory is the router's own notebook about the sources, in a separate store ([§8.2](memory-design.md#section-8-2)).
+No. Engram is one of the sources. Sanctum memory is the router's own notebook about the sources, in a separate store ([§11.2](memory-design.md#section-11-2)).
 
 **"How do we test this before real backends are ready?"**
-The Sanctum Lab: simulated hubs built from one synthetic world, auto-derived gold answers, the ablation ladder as runnable configs, then a thin real slice (§17.2 (lab)).
+The Sanctum Lab: simulated hubs built from one synthetic world, auto-derived gold answers, the ablation ladder as runnable configs, then a thin real slice.
 
 **"Do we need an enterprise ontology?"**
-No. A thin core owned by Sanctum, source vocabularies left untouched, and reviewed names and places linking them ([§8.4](memory-design.md#section-8-4), [§8.5](memory-design.md#section-8-5)).
+No. A thin core owned by Sanctum, source vocabularies left untouched, and reviewed names and places linking them ([§11.4](memory-design.md#section-11-4), [§11.5](memory-design.md#section-11-5)).
 
 **"Can the memory improve itself?"**
-Yes, through a gated loop: it proposes, tests on a frozen benchmark, and owners approve anything risky. It cannot change authority, access, or its own evaluation set ([§9.10](memory-design.md#section-9-10), [Ex. 14](contracts-and-scenarios.md#example-14)).
+Yes, through a gated loop: it proposes, tests on a frozen benchmark, and owners approve anything risky. It cannot change authority, access, or its own evaluation set ([§12.10](memory-design.md#section-12-10), [Ex. 12](contracts-and-scenarios.md#example-12)).
 
 **"Why not just use an LLM for routing?"**
 Too slow and costly on every request. It is used once, when the cheap tier is unsure ([Ex. 6](contracts-and-scenarios.md#example-6)), and E4 checks that it's worth it.
@@ -547,9 +544,9 @@ Rules and graph priors with capped fan-out, response marked degraded ([Ex. 9](co
 
 ---
 
-<a id="section-21"></a>
+<a id="section-10"></a>
 
-## 21. Decisions needed from the group
+## 10. Open decision
 
 | # | Decision | Proposed default |
 |---|---|---|

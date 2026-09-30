@@ -1,14 +1,14 @@
-# Sanctum intelligence layer — overview and reading guide
+# Sanctum intelligence layer: overview and reading guide
 
 ## Purpose and relationship to the team's proposal
 
 This document set expands the engineering team's initial Sanctum proposal. It develops an evidence router that works inside a given allowed set of sources, a System One decision interface, and governed memory about knowledge sources. The accompanying lab is a spike to investigate the underlying hypotheses. Its findings will inform design choices and possible follow-on work.
 
-The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains open. The architectural expansion and lab do not imply approval or replacement of that proposal.
+Add the initial team proposal's Confluence link here when publishing; compatibility with its contract remains open. The architectural expansion and lab do not imply approval or replacement of that proposal.
 
-**Version: v5.3.1** (proposed). It supersedes v5.3: one applicability field on evidence units, no latency budget, section 14 folded into §5, and one open question; see the [review history](review-history.md#v5-3-1).
+**Version v5.3.1**
 
-**Scope: routing intelligence.** The design covers two pillars: the cascade (Understand, Select, Retrieve, Assemble, with typed decisions from rules, then System One, then an LLM only if unsure) and the memory and ontology that advise it. Both operate inside a given allowed set of sources and a required subset. Access control, identity, credentials, writes, replay and approval workflows are assumed or out of scope at the research stage, not designed here.
+**Scope.** This is a research MVP design for routing intelligence. It covers two pillars: the cascade (Understand, Select, Retrieve, Assemble, with typed decisions from rules, then System One, then an LLM only if unsure) and the memory and ontology that advise it. Both operate inside a given allowed set of sources and a required subset: policy, including access control, is an assumed input, not designed here. The design is read-only.
 
 ## Start here
 
@@ -23,12 +23,11 @@ Given the sources the caller may use, Sanctum would resolve the question's names
 | [Architectural proposal](hld.md) | What is proposed, how a request flows, what the boundaries and tradeoffs are | Working group, architects, technical stakeholders |
 | [Memory and meta-taxonomy](memory-design.md) | How identities, locations, procedures, ownership and releases work | Memory, source integration and governance reviewers |
 | [Contracts and worked scenarios](contracts-and-scenarios.md) | Exact response expectations and normal, ambiguous, conflicting and failed cases | Implementers, adapter owners and evaluators |
-| [System One providers and the Jev handshake](system-one-providers.md) | How decisions reach a System One model: provider interface, `/v1/systemone` protocol, broker isolation, calibration and conformance | Decision-layer, provider and security reviewers |
-| [Review history](review-history.md) | Prior findings, editorial changes and their traceability | Reviewers needing the history |
+| [System One providers and the Jev handshake](system-one-providers.md) | How decisions reach a System One model: provider interface, `/v1/systemone` protocol, broker isolation, calibration and conformance | Decision-layer and provider reviewers |
 
-For a first review, read this overview and the HLD, then follow only the relevant detail links. The [section map](section-map.md) locates every original section.
+For a first review, read this overview and the HLD, then follow only the relevant detail links. The [section map](section-map.md) lists every section and the page that owns it.
 
-This set is design only: it states what Sanctum is and the rules it follows. Everything measured or run lives with the lab, outside this set: the hypothesis-validation spike (sections 2, 16, 17), the execution plan (section 18) and the System One lab page are in the lab repository under `docs/experiments/` (lab-spike.md, spike-plan.md, system-one-lab.md), with reports under `docs/reports/`. The lab links to these design pages; these pages do not link to the lab.
+This set is design only: it states what Sanctum is and the rules it follows. Everything measured or run lives with the lab, outside this set, in the lab repository under `docs/experiments/` and `docs/reports/`. The lab links to these design pages; these pages do not link to the lab.
 
 ## How to interpret status
 
@@ -40,22 +39,22 @@ This set is design only: it states what Sanctum is and the rules it follows. Eve
 | Spike implementation | Experimental machinery; does not by itself prove the hypothesis |
 | Finding | A reproducible result with a named comparison and stated limitations |
 | Open decision | A question requiring a designated owner or working-group resolution |
-| Deferred | Outside the proposed read-only pilot; retained to explain the future boundary |
+| Deferred | Outside the proposed read-only pilot |
 
-The source HLD describes existing Sanctum as an MCP endpoint across Engram, Dobby, Deep Insights and KaaS. That description has not been independently audited here. The current lab README describes M0–M2 work and a planned M3 reference SUT; this restructuring does not certify implementation status or rerun experiments.
+The team's proposal describes existing Sanctum as an MCP endpoint across Engram, Dobby, Deep Insights and KaaS. That description has not been independently audited here.
 
 ## Feedback requested
 
 1. Does this expansion fit the team's initial proposal and contract?
-2. Are the policy, judgment, memory, and source-ownership boundaries appropriate?
+2. Are the cascade, memory, and source-ownership boundaries appropriate?
 3. Is the proposed one-service, read-only pilot a useful future validation slice?
-4. Which hypotheses merit the spike, and what evidence would justify retaining each mechanism?
-5. Who owns source attestations, evaluation, approved data use, and unresolved decisions?
+4. Which hypotheses merit the spike, and what evidence would justify each mechanism?
+5. Who owns source attestations, evaluation, and unresolved decisions?
 
-The one open decision (cost versus completeness, the D2 margin) is in HLD §21. Dates and the older monthly rollout sketch live on the execution page and are not delivery commitments.
+The one open decision (cost versus completeness, the D2 margin) is in [HLD §10](hld.md#section-10).
 
 ## Publication and maintenance
 
-Publish this as the parent Confluence page, with the linked design pages as children; the lab pages publish separately. Replace local links with their Confluence page/heading targets and render Mermaid diagrams using the supported mechanism in your space. Check cross-page anchors after import. Keep the original v5.1 document as a historical attachment rather than a competing current page.
+Publish this as the parent Confluence page, with the linked design pages as children; the lab pages publish separately. Replace local links with their Confluence page/heading targets and render Mermaid diagrams using the supported mechanism in your space. Check cross-page anchors after import.
 
-Each numbered section has one owning page. Changes to hypotheses belong in the lab's spike page, schemas in their owning contract section, execution status and measurements in the lab's records, and architectural decisions in the HLD. Summaries link to those owners. The detailed design, examples, diagrams and evaluation protocol have been preserved; the split introduces no page-length limit.
+Each numbered section has one owning page. Hypotheses, execution status and measurements belong with the lab; schemas belong in their owning contract section; architectural decisions belong in the HLD.

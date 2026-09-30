@@ -107,6 +107,38 @@
    "provider": "laya-local",
    "row": "3r",
    "template": "d6-noul-v3-excerpts-compact-150"
+  },
+  {
+   "calls": 27,
+   "input_tokens": 59446,
+   "output_tokens": 4992,
+   "provider": "typesafe-jev",
+   "row": "4",
+   "template": "d6-decomp-v1"
+  },
+  {
+   "calls": 25,
+   "input_tokens": 39791,
+   "output_tokens": 5357,
+   "provider": "typesafe-jev",
+   "row": "5",
+   "template": "d6-choice-v1"
+  },
+  {
+   "calls": 168,
+   "input_tokens": 60780,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "4",
+   "template": "d6-decomp-v1"
+  },
+  {
+   "calls": 82,
+   "input_tokens": 36663,
+   "output_tokens": 0,
+   "provider": "laya-local",
+   "row": "5",
+   "template": "d6-choice-v1"
   }
  ]
 }

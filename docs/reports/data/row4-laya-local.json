@@ -1,7 +1,7 @@
 {
  "campaign_row": {
-  "calls": 194,
-  "input_tokens": 75016,
+  "calls": 168,
+  "input_tokens": 60780,
   "output_tokens": 0
  },
  "ceilings": {
@@ -10,9 +10,59 @@
  },
  "decision": "d6",
  "diagnostic": true,
- "git_commit": "fad69837210cf6b7dab10143d44972471f2d555c",
+ "git_commit": "8a71448b6334322460091d28cfc6f69386ada06b",
  "items": {
-  "dev-002\tev-10|ev-2": {
+  "dev-002\tev-2|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.3425,
+    "same_subject": 0.549,
+    "values_differ": 0.6238
+   }
+  },
+  "dev-002\tev-2|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-b1a3c404c0",
+     "end": 515,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4259,
+    "same_subject": 0.6474,
+    "values_differ": 0.6578
+   }
+  },
+  "dev-002\tev-8|ev-2": {
    "label": 1,
    "refs": [
     {
@@ -32,37 +82,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.3604,
-    "same_subject": 0.6305,
-    "values_differ": 0.5716
+    "product_diagnostic": 0.3645,
+    "same_subject": 0.6344,
+    "values_differ": 0.5745
    }
   },
-  "dev-002\tev-10|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4309,
-    "same_subject": 0.6826,
-    "values_differ": 0.6312
-   }
-  },
-  "dev-002\tev-10|ev-7": {
+  "dev-002\tev-8|ev-6": {
    "label": 0,
    "refs": [
     {
@@ -82,84 +107,9 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.4935,
-    "same_subject": 0.7126,
-    "values_differ": 0.6925
-   }
-  },
-  "dev-002\tev-2|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-bd52a9e934",
-     "end": 357,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3503,
-    "same_subject": 0.556,
-    "values_differ": 0.6301
-   }
-  },
-  "dev-002\tev-2|ev-7": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-b1a3c404c0",
-     "end": 515,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4318,
-    "same_subject": 0.6539,
-    "values_differ": 0.6604
-   }
-  },
-  "dev-002\tev-5|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-bd52a9e934",
-     "end": 357,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.565,
-    "same_subject": 0.8015,
-    "values_differ": 0.7049
+    "product_diagnostic": 0.5152,
+    "same_subject": 0.7277,
+    "values_differ": 0.708
    }
   },
   "dev-004\tev-1|ev-2": {
@@ -187,7 +137,7 @@
     "values_differ": 0.6094
    }
   },
-  "dev-005\tev-15|ev-3": {
+  "dev-005\tev-13|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -207,37 +157,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.3248,
-    "same_subject": 0.6734,
-    "values_differ": 0.4824
+    "product_diagnostic": 0.3282,
+    "same_subject": 0.6747,
+    "values_differ": 0.4865
    }
   },
-  "dev-006\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2384,
-    "same_subject": 0.4408,
-    "values_differ": 0.5408
-   }
-  },
-  "dev-010\tev-10|ev-4": {
+  "dev-010\tev-8|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -257,87 +182,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.2819,
-    "same_subject": 0.5662,
-    "values_differ": 0.4979
+    "product_diagnostic": 0.2917,
+    "same_subject": 0.5686,
+    "values_differ": 0.513
    }
   },
-  "dev-010\tev-3|ev-10": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3903,
-    "same_subject": 0.6579,
-    "values_differ": 0.5933
-   }
-  },
-  "dev-011\tev-10|ev-1": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2264,
-    "same_subject": 0.5344,
-    "values_differ": 0.4237
-   }
-  },
-  "dev-011\tev-10|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b1a3c404c0",
-     "end": 515,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": false,
-   "signals": {
-    "product_diagnostic": 0.4679,
-    "same_subject": 0.6895,
-    "values_differ": 0.6786
-   }
-  },
-  "dev-011\tev-5|ev-1": {
+  "dev-011\tev-4|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -357,12 +207,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4785,
-    "same_subject": 0.7443,
-    "values_differ": 0.6429
+    "product_diagnostic": 0.4741,
+    "same_subject": 0.7422,
+    "values_differ": 0.6388
    }
   },
-  "dev-011\tev-7|ev-1": {
+  "dev-011\tev-6|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -382,9 +232,59 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.3392,
-    "same_subject": 0.633,
-    "values_differ": 0.5358
+    "product_diagnostic": 0.3452,
+    "same_subject": 0.6361,
+    "values_differ": 0.5427
+   }
+  },
+  "dev-011\tev-8|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.2256,
+    "same_subject": 0.5352,
+    "values_differ": 0.4216
+   }
+  },
+  "dev-011\tev-8|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-b1a3c404c0",
+     "end": 515,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "product_diagnostic": 0.4788,
+    "same_subject": 0.6968,
+    "values_differ": 0.6871
    }
   },
   "dev-012\tev-1|ev-5": {
@@ -512,57 +412,7 @@
     "values_differ": 0.7112
    }
   },
-  "dev-014\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.1645,
-    "same_subject": 0.3356,
-    "values_differ": 0.4903
-   }
-  },
-  "dev-015\tev-11|ev-7": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6a944fe4fd",
-     "end": 392,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
-     "artifact_id": "art-5ba50f29c0",
-     "end": 314,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.1835,
-    "same_subject": 0.2686,
-    "values_differ": 0.6831
-   }
-  },
-  "dev-019\tev-15|ev-2": {
+  "dev-019\tev-11|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -582,37 +432,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4107,
-    "same_subject": 0.6569,
-    "values_differ": 0.6252
+    "product_diagnostic": 0.4196,
+    "same_subject": 0.6645,
+    "values_differ": 0.6314
    }
   },
-  "dev-019\tev-16|ev-6": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4571,
-    "same_subject": 0.7148,
-    "values_differ": 0.6395
-   }
-  },
-  "dev-019\tev-16|ev-7": {
+  "dev-019\tev-12|ev-5": {
    "label": 1,
    "refs": [
     {
@@ -632,9 +457,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4369,
-    "same_subject": 0.6893,
-    "values_differ": 0.6339
+    "product_diagnostic": 0.4361,
+    "same_subject": 0.6841,
+    "values_differ": 0.6375
    }
   },
   "dev-019\tev-1|ev-2": {
@@ -662,7 +487,57 @@
     "values_differ": 0.6527
    }
   },
-  "dev-020\tev-15|ev-2": {
+  "dev-019\tev-2|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    },
+    {
+     "artifact_id": "art-c2de08042b",
+     "end": 256,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "product_diagnostic": 0.2951,
+    "same_subject": 0.3993,
+    "values_differ": 0.739
+   }
+  },
+  "dev-019\tev-5|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4144,
+    "same_subject": 0.5466,
+    "values_differ": 0.7581
+   }
+  },
+  "dev-020\tev-11|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -682,37 +557,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.2443,
-    "same_subject": 0.425,
-    "values_differ": 0.5749
+    "product_diagnostic": 0.2531,
+    "same_subject": 0.4353,
+    "values_differ": 0.5814
    }
   },
-  "dev-020\tev-16|ev-6": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2482,
-    "same_subject": 0.4289,
-    "values_differ": 0.5786
-   }
-  },
-  "dev-020\tev-16|ev-7": {
+  "dev-020\tev-12|ev-5": {
    "label": 1,
    "refs": [
     {
@@ -732,9 +582,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.1225,
-    "same_subject": 0.2793,
-    "values_differ": 0.4386
+    "product_diagnostic": 0.133,
+    "same_subject": 0.2969,
+    "values_differ": 0.448
    }
   },
   "dev-020\tev-1|ev-2": {
@@ -762,7 +612,57 @@
     "values_differ": 0.7257
    }
   },
-  "dev-021\tev-16|ev-1": {
+  "dev-020\tev-2|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    },
+    {
+     "artifact_id": "art-c2de08042b",
+     "end": 256,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "product_diagnostic": 0.1567,
+    "same_subject": 0.2581,
+    "values_differ": 0.6073
+   }
+  },
+  "dev-020\tev-5|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.2017,
+    "same_subject": 0.2656,
+    "values_differ": 0.7593
+   }
+  },
+  "dev-021\tev-12|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -782,37 +682,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.3208,
-    "same_subject": 0.5845,
-    "values_differ": 0.5489
+    "product_diagnostic": 0.3146,
+    "same_subject": 0.5712,
+    "values_differ": 0.5508
    }
   },
-  "dev-021\tev-17|ev-6": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.324,
-    "same_subject": 0.6101,
-    "values_differ": 0.531
-   }
-  },
-  "dev-021\tev-17|ev-7": {
+  "dev-021\tev-13|ev-5": {
    "label": 1,
    "refs": [
     {
@@ -832,9 +707,34 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.293,
-    "same_subject": 0.5898,
-    "values_differ": 0.4968
+    "product_diagnostic": 0.3356,
+    "same_subject": 0.6213,
+    "values_differ": 0.5401
+   }
+  },
+  "dev-021\tev-1|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    },
+    {
+     "artifact_id": "art-c2de08042b",
+     "end": 256,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "product_diagnostic": 0.2522,
+    "same_subject": 0.3853,
+    "values_differ": 0.6545
    }
   },
   "dev-021\tev-2|ev-1": {
@@ -862,32 +762,32 @@
     "values_differ": 0.6001
    }
   },
-  "dev-022\tev-10|ev-4": {
+  "dev-021\tev-5|ev-9": {
    "label": 0,
    "refs": [
     {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
      "source_id": "codehub",
      "start": 0,
      "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
     }
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4093,
-    "same_subject": 0.6362,
-    "values_differ": 0.6433
+    "product_diagnostic": 0.356,
+    "same_subject": 0.4883,
+    "values_differ": 0.729
    }
   },
-  "dev-022\tev-3|ev-10": {
+  "dev-022\tev-3|ev-8": {
    "label": 1,
    "refs": [
     {
@@ -907,9 +807,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4262,
-    "same_subject": 0.5552,
-    "values_differ": 0.7676
+    "product_diagnostic": 0.4327,
+    "same_subject": 0.5622,
+    "values_differ": 0.7696
    }
   },
   "dev-023\tev-1|ev-2": {
@@ -937,357 +837,7 @@
     "values_differ": 0.5579
    }
   },
-  "dev-023\tev-6|ev-2": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-bde7c60201",
-     "end": 327,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
-     "artifact_id": "art-686218a959",
-     "end": 497,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R41"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3209,
-    "same_subject": 0.606,
-    "values_differ": 0.5296
-   }
-  },
-  "dev-024\tev-16|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-bde7c60201",
-     "end": 327,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
-     "artifact_id": "art-686218a959",
-     "end": 497,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R41"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4337,
-    "same_subject": 0.6909,
-    "values_differ": 0.6278
-   }
-  },
-  "dev-024\tev-17|ev-7": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3428,
-    "same_subject": 0.621,
-    "values_differ": 0.552
-   }
-  },
-  "dev-024\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-fe4b432c72",
-     "end": 343,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-686218a959",
-     "end": 497,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R41"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3563,
-    "same_subject": 0.5459,
-    "values_differ": 0.6526
-   }
-  },
-  "dev-025\tev-3|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R40"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.1483,
-    "same_subject": 0.2969,
-    "values_differ": 0.4996
-   }
-  },
-  "dev-026\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-79494b3d81",
-     "end": 310,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R40"
-    },
-    {
-     "artifact_id": "art-8d9e99085a",
-     "end": 268,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v2"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3355,
-    "same_subject": 0.4879,
-    "values_differ": 0.6876
-   }
-  },
-  "dev-027\tev-1|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-fe4b432c72",
-     "end": 343,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R40"
-    },
-    {
-     "artifact_id": "art-bde7c60201",
-     "end": 327,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4414,
-    "same_subject": 0.6211,
-    "values_differ": 0.7106
-   }
-  },
-  "dev-031\tev-10|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3259,
-    "same_subject": 0.6942,
-    "values_differ": 0.4694
-   }
-  },
-  "dev-031\tev-10|ev-4": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2809,
-    "same_subject": 0.6994,
-    "values_differ": 0.4016
-   }
-  },
-  "dev-031\tev-4|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-bd52a9e934",
-     "end": 357,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4699,
-    "same_subject": 0.6847,
-    "values_differ": 0.6863
-   }
-  },
-  "dev-032\tev-10|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3933,
-    "same_subject": 0.5807,
-    "values_differ": 0.6772
-   }
-  },
-  "dev-032\tev-10|ev-4": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4157,
-    "same_subject": 0.6025,
-    "values_differ": 0.69
-   }
-  },
-  "dev-033\tev-2|ev-5": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3938,
-    "same_subject": 0.6788,
-    "values_differ": 0.5801
-   }
-  },
-  "dev-033\tev-5|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2568,
-    "same_subject": 0.5713,
-    "values_differ": 0.4495
-   }
-  },
-  "dev-034\tev-1|ev-5": {
+  "dev-023\tev-2|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -1307,9 +857,259 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.373,
-    "same_subject": 0.5533,
-    "values_differ": 0.6741
+    "product_diagnostic": 0.15,
+    "same_subject": 0.2574,
+    "values_differ": 0.5829
+   }
+  },
+  "dev-023\tev-4|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-bde7c60201",
+     "end": 327,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    },
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.3207,
+    "same_subject": 0.6057,
+    "values_differ": 0.5294
+   }
+  },
+  "dev-024\tev-12|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-bde7c60201",
+     "end": 327,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    },
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4342,
+    "same_subject": 0.6884,
+    "values_differ": 0.6308
+   }
+  },
+  "dev-024\tev-13|ev-5": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.3458,
+    "same_subject": 0.6199,
+    "values_differ": 0.5578
+   }
+  },
+  "dev-024\tev-1|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-fe4b432c72",
+     "end": 343,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.3685,
+    "same_subject": 0.5612,
+    "values_differ": 0.6566
+   }
+  },
+  "dev-026\tev-1|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-79494b3d81",
+     "end": 310,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R40"
+    },
+    {
+     "artifact_id": "art-8d9e99085a",
+     "end": 268,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.3881,
+    "same_subject": 0.5583,
+    "values_differ": 0.6952
+   }
+  },
+  "dev-027\tev-1|ev-3": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-fe4b432c72",
+     "end": 343,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R40"
+    },
+    {
+     "artifact_id": "art-bde7c60201",
+     "end": 327,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4331,
+    "same_subject": 0.6146,
+    "values_differ": 0.7047
+   }
+  },
+  "dev-031\tev-3|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4689,
+    "same_subject": 0.6864,
+    "values_differ": 0.6831
+   }
+  },
+  "dev-031\tev-8|ev-3": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.294,
+    "same_subject": 0.7034,
+    "values_differ": 0.418
+   }
+  },
+  "dev-032\tev-8|ev-3": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4373,
+    "same_subject": 0.6229,
+    "values_differ": 0.7021
+   }
+  },
+  "dev-033\tev-2|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.3902,
+    "same_subject": 0.6649,
+    "values_differ": 0.5869
    }
   },
   "dev-034\tev-2|ev-1": {
@@ -1337,7 +1137,7 @@
     "values_differ": 0.6203
    }
   },
-  "dev-034\tev-6|ev-1": {
+  "dev-034\tev-4|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -1357,12 +1157,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4064,
-    "same_subject": 0.6748,
-    "values_differ": 0.6022
+    "product_diagnostic": 0.3941,
+    "same_subject": 0.667,
+    "values_differ": 0.5908
    }
   },
-  "dev-036\tev-2|ev-7": {
+  "dev-036\tev-1|ev-5": {
    "label": 0,
    "refs": [
     {
@@ -1382,12 +1182,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.6215,
-    "same_subject": 0.771,
-    "values_differ": 0.8061
+    "product_diagnostic": 0.616,
+    "same_subject": 0.7686,
+    "values_differ": 0.8014
    }
   },
-  "dev-036\tev-8|ev-2": {
+  "dev-036\tev-6|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -1407,87 +1207,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4801,
-    "same_subject": 0.7146,
-    "values_differ": 0.6718
+    "product_diagnostic": 0.4879,
+    "same_subject": 0.7172,
+    "values_differ": 0.6803
    }
   },
-  "dev-037\tev-11|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3666,
-    "same_subject": 0.7102,
-    "values_differ": 0.5162
-   }
-  },
-  "dev-037\tev-11|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3972,
-    "same_subject": 0.7001,
-    "values_differ": 0.5674
-   }
-  },
-  "dev-037\tev-11|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "exp-branch"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4032,
-    "same_subject": 0.7015,
-    "values_differ": 0.5748
-   }
-  },
-  "dev-037\tev-4|ev-5": {
+  "dev-037\tev-3|ev-4": {
    "label": 1,
    "refs": [
     {
@@ -1507,12 +1232,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.2596,
-    "same_subject": 0.5267,
-    "values_differ": 0.4929
+    "product_diagnostic": 0.2507,
+    "same_subject": 0.5188,
+    "values_differ": 0.4832
    }
   },
-  "dev-037\tev-4|ev-6": {
+  "dev-037\tev-3|ev-5": {
    "label": 0,
    "refs": [
     {
@@ -1532,12 +1257,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.3837,
-    "same_subject": 0.6217,
-    "values_differ": 0.6172
+    "product_diagnostic": 0.3817,
+    "same_subject": 0.6167,
+    "values_differ": 0.619
    }
   },
-  "dev-037\tev-5|ev-6": {
+  "dev-037\tev-4|ev-5": {
    "label": 0,
    "refs": [
     {
@@ -1557,37 +1282,62 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.375,
-    "same_subject": 0.5932,
-    "values_differ": 0.6322
+    "product_diagnostic": 0.3769,
+    "same_subject": 0.6007,
+    "values_differ": 0.6275
    }
   },
-  "dev-038\tev-2|ev-3": {
+  "dev-037\tev-9|ev-3": {
    "label": 0,
    "refs": [
     {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
      "source_id": "codehub",
      "start": 0,
      "version": "R42"
-    },
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
     }
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.2491,
-    "same_subject": 0.3916,
-    "values_differ": 0.6361
+    "product_diagnostic": 0.4107,
+    "same_subject": 0.7043,
+    "values_differ": 0.5831
    }
   },
-  "dev-041\tev-2|ev-3": {
+  "dev-037\tev-9|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "exp-branch"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "product_diagnostic": 0.4123,
+    "same_subject": 0.7065,
+    "values_differ": 0.5836
+   }
+  },
+  "dev-041\tev-1|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1607,12 +1357,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.299,
-    "same_subject": 0.4639,
-    "values_differ": 0.6445
+    "product_diagnostic": 0.2964,
+    "same_subject": 0.4647,
+    "values_differ": 0.6378
    }
   },
-  "dev-041\tev-4|ev-3": {
+  "dev-041\tev-3|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1632,12 +1382,12 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.2637,
-    "same_subject": 0.5216,
-    "values_differ": 0.5056
+    "product_diagnostic": 0.264,
+    "same_subject": 0.5183,
+    "values_differ": 0.5094
    }
   },
-  "dev-041\tev-6|ev-3": {
+  "dev-041\tev-4|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1659,10 +1409,10 @@
    "signals": {
     "product_diagnostic": 0.4086,
     "same_subject": 0.6535,
-    "values_differ": 0.6252
+    "values_differ": 0.6253
    }
   },
-  "dev-042\tev-12|ev-20": {
+  "dev-042\tev-12|ev-19": {
    "label": 0,
    "refs": [
     {
@@ -1682,9 +1432,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.1455,
-    "same_subject": 0.3747,
-    "values_differ": 0.3882
+    "product_diagnostic": 0.1571,
+    "same_subject": 0.3821,
+    "values_differ": 0.4112
    }
   },
   "dev-042\tev-12|ev-7": {
@@ -1707,9 +1457,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.1494,
-    "same_subject": 0.3424,
-    "values_differ": 0.4364
+    "product_diagnostic": 0.1792,
+    "same_subject": 0.38,
+    "values_differ": 0.4716
    }
   },
   "dev-042\tev-12|ev-8": {
@@ -1737,7 +1487,7 @@
     "values_differ": 0.3635
    }
   },
-  "dev-042\tev-20|ev-13": {
+  "dev-042\tev-19|ev-13": {
    "label": 0,
    "refs": [
     {
@@ -1757,12 +1507,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.3133,
-    "same_subject": 0.6153,
-    "values_differ": 0.5092
+    "product_diagnostic": 0.324,
+    "same_subject": 0.633,
+    "values_differ": 0.5119
    }
   },
-  "dev-042\tev-20|ev-14": {
+  "dev-042\tev-19|ev-14": {
    "label": 0,
    "refs": [
     {
@@ -1782,12 +1532,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.26,
-    "same_subject": 0.4743,
-    "values_differ": 0.5482
+    "product_diagnostic": 0.2802,
+    "same_subject": 0.505,
+    "values_differ": 0.5548
    }
   },
-  "dev-042\tev-20|ev-7": {
+  "dev-042\tev-19|ev-7": {
    "label": 0,
    "refs": [
     {
@@ -1807,12 +1557,12 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.2873,
-    "same_subject": 0.6133,
-    "values_differ": 0.4684
+    "product_diagnostic": 0.2932,
+    "same_subject": 0.6184,
+    "values_differ": 0.4741
    }
   },
-  "dev-042\tev-20|ev-8": {
+  "dev-042\tev-19|ev-8": {
    "label": 0,
    "refs": [
     {
@@ -1832,9 +1582,9 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.2573,
-    "same_subject": 0.553,
-    "values_differ": 0.4652
+    "product_diagnostic": 0.2715,
+    "same_subject": 0.5742,
+    "values_differ": 0.4729
    }
   },
   "dev-042\tev-7|ev-13": {
@@ -2107,9 +1857,9 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.1328,
-    "same_subject": 0.2583,
-    "values_differ": 0.514
+    "product_diagnostic": 0.197,
+    "same_subject": 0.3033,
+    "values_differ": 0.6496
    }
   },
   "dev-044\tev-2|ev-4": {
@@ -2132,9 +1882,9 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.172,
-    "same_subject": 0.3316,
-    "values_differ": 0.5187
+    "product_diagnostic": 0.3094,
+    "same_subject": 0.5296,
+    "values_differ": 0.5842
    }
   },
   "dev-044\tev-6|ev-8": {
@@ -2157,9 +1907,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.1447,
-    "same_subject": 0.2128,
-    "values_differ": 0.6799
+    "product_diagnostic": 0.1773,
+    "same_subject": 0.2644,
+    "values_differ": 0.6706
    }
   },
   "dev-044\tev-7|ev-8": {
@@ -2182,9 +1932,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.1603,
-    "same_subject": 0.23,
-    "values_differ": 0.697
+    "product_diagnostic": 0.1365,
+    "same_subject": 0.1752,
+    "values_differ": 0.779
    }
   },
   "dev-044\tev-8|ev-9": {
@@ -2207,37 +1957,12 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.1771,
-    "same_subject": 0.2162,
-    "values_differ": 0.8193
+    "product_diagnostic": 0.1618,
+    "same_subject": 0.273,
+    "values_differ": 0.5928
    }
   },
-  "dev-051\tev-3|ev-2": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    },
-    {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.4124,
-    "same_subject": 0.6786,
-    "values_differ": 0.6077
-   }
-  },
-  "dev-053\tev-3|ev-4": {
+  "dev-053\tev-2|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -2257,12 +1982,12 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.1298,
-    "same_subject": 0.3325,
-    "values_differ": 0.3905
+    "product_diagnostic": 0.1287,
+    "same_subject": 0.3301,
+    "values_differ": 0.39
    }
   },
-  "dev-053\tev-3|ev-5": {
+  "dev-053\tev-2|ev-5": {
    "label": 0,
    "refs": [
     {
@@ -2273,8 +1998,8 @@
      "version": "R41"
     },
     {
-     "artifact_id": "art-92c0687690",
-     "end": 284,
+     "artifact_id": "art-b846f74563",
+     "end": 361,
      "source_id": "codehub",
      "start": 0,
      "version": "R42"
@@ -2282,12 +2007,12 @@
    ],
    "rule_flagged": false,
    "signals": {
-    "product_diagnostic": 0.1946,
-    "same_subject": 0.3619,
-    "values_differ": 0.5378
+    "product_diagnostic": 0.2581,
+    "same_subject": 0.3219,
+    "values_differ": 0.8019
    }
   },
-  "dev-054\tev-10|ev-3": {
+  "dev-054\tev-8|ev-3": {
    "label": 1,
    "refs": [
     {
@@ -2307,34 +2032,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.2759,
-    "same_subject": 0.6272,
-    "values_differ": 0.4399
-   }
-  },
-  "dev-054\tev-10|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3672,
-    "same_subject": 0.6323,
-    "values_differ": 0.5807
+    "product_diagnostic": 0.2707,
+    "same_subject": 0.6247,
+    "values_differ": 0.4334
    }
   },
   "dev-056\tev-1|ev-2": {
@@ -2362,7 +2062,7 @@
     "values_differ": 0.697
    }
   },
-  "dev-056\tev-7|ev-2": {
+  "dev-056\tev-5|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -2382,59 +2082,9 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.2914,
-    "same_subject": 0.5347,
-    "values_differ": 0.5449
-   }
-  },
-  "dev-057\tev-2|ev-10": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2158,
-    "same_subject": 0.3542,
-    "values_differ": 0.6093
-   }
-  },
-  "dev-058\tev-2|ev-8": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.2236,
-    "same_subject": 0.322,
-    "values_differ": 0.6945
+    "product_diagnostic": 0.2918,
+    "same_subject": 0.5314,
+    "values_differ": 0.5491
    }
   },
   "dev-059\tev-11|ev-7": {
@@ -2448,31 +2098,6 @@
      "version": "v2"
     },
     {
-     "artifact_id": "art-5ba50f29c0",
-     "end": 314,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.6101,
-    "same_subject": 0.7599,
-    "values_differ": 0.8029
-   }
-  },
-  "dev-059\tev-11|ev-8": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6a944fe4fd",
-     "end": 392,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
      "artifact_id": "art-8d9e99085a",
      "end": 268,
      "source_id": "dochub",
@@ -2482,42 +2107,17 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "product_diagnostic": 0.4346,
-    "same_subject": 0.6209,
-    "values_differ": 0.7
-   }
-  },
-  "dev-059\tev-7|ev-8": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5ba50f29c0",
-     "end": 314,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    },
-    {
-     "artifact_id": "art-8d9e99085a",
-     "end": 268,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v2"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "product_diagnostic": 0.3983,
-    "same_subject": 0.6204,
-    "values_differ": 0.642
+    "product_diagnostic": 0.4148,
+    "same_subject": 0.5997,
+    "values_differ": 0.6916
    }
   }
  },
- "items_answered": 100,
- "items_labelled": 100,
+ "items_answered": 84,
+ "items_labelled": 84,
  "items_unavailable": 0,
  "model_call_outcomes": {
-  "ok": 36
+  "ok": 28
  },
  "models": [
   "laya-rl-agent"
@@ -2527,76 +2127,75 @@
  "signals": {
   "product_diagnostic": {
    "all": {
-    "brier_raw": 0.1543,
-    "n": 100,
+    "brier_raw": 0.1565,
+    "n": 84,
     "positives": 12,
-    "pr_auc": 0.1344,
-    "roc_auc": 0.536
+    "pr_auc": 0.1848,
+    "roc_auc": 0.5706
    },
    "candidates": {
-    "brier_raw": 0.0932,
-    "n": 19,
+    "brier_raw": 0.0904,
+    "n": 22,
     "positives": 0,
     "pr_auc": null,
     "roc_auc": null
    },
    "rule_flagged": {
-    "brier_raw": 0.1686,
-    "n": 81,
+    "brier_raw": 0.18,
+    "n": 62,
     "positives": 12,
-    "pr_auc": 0.1581,
-    "roc_auc": 0.5145
+    "pr_auc": 0.2328,
+    "roc_auc": 0.54
    }
   },
   "same_subject": {
    "all": {
-    "brier_raw": 0.2754,
-    "n": 100,
+    "brier_raw": 0.2533,
+    "n": 84,
     "positives": 12,
-    "pr_auc": 0.1541,
-    "roc_auc": 0.6089
+    "pr_auc": 0.2214,
+    "roc_auc": 0.6829
    },
    "candidates": {
-    "brier_raw": 0.2325,
-    "n": 19,
+    "brier_raw": 0.2172,
+    "n": 22,
     "positives": 0,
     "pr_auc": null,
     "roc_auc": null
    },
    "rule_flagged": {
-    "brier_raw": 0.2854,
-    "n": 81,
+    "brier_raw": 0.2662,
+    "n": 62,
     "positives": 12,
-    "pr_auc": 0.1718,
-    "roc_auc": 0.5688
+    "pr_auc": 0.2539,
+    "roc_auc": 0.6317
    }
   },
   "values_differ": {
    "all": {
-    "brier_raw": 0.3629,
-    "n": 100,
+    "brier_raw": 0.3754,
+    "n": 84,
     "positives": 12,
-    "pr_auc": 0.1065,
-    "roc_auc": 0.3068
+    "pr_auc": 0.1203,
+    "roc_auc": 0.2859
    },
    "candidates": {
-    "brier_raw": 0.3902,
-    "n": 19,
+    "brier_raw": 0.4217,
+    "n": 22,
     "positives": 0,
     "pr_auc": null,
     "roc_auc": null
    },
    "rule_flagged": {
-    "brier_raw": 0.3565,
-    "n": 81,
+    "brier_raw": 0.359,
+    "n": 62,
     "positives": 12,
-    "pr_auc": 0.1275,
-    "roc_auc": 0.3043
+    "pr_auc": 0.1681,
+    "roc_auc": 0.2967
    }
   }
  },
  "state": "refs",
  "template": "d6-decomp-v1",
- "tolerance": 0.2,
- "world_build_note": "collected while build/world was being rebuilt by another agent (world manifest 9f813169, not 452b57d9 as rows 1-3); not comparable with rows 1-3"
+ "tolerance": 0.2
 }

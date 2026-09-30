@@ -1,7 +1,7 @@
 {
  "campaign_row": {
-  "calls": 91,
-  "input_tokens": 42055,
+  "calls": 82,
+  "input_tokens": 36663,
   "output_tokens": 0
  },
  "ceilings": {
@@ -10,9 +10,57 @@
  },
  "decision": "d6",
  "diagnostic": true,
- "git_commit": "fad69837210cf6b7dab10143d44972471f2d555c",
+ "git_commit": "8a71448b6334322460091d28cfc6f69386ada06b",
  "items": {
-  "dev-002\tev-10|ev-2": {
+  "dev-002\tev-2|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.849
+   }
+  },
+  "dev-002\tev-2|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-b1a3c404c0",
+     "end": 515,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8539
+   }
+  },
+  "dev-002\tev-8|ev-2": {
    "label": 1,
    "refs": [
     {
@@ -33,34 +81,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8242
+    "p_relation_diagnostic": 0.8178
    }
   },
-  "dev-002\tev-10|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8495
-   }
-  },
-  "dev-002\tev-10|ev-7": {
+  "dev-002\tev-8|ev-6": {
    "label": 0,
    "refs": [
     {
@@ -81,79 +105,7 @@
    "rule_flagged": false,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8012
-   }
-  },
-  "dev-002\tev-2|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-bd52a9e934",
-     "end": 357,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.845
-   }
-  },
-  "dev-002\tev-2|ev-7": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-b1a3c404c0",
-     "end": 515,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8513
-   }
-  },
-  "dev-002\tev-5|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-bd52a9e934",
-     "end": 357,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8674
+    "p_relation_diagnostic": 0.794
    }
   },
   "dev-004\tev-1|ev-2": {
@@ -180,7 +132,7 @@
     "p_relation_diagnostic": 0.7828
    }
   },
-  "dev-005\tev-15|ev-3": {
+  "dev-005\tev-13|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -201,34 +153,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8259
+    "p_relation_diagnostic": 0.8231
    }
   },
-  "dev-006\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8658
-   }
-  },
-  "dev-010\tev-10|ev-4": {
+  "dev-010\tev-8|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -249,82 +177,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8043
+    "p_relation_diagnostic": 0.801
    }
   },
-  "dev-010\tev-3|ev-10": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8355
-   }
-  },
-  "dev-011\tev-10|ev-1": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8063
-   }
-  },
-  "dev-011\tev-10|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b1a3c404c0",
-     "end": 515,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": false,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.806
-   }
-  },
-  "dev-011\tev-5|ev-1": {
+  "dev-011\tev-4|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -345,10 +201,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7941
+    "p_relation_diagnostic": 0.798
    }
   },
-  "dev-011\tev-7|ev-1": {
+  "dev-011\tev-6|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -369,7 +225,55 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8188
+    "p_relation_diagnostic": 0.8214
+   }
+  },
+  "dev-011\tev-8|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "policy_implementation_divergence",
+    "p_relation_diagnostic": 0.8037
+   }
+  },
+  "dev-011\tev-8|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-b1a3c404c0",
+     "end": 515,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8037
    }
   },
   "dev-012\tev-1|ev-5": {
@@ -492,55 +396,7 @@
     "p_relation_diagnostic": 0.8212
    }
   },
-  "dev-014\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8591
-   }
-  },
-  "dev-015\tev-11|ev-7": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6a944fe4fd",
-     "end": 392,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
-     "artifact_id": "art-5ba50f29c0",
-     "end": 314,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8356
-   }
-  },
-  "dev-019\tev-15|ev-2": {
+  "dev-019\tev-11|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -561,34 +417,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8136
+    "p_relation_diagnostic": 0.8165
    }
   },
-  "dev-019\tev-16|ev-6": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8477
-   }
-  },
-  "dev-019\tev-16|ev-7": {
+  "dev-019\tev-12|ev-5": {
    "label": 1,
    "refs": [
     {
@@ -609,7 +441,7 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8132
+    "p_relation_diagnostic": 0.8113
    }
   },
   "dev-019\tev-1|ev-2": {
@@ -636,7 +468,55 @@
     "p_relation_diagnostic": 0.8256
    }
   },
-  "dev-020\tev-15|ev-2": {
+  "dev-019\tev-2|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    },
+    {
+     "artifact_id": "art-c2de08042b",
+     "end": 256,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8433
+   }
+  },
+  "dev-019\tev-5|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7955
+   }
+  },
+  "dev-020\tev-11|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -657,34 +537,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.7848
+    "p_relation_diagnostic": 0.7873
    }
   },
-  "dev-020\tev-16|ev-6": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8507
-   }
-  },
-  "dev-020\tev-16|ev-7": {
+  "dev-020\tev-12|ev-5": {
    "label": 1,
    "refs": [
     {
@@ -704,8 +560,8 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7906
+    "choice": "policy_implementation_divergence",
+    "p_relation_diagnostic": 0.7828
    }
   },
   "dev-020\tev-1|ev-2": {
@@ -732,7 +588,55 @@
     "p_relation_diagnostic": 0.7919
    }
   },
-  "dev-021\tev-16|ev-1": {
+  "dev-020\tev-2|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    },
+    {
+     "artifact_id": "art-c2de08042b",
+     "end": 256,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8302
+   }
+  },
+  "dev-020\tev-5|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7919
+   }
+  },
+  "dev-021\tev-12|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -753,34 +657,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7897
+    "p_relation_diagnostic": 0.7908
    }
   },
-  "dev-021\tev-17|ev-6": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.817
-   }
-  },
-  "dev-021\tev-17|ev-7": {
+  "dev-021\tev-13|ev-5": {
    "label": 1,
    "refs": [
     {
@@ -801,7 +681,31 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8162
+    "p_relation_diagnostic": 0.8192
+   }
+  },
+  "dev-021\tev-1|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    },
+    {
+     "artifact_id": "art-c2de08042b",
+     "end": 256,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8258
    }
   },
   "dev-021\tev-2|ev-1": {
@@ -828,31 +732,31 @@
     "p_relation_diagnostic": 0.8246
    }
   },
-  "dev-022\tev-10|ev-4": {
+  "dev-021\tev-5|ev-9": {
    "label": 0,
    "refs": [
     {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
      "source_id": "codehub",
      "start": 0,
      "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
     }
    ],
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8301
+    "p_relation_diagnostic": 0.799
    }
   },
-  "dev-022\tev-3|ev-10": {
+  "dev-022\tev-3|ev-8": {
    "label": 1,
    "refs": [
     {
@@ -873,7 +777,7 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8382
+    "p_relation_diagnostic": 0.838
    }
   },
   "dev-023\tev-1|ev-2": {
@@ -900,343 +804,7 @@
     "p_relation_diagnostic": 0.8074
    }
   },
-  "dev-023\tev-6|ev-2": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-bde7c60201",
-     "end": 327,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
-     "artifact_id": "art-686218a959",
-     "end": 497,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R41"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7897
-   }
-  },
-  "dev-024\tev-16|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-bde7c60201",
-     "end": 327,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
-     "artifact_id": "art-686218a959",
-     "end": 497,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R41"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8022
-   }
-  },
-  "dev-024\tev-17|ev-7": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8147
-   }
-  },
-  "dev-024\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-fe4b432c72",
-     "end": 343,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-686218a959",
-     "end": 497,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R41"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8447
-   }
-  },
-  "dev-025\tev-3|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R40"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "version_difference",
-    "p_relation_diagnostic": 0.8726
-   }
-  },
-  "dev-026\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-79494b3d81",
-     "end": 310,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R40"
-    },
-    {
-     "artifact_id": "art-8d9e99085a",
-     "end": 268,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v2"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "version_difference",
-    "p_relation_diagnostic": 0.8224
-   }
-  },
-  "dev-027\tev-1|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-fe4b432c72",
-     "end": 343,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R40"
-    },
-    {
-     "artifact_id": "art-bde7c60201",
-     "end": 327,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.837
-   }
-  },
-  "dev-031\tev-10|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8186
-   }
-  },
-  "dev-031\tev-10|ev-4": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.8014
-   }
-  },
-  "dev-031\tev-4|ev-5": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-bd52a9e934",
-     "end": 357,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "current"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "no_conflict",
-    "p_relation_diagnostic": 0.764
-   }
-  },
-  "dev-032\tev-10|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8075
-   }
-  },
-  "dev-032\tev-10|ev-4": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.7952
-   }
-  },
-  "dev-033\tev-2|ev-5": {
-   "label": 1,
-   "refs": [
-    {
-     "artifact_id": "art-7623f130c9",
-     "end": 491,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8494
-   }
-  },
-  "dev-033\tev-5|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8416
-   }
-  },
-  "dev-034\tev-1|ev-5": {
+  "dev-023\tev-2|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -1257,7 +825,247 @@
    "rule_flagged": false,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8346
+    "p_relation_diagnostic": 0.802
+   }
+  },
+  "dev-023\tev-4|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-bde7c60201",
+     "end": 327,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    },
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7922
+   }
+  },
+  "dev-024\tev-12|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-bde7c60201",
+     "end": 327,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    },
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8014
+   }
+  },
+  "dev-024\tev-13|ev-5": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "policy_implementation_divergence",
+    "p_relation_diagnostic": 0.815
+   }
+  },
+  "dev-024\tev-1|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-fe4b432c72",
+     "end": 343,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-686218a959",
+     "end": 497,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8501
+   }
+  },
+  "dev-026\tev-1|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-79494b3d81",
+     "end": 310,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R40"
+    },
+    {
+     "artifact_id": "art-8d9e99085a",
+     "end": 268,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8142
+   }
+  },
+  "dev-027\tev-1|ev-3": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-fe4b432c72",
+     "end": 343,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R40"
+    },
+    {
+     "artifact_id": "art-bde7c60201",
+     "end": 327,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "policy_implementation_divergence",
+    "p_relation_diagnostic": 0.8361
+   }
+  },
+  "dev-031\tev-3|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bd52a9e934",
+     "end": 357,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "current"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "no_conflict",
+    "p_relation_diagnostic": 0.7621
+   }
+  },
+  "dev-031\tev-8|ev-3": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "policy_implementation_divergence",
+    "p_relation_diagnostic": 0.8
+   }
+  },
+  "dev-032\tev-8|ev-3": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    },
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "policy_implementation_divergence",
+    "p_relation_diagnostic": 0.7948
+   }
+  },
+  "dev-033\tev-2|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-7623f130c9",
+     "end": 491,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-5b6058d059",
+     "end": 328,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8501
    }
   },
   "dev-034\tev-2|ev-1": {
@@ -1284,7 +1092,7 @@
     "p_relation_diagnostic": 0.8366
    }
   },
-  "dev-034\tev-6|ev-1": {
+  "dev-034\tev-4|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -1304,11 +1112,11 @@
    ],
    "rule_flagged": true,
    "signals": {
-    "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.7857
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7957
    }
   },
-  "dev-036\tev-2|ev-7": {
+  "dev-036\tev-1|ev-5": {
    "label": 0,
    "refs": [
     {
@@ -1329,10 +1137,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8275
+    "p_relation_diagnostic": 0.8286
    }
   },
-  "dev-036\tev-8|ev-2": {
+  "dev-036\tev-6|ev-1": {
    "label": 0,
    "refs": [
     {
@@ -1353,34 +1161,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8512
+    "p_relation_diagnostic": 0.8531
    }
   },
-  "dev-038\tev-2|ev-3": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.865
-   }
-  },
-  "dev-041\tev-2|ev-3": {
+  "dev-041\tev-1|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1401,10 +1185,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.7969
+    "p_relation_diagnostic": 0.7943
    }
   },
-  "dev-041\tev-4|ev-3": {
+  "dev-041\tev-3|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1425,10 +1209,10 @@
    "rule_flagged": false,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7941
+    "p_relation_diagnostic": 0.7977
    }
   },
-  "dev-041\tev-6|ev-3": {
+  "dev-041\tev-4|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1449,10 +1233,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7966
+    "p_relation_diagnostic": 0.7918
    }
   },
-  "dev-042\tev-12|ev-20": {
+  "dev-042\tev-12|ev-19": {
    "label": 0,
    "refs": [
     {
@@ -1473,7 +1257,7 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8097
+    "p_relation_diagnostic": 0.7941
    }
   },
   "dev-042\tev-12|ev-7": {
@@ -1524,7 +1308,7 @@
     "p_relation_diagnostic": 0.8224
    }
   },
-  "dev-042\tev-20|ev-13": {
+  "dev-042\tev-19|ev-13": {
    "label": 0,
    "refs": [
     {
@@ -1545,10 +1329,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7875
+    "p_relation_diagnostic": 0.7862
    }
   },
-  "dev-042\tev-20|ev-14": {
+  "dev-042\tev-19|ev-14": {
    "label": 0,
    "refs": [
     {
@@ -1569,10 +1353,10 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7741
+    "p_relation_diagnostic": 0.7694
    }
   },
-  "dev-042\tev-20|ev-7": {
+  "dev-042\tev-19|ev-7": {
    "label": 0,
    "refs": [
     {
@@ -1593,10 +1377,10 @@
    "rule_flagged": false,
    "signals": {
     "choice": "version_difference",
-    "p_relation_diagnostic": 0.7925
+    "p_relation_diagnostic": 0.7863
    }
   },
-  "dev-042\tev-20|ev-8": {
+  "dev-042\tev-19|ev-8": {
    "label": 0,
    "refs": [
     {
@@ -1617,7 +1401,7 @@
    "rule_flagged": false,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7969
+    "p_relation_diagnostic": 0.7893
    }
   },
   "dev-042\tev-7|ev-13": {
@@ -1788,31 +1572,199 @@
     "p_relation_diagnostic": 0.8082
    }
   },
-  "dev-051\tev-3|ev-2": {
+  "dev-044\tev-11|ev-2": {
    "label": 0,
    "refs": [
     {
-     "artifact_id": "art-d9deef17dc",
-     "end": 331,
-     "source_id": "dochub",
+     "artifact_id": "art-b95c7dc76a",
+     "end": 343,
+     "source_id": "skillhub",
      "start": 0,
      "version": "v1"
     },
     {
-     "artifact_id": "art-6d40696cc7",
-     "end": 460,
+     "artifact_id": "art-5a719f45b7",
+     "end": 243,
      "source_id": "codehub",
      "start": 0,
      "version": "R42"
     }
    ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8402
+   }
+  },
+  "dev-044\tev-11|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b95c7dc76a",
+     "end": 343,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-404800edb1",
+     "end": 267,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8448
+   }
+  },
+  "dev-044\tev-1|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-181bd462ac",
+     "end": 229,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-b95c7dc76a",
+     "end": 343,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.857
+   }
+  },
+  "dev-044\tev-1|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-181bd462ac",
+     "end": 229,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-404800edb1",
+     "end": 267,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "contradiction",
+    "p_relation_diagnostic": 0.8445
+   }
+  },
+  "dev-044\tev-2|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-5a719f45b7",
+     "end": 243,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-404800edb1",
+     "end": 267,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8132
+   }
+  },
+  "dev-044\tev-6|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-fd911e9eb9",
+     "end": 214,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    },
+    {
+     "artifact_id": "art-c99b5215cc",
+     "end": 255,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.9004
+    "p_relation_diagnostic": 0.7987
    }
   },
-  "dev-053\tev-3|ev-4": {
+  "dev-044\tev-7|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-354d70af56",
+     "end": 235,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    },
+    {
+     "artifact_id": "art-c99b5215cc",
+     "end": 255,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "no_conflict",
+    "p_relation_diagnostic": 0.7312
+   }
+  },
+  "dev-044\tev-8|ev-9": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c99b5215cc",
+     "end": 255,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-3c33236ab6",
+     "end": 276,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": true,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8523
+   }
+  },
+  "dev-053\tev-2|ev-3": {
    "label": 0,
    "refs": [
     {
@@ -1833,10 +1785,10 @@
    "rule_flagged": false,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8344
+    "p_relation_diagnostic": 0.8296
    }
   },
-  "dev-053\tev-3|ev-5": {
+  "dev-053\tev-2|ev-5": {
    "label": 0,
    "refs": [
     {
@@ -1847,8 +1799,8 @@
      "version": "R41"
     },
     {
-     "artifact_id": "art-92c0687690",
-     "end": 284,
+     "artifact_id": "art-b846f74563",
+     "end": 361,
      "source_id": "codehub",
      "start": 0,
      "version": "R42"
@@ -1857,10 +1809,10 @@
    "rule_flagged": false,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8828
+    "p_relation_diagnostic": 0.8793
    }
   },
-  "dev-054\tev-10|ev-3": {
+  "dev-054\tev-8|ev-3": {
    "label": 1,
    "refs": [
     {
@@ -1881,31 +1833,7 @@
    "rule_flagged": true,
    "signals": {
     "choice": "policy_implementation_divergence",
-    "p_relation_diagnostic": 0.7999
-   }
-  },
-  "dev-054\tev-10|ev-4": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    },
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8248
+    "p_relation_diagnostic": 0.794
    }
   },
   "dev-056\tev-1|ev-2": {
@@ -1932,7 +1860,7 @@
     "p_relation_diagnostic": 0.8205
    }
   },
-  "dev-056\tev-7|ev-2": {
+  "dev-056\tev-5|ev-2": {
    "label": 0,
    "refs": [
     {
@@ -1953,55 +1881,7 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.7873
-   }
-  },
-  "dev-057\tev-2|ev-10": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8174
-   }
-  },
-  "dev-058\tev-2|ev-8": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-b6478b8689",
-     "end": 430,
-     "source_id": "codehub",
-     "start": 0,
-     "version": "R42"
-    },
-    {
-     "artifact_id": "art-5b6058d059",
-     "end": 328,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v3"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8401
+    "p_relation_diagnostic": 0.7886
    }
   },
   "dev-059\tev-11|ev-7": {
@@ -2015,30 +1895,6 @@
      "version": "v2"
     },
     {
-     "artifact_id": "art-5ba50f29c0",
-     "end": 314,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8012
-   }
-  },
-  "dev-059\tev-11|ev-8": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-6a944fe4fd",
-     "end": 392,
-     "source_id": "skillhub",
-     "start": 0,
-     "version": "v2"
-    },
-    {
      "artifact_id": "art-8d9e99085a",
      "end": 268,
      "source_id": "dochub",
@@ -2049,81 +1905,56 @@
    "rule_flagged": true,
    "signals": {
     "choice": "environment_difference",
-    "p_relation_diagnostic": 0.8181
-   }
-  },
-  "dev-059\tev-7|ev-8": {
-   "label": 0,
-   "refs": [
-    {
-     "artifact_id": "art-5ba50f29c0",
-     "end": 314,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v1"
-    },
-    {
-     "artifact_id": "art-8d9e99085a",
-     "end": 268,
-     "source_id": "dochub",
-     "start": 0,
-     "version": "v2"
-    }
-   ],
-   "rule_flagged": true,
-   "signals": {
-    "choice": "version_difference",
-    "p_relation_diagnostic": 0.8258
+    "p_relation_diagnostic": 0.8168
    }
   }
  },
- "items_answered": 86,
- "items_labelled": 86,
- "items_unavailable": 14,
+ "items_answered": 79,
+ "items_labelled": 79,
+ "items_unavailable": 5,
  "model_call_outcomes": {
-  "ok": 34,
-  "truncated": 2
+  "ok": 27,
+  "truncated": 1
  },
  "models": [
   "laya-rl-agent"
  ],
  "provider": "laya-local",
  "relation_type_accuracy": {
-  "correct": 6,
+  "correct": 7,
   "n": 11,
   "wilson95": [
-   0.2801,
-   0.7873
+   0.3538,
+   0.8483
   ]
  },
  "row": "5",
  "signals": {
   "p_relation_diagnostic": {
    "all": {
-    "brier_raw": 0.5948,
-    "n": 86,
+    "brier_raw": 0.5769,
+    "n": 79,
     "positives": 11,
-    "pr_auc": 0.1084,
-    "roc_auc": 0.3964
+    "pr_auc": 0.1336,
+    "roc_auc": 0.4619
    },
    "candidates": {
-    "brier_raw": 0.6747,
-    "n": 14,
+    "brier_raw": 0.6799,
+    "n": 22,
     "positives": 0,
     "pr_auc": null,
     "roc_auc": null
    },
    "rule_flagged": {
-    "brier_raw": 0.5793,
-    "n": 72,
+    "brier_raw": 0.5372,
+    "n": 57,
     "positives": 11,
-    "pr_auc": 0.1283,
-    "roc_auc": 0.3875
+    "pr_auc": 0.2008,
+    "roc_auc": 0.5109
    }
   }
  },
  "state": "refs",
  "template": "d6-choice-v1",
- "tolerance": 0.2,
- "world_build_note": "collected while build/world was being rebuilt by another agent (world manifest 9f813169, not 452b57d9 as rows 1-3); not comparable with rows 1-3"
+ "tolerance": 0.2
 }

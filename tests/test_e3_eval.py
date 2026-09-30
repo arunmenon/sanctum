@@ -101,3 +101,37 @@ def test_report_counts_model_calls_per_decision_and_conflicts(tmp_path):
     assert "| C4+D6 | D4 | local-test | m1 | strict | 1 | ok 1 | 90.0 | 90.0 |" in text
     assert "| C4+D6 | D6 | local-test | m1 | strict | 2 | ok 2 | 30.0 | 50.0 |" in text
     assert "| C4+D6 | 1.00 | 2 | 0.50 |" in "\n".join(render_conflicts([view]))
+
+
+# ---- the fit tool's REF interface (m3-ref, design page §14) ------------------------------------------
+REF_A = {"source_id": "codehub", "artifact_id": "art-rc", "version": "R42", "start": 100, "end": 200}
+REF_B = {"source_id": "skillhub", "artifact_id": "art-sk", "version": "v3", "start": 0, "end": 120}
+
+
+def test_ref_labels(case):
+    from sanctum_eval.calibration_labels import d4_unit_label, d6_pair_label, d6_relation_type
+
+    gold, _, _, _ = case("m0-001")
+    assert d6_pair_label(gold, REF_A, REF_B) == 1 and d6_pair_label(gold, REF_B, REF_A) == 1
+    assert d6_relation_type(gold, REF_A, REF_B).value == "policy_implementation_divergence"
+    partial = {**REF_A, "start": 150}                                   # no longer covers witness_a (120-180)
+    assert d6_pair_label(gold, partial, REF_B) == 0 and d6_relation_type(gold, partial, REF_B) is None
+    necessary = {span.artifact_id for o in gold.obligations for b in o.bundles for span in b.spans}
+    assert d4_unit_label(gold, {**REF_A, "start": 150, "end": 160}) == int("art-rc" in necessary)
+    assert d4_unit_label(gold, {**REF_A, "artifact_id": "art-other"}) == 0
+    assert d4_unit_label(gold, {**REF_A, "version": "R40"}) == 0
+
+
+def test_labels_from_run_prefers_receipt_refs(case, tmp_path):
+    gold, response, receipt, _ = case("m0-001")
+    decision = {"status": "answered", "target": "D6", "disposition": "preserve_candidate", "provider": "local-test",
+                "policy_version": "d6-noul-v1", "latency_ms": 1, "cost": 0.0,
+                "value": {"pair": "d6:ev-a1|ev-b1", "p_raw": 0.8, "rule_flagged": True, "a": REF_A, "b": REF_B}}
+    unit = {**decision, "target": "D4", "value": {"unit": "d4:ev-a1", "p_raw": 0.4, "rules_packed": True, "ref": REF_A}}
+    (tmp_path / "responses.jsonl").write_text(json.dumps(response) + "\n")
+    (tmp_path / "receipts.jsonl").write_text(json.dumps({**receipt, "decisions": [decision, unit]}) + "\n")
+    cases = tmp_path / "cases"
+    cases.mkdir()
+    (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
+    assert labels_from_run("d6", tmp_path, cases) == {("m0-001", "d6:ev-a1|ev-b1"): 1}
+    assert set(labels_from_run("d4", tmp_path, cases)) == {("m0-001", "d4:ev-a1")}

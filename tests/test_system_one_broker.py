@@ -240,3 +240,52 @@ def test_broker_and_calibration_fit_agree_on_descriptor_release(server, tmp_path
     assert result["descriptor_release"] == release
     import hashlib
     assert release == "sha256:" + hashlib.sha256(json.dumps(descriptors, sort_keys=True).encode()).hexdigest()[:16]
+
+
+# ---- Round 3 (d6, d4): refs in, broker-read text out -------------------------------------------------
+async def _round3(world, broker, out):
+    tokens = TokenService(world / "identity" / "principals.json", "broker-test-secret")
+    caller = tokens.issue_caller_token(PRINCIPAL)
+    async with HubGateway(world, released_hub_ids(DEFAULT_HUBS_CONFIG), tokens) as gateway:
+        proxy = await GatewayProxy.create(gateway, world)
+        gateway.system_one = broker
+        handle = gateway.handle("req-3", caller)
+        proxy.bind("req-3", caller, handle, query="retry limit")
+        with gateway.sut_call("req-3"):
+            found = await handle.call("codehub", "search_code", {"query": "retry"})
+            item = found["results"][0]
+            row = gateway.stores["codehub"].at_version(item["artifact_id"], item["version"])
+            fetched = {"source_id": "codehub", "artifact_id": row.artifact_id, "version": row.version,
+                       "start": 0, "end": min(len(row.text), 5000)}
+            returned = {result["artifact_id"] for result in found["results"]}
+            unfetched_row = next(r for r in gateway.stores["codehub"].rows()
+                                 if r.artifact_id not in returned and "payments-eng" in r.acl)
+            unfetched = {**fetched, "artifact_id": unfetched_row.artifact_id, "version": unfetched_row.version}
+            identity_row = next(r for r in gateway.stores["codehub"].rows() if r.acl == ["identity-eng"])
+            unreadable = {**fetched, "artifact_id": identity_row.artifact_id, "version": identity_row.version}
+            out["row_text"] = row.text
+            out["result"] = await proxy.dispatch(DECIDE_TOOL, {
+                "round": "d6",
+                "questions": {"d6:e1|e2": NOUL, "d6:e1|e3": NOUL, "d6:e1|e4": NOUL, "d6:bad": NOUL},
+                "items": {"d6:e1|e2": {"refs": [fetched, fetched]},
+                          "d6:e1|e3": {"refs": [fetched, unfetched]},
+                          "d6:e1|e4": {"refs": [fetched, unreadable]},
+                          "d6:bad": {"refs": [fetched]}}}, "req-3", caller)
+        proxy.unbind("req-3", handle)
+        out["trace"] = gateway.trace("req-3")
+
+
+def test_round3_sends_only_broker_read_text_of_fetched_readable_refs(scenario_world, server, tmp_path):  # noqa: F811
+    out = {}
+    anyio.run(_round3, scenario_world, _broker(server, tmp_path), out)
+    result = out["result"]
+    assert set(result["answers"]) == {"d6:e1|e2"}
+    assert set(result["invalid_ids"]) == {"d6:e1|e3", "d6:e1|e4", "d6:bad"}
+    assert result["descriptor_release"] == "none"
+    [sent] = server.behavior.requests
+    assert set(sent["questions"]) == {"d6:e1|e2"}
+    [first, second] = sent["state"]["items"]["d6:e1|e2"]
+    assert first["text"] == out["row_text"][:1200] and len(first["text"]) <= 1200
+    assert set(first) == {"source_id", "version", "environment", "text"}
+    assert sent["state"]["query"] == "retry limit"
+    assert [call.round for call in out["trace"].model_calls] == ["d6"]

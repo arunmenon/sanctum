@@ -40,7 +40,7 @@ from mcp.shared.memory import create_connected_server_and_client_session
 
 from sanctum_eval.trace import ModelCall, ObservedCall, ObservedTrace
 from sanctum_hubs.client import call_hub_tool, tool_payload
-from sanctum_hubs.corpus import HubStore
+from sanctum_hubs.corpus import HubRow, HubStore
 from sanctum_hubs.interfaces import (
     CALLER_AUDIENCE, AuthUnavailable, ErrorCode, FailureInjector, TokenRejected,
 )
@@ -75,6 +75,21 @@ def _outcome_from_payload(payload: dict[str, Any]) -> str:
     return "error"
 
 
+def _artifact_ids(payload: Any) -> set[str]:
+    """Every `artifact_id` value anywhere in a hub response body."""
+    found: set[str] = set()
+    stack = [payload]
+    while stack:
+        value = stack.pop()
+        if isinstance(value, dict):
+            if isinstance(value.get("artifact_id"), str):
+                found.add(value["artifact_id"])
+            stack.extend(value.values())
+        elif isinstance(value, list):
+            stack.extend(value)
+    return found
+
+
 class HubGateway:
     """Use as `async with HubGateway(...) as gateway`; then `gateway.handle()` for a SUT."""
 
@@ -92,6 +107,8 @@ class HubGateway:
         self.change_feed_path = Path(change_feed_path) if change_feed_path else None
         self._calls_by_request: dict[str, list[ObservedCall]] = {}
         self._model_calls_by_request: dict[str, list[ModelCall]] = {}
+        # (hub, artifact id) pairs each request's own hub calls returned (for System One Round 3 reads)
+        self._fetched_by_request: dict[str, set[tuple[str, str]]] = {}
         self.system_one = None      # runner-side SystemOneBroker, when the run configures a provider
         self._exit_stack: Optional[AsyncExitStack] = None
         # invocation id -> (request id, caller token, principal): fixed when the handle is made
@@ -251,6 +268,25 @@ class HubGateway:
             return None
         return "reader-" + hashlib.sha256(f"{self._reader_salt}:{subject}".encode()).hexdigest()[:16]
 
+    def read_for_request(self, handle: "GatewayHandle", source_id: str, artifact_id: str,
+                         version: str) -> Optional[HubRow]:
+        """The artifact version, for the runner's System One broker only, when the handle's verified
+        caller may read it and this request's own hub calls returned it; else None."""
+        request_id, caller_token, principal = self._credentials(handle._GatewayHandle__invocation_id)
+        store = self._stores.get(source_id)
+        if request_id is None or store is None or (source_id, artifact_id) not in self._fetched_by_request.get(request_id, set()):
+            return None
+        try:
+            groups = set(self._token_service.verify(caller_token, CALLER_AUDIENCE).groups)
+        except TokenRejected:
+            return None
+        row = store.at_version(artifact_id, version)
+        if row is None or not set(row.acl) & groups:
+            return None
+        if row.owner is not None and row.owner != principal:
+            return None                                  # session memory is personal
+        return row
+
     @property
     def stores(self) -> dict[str, HubStore]:
         """Lab side only (admin API wiring in tests and scenario scripts); never reaches a SUT."""
@@ -307,6 +343,9 @@ class HubGateway:
                 result = await call_hub_tool(session, tool, arguments, hub_token, request_id)
             payload = tool_payload(result)
             outcome = _outcome_from_payload(payload) if result.isError or "error" in payload else "ok"
+            if outcome == "ok":
+                self._fetched_by_request.setdefault(request_id, set()).update(
+                    (hub_id, artifact_id) for artifact_id in _artifact_ids(payload))
             return payload
         except TimeoutError:
             outcome = "timeout"

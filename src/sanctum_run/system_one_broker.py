@@ -18,6 +18,11 @@ sent. Each call is bound independently of the SUT's claims:
 - replay: the raw provider request/response pairs (never the Authorization header) under
   `<run>/system_one/`.
 
+Round 3 rounds "d6" and "d4" carry evidence refs, not text: the broker re-reads each ref from the
+gateway's stores at its version, only when the bound caller may read that artifact and this
+request's own hub calls returned it, and slices at most 1,200 characters per ref. Any failing ref
+drops its question into `invalid_ids`. `descriptor_release` is "none" for these rounds.
+
 The key is read here, on the runner side, from the environment or `.env`; the SUT process
 environment is scrubbed and never receives it. The tool result is `CallOutcome` JSON.
 """
@@ -42,6 +47,8 @@ DEFAULT_PROVIDERS = ROOT / "configs" / "system_one_providers.yaml"
 DEFAULT_DESCRIPTORS = ROOT / "configs" / "d2_standin.yaml"
 DECIDE_TOOL = "system_one.decide"
 QUESTION_TYPES = ("noul", "choice", "score")
+ROUND3 = {"d6": 2, "d4": 1}          # Round 3 rounds and the refs each item carries
+MAX_REF_CHARS = 1200
 
 
 @dataclass(frozen=True)
@@ -131,16 +138,27 @@ class SystemOneBroker:
     transport: Optional[httpx.BaseTransport] = None     # tests may inject; default is real HTTP
     _stored: int = 0
 
-    async def decide(self, gateway, request_id: str, query: str, arguments: dict[str, Any]) -> dict[str, Any]:
+    async def decide(self, gateway, request_id: str, query: str, arguments: dict[str, Any],
+                     handle=None) -> dict[str, Any]:
         round_id = str(arguments.get("round") or "d2")
         raw = arguments.get("questions")
         questions = {str(qid): q for qid, q in raw.items()} if isinstance(raw, dict) else {}
-        sources = state_sources(self.descriptors, self.allowed_sources)
-        release = descriptor_release(sources)
-        # questions about a source outside the gateway's view, or malformed, are never sent
-        refused = sorted(qid for qid, q in questions.items() if not isinstance(q, dict)
-                         or q.get("type") not in QUESTION_TYPES
-                         or (qid.startswith("d2:") and qid.split(":", 1)[1] not in sources))
+        refused = sorted(qid for qid, q in questions.items()
+                         if not isinstance(q, dict) or q.get("type") not in QUESTION_TYPES)
+        if round_id in ROUND3:
+            # evidence text reaches the model only through the broker's own reads of refs the bound
+            # caller may read and this request fetched; the SUT supplies refs, never text
+            items, bad = self._round3_items(gateway, handle, round_id, questions, arguments.get("items"))
+            refused = sorted(set(refused) | set(bad))
+            state = {"query": query, "items": {qid: items[qid] for qid in sorted(items) if qid not in refused}}
+            release = "none"
+        else:
+            sources = state_sources(self.descriptors, self.allowed_sources)
+            release = descriptor_release(sources)
+            # questions about a source outside the gateway's view are never sent
+            refused = sorted(set(refused) | {qid for qid in questions
+                                             if qid.startswith("d2:") and qid.split(":", 1)[1] not in sources})
+            state = {"query": query, "sources": sources}
         asked = {qid: q for qid, q in questions.items() if qid not in refused}
         requested_calls = arguments.get("max_calls")
         max_calls = self.profile.max_calls_per_round
@@ -160,7 +178,6 @@ class SystemOneBroker:
             recorder = _RecordingTransport(self.transport or httpx.HTTPTransport())
             client = SystemOneClient(self.spec, base_url, self.spec.requested_model(self.environment),
                                      api_key=self.secret, transport=recorder)
-            state = {"query": query, "sources": sources}
             try:
                 outcome = await anyio.to_thread.run_sync(
                     client.decide, state, asked, self.profile.deadline_ms / 1000.0, max_calls)
@@ -177,6 +194,40 @@ class SystemOneBroker:
             invalid_ids=list(outcome.invalid_ids)))
         self._store(request_id, round_id, outcome, exchanges, release)
         return outcome.model_dump(mode="json")
+
+    def _round3_items(self, gateway, handle, round_id: str, questions: dict, raw_items: Any
+                      ) -> tuple[dict[str, list[dict]], list[str]]:
+        """qid -> the broker-read text of each ref; qids whose refs fail any check go to `bad`."""
+        items_in = raw_items if isinstance(raw_items, dict) else {}
+        items, bad = {}, []
+        for qid in questions:
+            refs = (items_in.get(qid) or {}).get("refs") if isinstance(items_in.get(qid), dict) else None
+            read = self._read_refs(gateway, handle, refs) if (
+                qid.startswith(f"{round_id}:") and isinstance(refs, list) and len(refs) == ROUND3[round_id]) else None
+            if read is None:
+                bad.append(qid)
+            else:
+                items[qid] = read
+        return items, bad
+
+    def _read_refs(self, gateway, handle, refs: list) -> Optional[list[dict]]:
+        out = []
+        for ref in refs:
+            if handle is None or not isinstance(ref, dict):
+                return None
+            try:
+                source_id, artifact_id, version = str(ref["source_id"]), str(ref["artifact_id"]), str(ref["version"])
+                start, end = int(ref["start"]), int(ref["end"])
+            except (KeyError, TypeError, ValueError):
+                return None
+            if source_id not in self.allowed_sources or not 0 <= start <= end:
+                return None
+            row = gateway.read_for_request(handle, source_id, artifact_id, version)
+            if row is None or end > len(row.text):
+                return None
+            out.append({"source_id": source_id, "version": version, "environment": row.environment,
+                        "text": row.text[start:end][:MAX_REF_CHARS]})
+        return out
 
     def _store(self, request_id: str, round_id: str, outcome: CallOutcome, exchanges: list[dict],
                release: str) -> None:

@@ -73,6 +73,7 @@ class GatewayProxy:
             name=DECIDE_TOOL, description="Ask the run's System One provider (runner-side broker).",
             inputSchema={"type": "object", "required": ["questions"], "properties": {
                 "round": {"type": "string"},
+                "items": {"type": "object"},
                 "questions": {"type": "object", "additionalProperties": {"type": "object", "required": ["type"], "properties": {
                     "type": {"enum": ["noul", "choice", "score"]}, "instructions": {"type": "string"},
                     "criteria": {"type": ["array", "object"]}}}}}}))
@@ -143,7 +144,8 @@ class GatewayProxy:
                 return _denied_body()
             if broker is None:
                 return {"error": {"code": "decision_layer_unavailable", "message": "no System One provider in this run"}}
-            return await broker.decide(self._gateway, request_id, self._queries.get(request_id, ""), arguments)
+            return await broker.decide(self._gateway, request_id, self._queries.get(request_id, ""), arguments,
+                                       handle=binding[1])
         target = self._tool_targets.get(name)
         if target is None:
             return {"error": {"code": ErrorCode.INVALID_ARGUMENT.value, "message": "invalid argument: unknown tool"}}

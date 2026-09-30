@@ -6,7 +6,7 @@ This document set expands the engineering team's initial Sanctum proposal. It de
 
 The initial team proposal has not been included in this restructuring. Add its Confluence link here when publishing; compatibility with its contract remains Q1. The architectural expansion and lab do not imply approval or replacement of that proposal.
 
-**Version: v5.2.1** (proposed). It supersedes v5.2 with reduced scope: the design stays focused on memory and the cascade flow, for proving the tenets; production hardening drafted in v5.2 was removed as out of scope at the research stage. See the [review history](review-history.md#v5-2-1).
+**Version: v5.2.2** (proposed). It supersedes v5.2 with reduced scope: the design stays focused on memory and the cascade flow, for proving the tenets; production hardening drafted in v5.2 was removed as out of scope at the research stage. See the [review history](review-history.md#v5-2-1).
 
 ## Start here
 

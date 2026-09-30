@@ -40,7 +40,7 @@
 
 ## Budget stress (Laya, `tools/run_budget_stress.py`)
 
-Cases: `gold/dev` plus `gold/scenarios` (84 cases, 72 answerable); no holdout or acceptance case was used (the tool's banner text mentions holdout generically). No D4 calibration is live, so the C4+D4 arm stays in rules order and its receipts equal C4.
+Cases: `gold/dev` plus `gold/scenarios` (84 cases, 72 answerable); no holdout or acceptance case was used (the tool's banner text mentions holdout generically). No D4 calibration was live, and the tool did not pass a System One profile, so the D4 arm ran on the strict profile (150 ms, 1 call): every D4 round was over budget with no call, and its receipts equal C4. This table therefore measures the rules-only order only; the live arm below is the D4 measurement.
 
 | Arm | Budget | Coverage@1000 | Coverage@2000 | Coverage@4000 | First support rank (mean, median, n) | Answerable without support |
 |---|---|---|---|---|---|---|
@@ -50,3 +50,36 @@ Cases: `gold/dev` plus `gold/scenarios` (84 cases, 72 answerable); no holdout or
 | C4+D4 | 2000 | 0.66 (72) | 0.76 (72) | 0.76 (72) | 1.24, 1, 66 | 6 |
 | C4 | 4000 | 0.66 (72) | 0.74 (72) | 0.78 (72) | 1.44, 1, 68 | 4 |
 | C4+D4 | 4000 | 0.66 (72) | 0.74 (72) | 0.78 (72) | 1.44, 1, 68 | 4 |
+
+## Live experiment arm: Laya D4 `d4-noul-v2-support-compact-150` (owner-approved)
+
+| Item | Value |
+|---|---|
+| Calibration | `configs/calibration/laya-local@laya-rl-agent.d4.yaml`, fitted on dev (361 units, 361 calls, 105,189 input tokens): Platt a 1.397, b -0.672, use band 0.59, held-out Brier 0.158 (raw 0.176), ECE 0.066 (raw 0.158). Binding: laya-local, laya-rl-agent, revision 55cf4c4e, template `d4-noul-v2-support-compact-150`, layout `r3-state-v2-compact-150` (test `tests/test_d4_live_arm_binding.py`; one-case preflight: 3 of 3 D4 decisions calibrated, none shadow) |
+| Arm | template override `laya-local: d4 -> d4-noul-v2-support-compact-150` set for the grid only and reverted after; relaxed profile; reorder-only gate active |
+| Grid | `tools/run_budget_stress.py --provider laya-local --system-one-profile relaxed`; budgets 1,000 / 2,000 / 4,000; `gold/dev` plus `gold/scenarios` (84 cases, 72 answerable). Dev cases are the calibration set (in-sample); the 24 scenario cases are not |
+| Control | no live source-prior arm exists; the offline source-prior control on the same 361 dev units selects band 1.0 in every fold and promotes nothing (row 8 table) |
+
+Scored (all 84 cases, per budget; identical at every budget between arms):
+
+| Budget | Arm | Safe grounded success | Mean recall | Mean tokens used | Cases with a failed gate | Reorder-only violations | Cases differing from C4 (success / recall) |
+|---|---|---|---|---|---|---|---|
+| 1000 | C4 | 27 | 0.552 | 743 | 5 | 0 | |
+| 1000 | C4+D4 | 27 | 0.552 | 743 | 5 | 0 | 0 / 0 |
+| 2000 | C4 | 53 | 0.695 | 1,322 | 5 | 0 | |
+| 2000 | C4+D4 | 53 | 0.695 | 1,322 | 5 | 0 | 0 / 0 |
+| 4000 | C4 | 57 | 0.719 | 1,773 | 5 | 0 | |
+| 4000 | C4+D4 | 57 | 0.719 | 1,773 | 5 | 0 | 0 / 0 |
+
+Order (offline receipt-prefix metrics on the live runs):
+
+| Arm | Budget | Coverage@1000 | Coverage@2000 | Coverage@4000 | First support rank (mean, median, n) | Answerable without support |
+|---|---|---|---|---|---|---|
+| C4 | 1000 | 0.63 (72) | 0.63 (72) | 0.63 (72) | 1.13, 1, 63 | 9 |
+| C4+D4 | 1000 | 0.63 (72) | 0.63 (72) | 0.63 (72) | 1.06, 1, 63 | 9 |
+| C4 | 2000 | 0.66 (72) | 0.76 (72) | 0.76 (72) | 1.24, 1, 66 | 6 |
+| C4+D4 | 2000 | 0.64 (72) | 0.76 (72) | 0.76 (72) | 1.15, 1, 66 | 6 |
+| C4 | 4000 | 0.66 (72) | 0.74 (72) | 0.78 (72) | 1.44, 1, 68 | 4 |
+| C4+D4 | 4000 | 0.60 (72) | 0.76 (72) | 0.78 (72) | 1.47, 1, 68 | 4 |
+
+Per budget, 546 D4 judgments were calibrated (0 shadow), 146 of them at or above the use band, over 546 Laya calls. Mean tokens used are identical between arms at every budget, so no unit was added; D4 changed order only. Data: `docs/reports/data/live-arm-laya-d4-budget-stress.md`.

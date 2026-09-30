@@ -47,3 +47,13 @@ Measured once at 790f8e9..b26f7b3, relaxed profile, calibrations on dev (CV-sepa
 Why nothing moves: for D6 the typed rules already flag every pair that carries a gold relation, and the dropped candidates rarely hold one; Jev cleared its band on 2 of 84 judgments, neither a candidate pair. For D4 no add band met the false-promotion tolerance for either provider, so D4 only reorders, and the scored metrics ignore order; the reorder-only gate never fired. Under the strict profile every round hit the deadline and the rules-only fallback applied. The design invariants (D6 add-only on rule-produced pairs, D4 reorder-and-fill only) cap what either decision can change; the null is partly a consequence of those guardrails and partly of the rules already covering the gold conflicts on this world.
 
 Cost and latency (reported, not gated): Jev p50 about 360 to 380 ms, about 1.2k input tokens per request for D4. Laya on CPU: D6 p50 1.0 to 1.9 s (p95 3.1 s), D4 p50 1.6 to 2.3 s (p95 4.7 s), about 3 HTTP calls per round. H3 is not supported for D6 or D4 on this data with either provider. Reports: docs/reports/system-one-d6-dev.md, system-one-d4-dev.md.
+
+## E3-prompt campaign (System One prompt and state variants): result
+
+Measured once, shadow-only except one owner-approved live experiment arm; dev, scenarios (live arm and budget stress) and the D6 challenge overlay (manifest 15304c65); no acceptance or holdout case used. Jev spend 631 calls, 1,008,710 input and 70,382 output tokens under a pre-dispatch ceiling of 1,100 / 1,030k / 110k. Numbers only:
+
+- D2: Jev variants reach nested-CV outer AUC 0.737 to 0.758 against 0.731 for the no-model source-prior control; Laya variants 0.695 to 0.737 (no live Laya D2 arm).
+- D4 (361 dev units): Jev support rubric on excerpts 0.697, Laya compact-150 0.820, control 0.639. Laya D4 live arm (84 cases, budgets 1,000 / 2,000 / 4,000): safe success, recall and tokens identical to C4 at every budget; order changed; reorder-only gate never fired.
+- D6: 0 promotions on dev by construction (every positive pair rule-flagged); on the challenge slice (58 items, 26 positive, 4 of 20 positive pairs never exposed) noul raw AUC Jev 0.521 to 0.593, Laya 0.335 to 0.730.
+
+Summary, tables, ledger and caveats: docs/reports/system-one-prompt-campaign.md; lab page: docs/experiments/system-one-lab.md.

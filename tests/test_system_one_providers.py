@@ -221,3 +221,18 @@ def test_bad_choice_is_invalid():
     with SystemOneTestServer(ServerBehavior(invalid="bad_choice")) as server:
         outcome = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"c": CHOICE, "n": NOUL}, 5, max_calls=1)
     assert outcome.invalid_ids == ["c"] and set(outcome.answers) == {"n"}
+
+
+def test_broker_result_translation():
+    from sanctum_ref.providers.http_systemone import outcome_from_broker
+    ok = outcome_from_broker({"provider": "p", "model": "m-1", "answers": {"d2:a": {"type": "noul", "noul": 0.4},
+                              "d2:b": {"type": "noul", "noul": 0.9}}, "unavailable": {"d2:b": "not_allowed"},
+                              "elapsed_ms": 12.5, "usage": {"input_tokens": 3}})
+    assert ok.model == "m-1" and set(ok.answers) == {"d2:a"} and ok.invalid_ids == ["d2:b"]
+    assert ok.unavailable_reason is None and ok.latency_ms == 12
+    refused = outcome_from_broker({"provider": "p", "model": None, "answers": {},
+                                   "unavailable": {"d2:a": "data_class_ineligible"}})
+    assert refused.unavailable_reason == "data_class_refused"
+    mixed_versions = outcome_from_broker({"provider": "p", "model": ["m-1", "m-2"], "answers": {"d2:a": {"type": "noul", "noul": 0.4}}})
+    assert mixed_versions.unavailable_reason == "invalid_output"
+    assert outcome_from_broker({"error": {"code": "x"}}).unavailable_reason == "not_configured"

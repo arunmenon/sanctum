@@ -44,6 +44,43 @@ def request_hash(round_name: str, query: str, questions: dict[str, Any]) -> str:
     return "sha256:" + hashlib.sha256(material.encode()).hexdigest()[:24]
 
 
+# The runner's broker reports per-question refusals with its own reason names; the SUT only needs
+# to know that a question was not answered (keep the candidate) and, for the whole call, why.
+BROKER_REASONS = {
+    "not_allowed": "invalid_output", "invalid_request": "invalid_output", "primitive_unsupported": "invalid_output",
+    "invalid_output": "invalid_output", "data_class_ineligible": "data_class_refused",
+    "over_budget": "over_budget", "call_limit": "over_budget", "decision_layer_unavailable": "error",
+}
+
+
+def outcome_from_broker(body: Any) -> CallOutcome:
+    """The broker's tool result (`system_one.decide`, runner side) as a `CallOutcome`. Anything
+    unexpected is unavailable: the SUT never partially trusts a result it cannot read."""
+    if not isinstance(body, dict) or "provider" not in body:
+        return CallOutcome(provider="unknown", unavailable_reason="not_configured")
+    try:
+        return CallOutcome.model_validate(body)                  # already in the core's shape
+    except ValueError:
+        pass
+    model = body.get("model")
+    answers = body.get("answers") if isinstance(body.get("answers"), dict) else {}
+    refused = body.get("unavailable") if isinstance(body.get("unavailable"), dict) else {}
+    outcome = CallOutcome(provider=str(body["provider"]), usage=body.get("usage") if isinstance(body.get("usage"), dict) else None,
+                          latency_ms=int(float(body.get("elapsed_ms") or 0)))
+    if isinstance(model, list):                                  # batches resolved to different versions
+        outcome.unavailable_reason = "invalid_output"
+        return outcome
+    outcome.model = model if isinstance(model, str) else None
+    outcome.answers = {qid: answer for qid, answer in answers.items() if qid not in refused and isinstance(answer, dict)}
+    outcome.invalid_ids = sorted(refused)
+    if refused and not outcome.answers:
+        reasons = {BROKER_REASONS.get(str(reason), "error") for reason in refused.values()}
+        outcome.unavailable_reason = sorted(reasons)[0] if len(reasons) == 1 else "error"
+    elif not outcome.answers:
+        outcome.unavailable_reason = "invalid_output"
+    return outcome
+
+
 class BrokerTransport:
     """Sends a round to the runner's broker through the SUT's proxy port."""
 
@@ -51,11 +88,7 @@ class BrokerTransport:
         call = getattr(port, "system_one_decide", None)
         if call is None:
             return CallOutcome(provider="unknown", unavailable_reason="not_configured")
-        body = await call(payload)
-        try:
-            return CallOutcome.model_validate(body)
-        except ValueError:
-            return CallOutcome(provider="unknown", unavailable_reason="invalid_output")
+        return outcome_from_broker(await call(payload))
 
 
 class DirectTransport:

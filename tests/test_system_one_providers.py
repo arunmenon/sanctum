@@ -227,7 +227,8 @@ def test_broker_result_translation():
     from sanctum_ref.providers.http_systemone import outcome_from_broker
     ok = outcome_from_broker({"provider": "p", "model": "m-1", "answers": {"d2:a": {"type": "noul", "noul": 0.4},
                               "d2:b": {"type": "noul", "noul": 0.9}}, "unavailable": {"d2:b": "not_allowed"},
-                              "elapsed_ms": 12.5, "usage": {"input_tokens": 3}})
+                              "elapsed_ms": 12.5, "usage": {"input_tokens": 3}, "descriptor_release": "sha256:abc"})
+    assert ok.descriptor_release == "sha256:abc"
     assert ok.model == "m-1" and set(ok.answers) == {"d2:a"} and ok.invalid_ids == ["d2:b"]
     assert ok.unavailable_reason is None and ok.latency_ms == 12
     refused = outcome_from_broker({"provider": "p", "model": None, "answers": {},

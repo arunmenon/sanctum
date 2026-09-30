@@ -65,8 +65,10 @@ def outcome_from_broker(body: Any) -> CallOutcome:
     model = body.get("model")
     answers = body.get("answers") if isinstance(body.get("answers"), dict) else {}
     refused = body.get("unavailable") if isinstance(body.get("unavailable"), dict) else {}
+    release = body.get("descriptor_release")
     outcome = CallOutcome(provider=str(body["provider"]), usage=body.get("usage") if isinstance(body.get("usage"), dict) else None,
-                          latency_ms=int(float(body.get("elapsed_ms") or 0)))
+                          latency_ms=int(float(body.get("elapsed_ms") or 0)),
+                          descriptor_release=release if isinstance(release, str) else None)
     if isinstance(model, list):                                  # batches resolved to different versions
         outcome.unavailable_reason = "invalid_output"
         return outcome

@@ -33,6 +33,7 @@ Each example follows the same shape: **the situation**, **a picture of the flow*
 | 13 | What the observations show after a month | Separate signals and priors (research) |
 | 14 | Memory fixes a gap it found | The improvement loop end to end |
 | 15 | Two services both called "auth" | Conflicting proposals and governance |
+| Trace | [Worked trace](contracts-and-scenarios.md#worked-trace) (v5.2.2) | One question through ontology, model state, decision, action and subjects |
 | 16–25 | Memory fixtures from the review | Ambiguity, composites, disabled relations, fallback, precedence, poisoning, probing, releases, versions, evaluation honesty |
 
 ---
@@ -575,6 +576,78 @@ flowchart TB
 **Why entity IDs are namespaced.** `repo:identity/auth#svc` and `repo:payments/payment-auth#svc` can never collapse into one node just because both involve "auth."
 
 **Takeaway.** Ambiguous names are surfaced, not merged. Scoped mappings keep one team's vocabulary from leaking into another's.
+
+---
+
+<a id="worked-trace"></a>
+
+### Worked trace: one question through ontology, model state, decision, action and subjects (v5.2.2)
+
+One question, followed through every layer, on the payment-auth neighborhood of [memory §8.8](memory-design.md#section-8-8). Values marked *illustrative* show the shape of the data, not results.
+
+**1. Question and caller.** A payments engineer's agent (principal in group `payments-eng`, agent caller profile) asks: *"What is the PA-svc retry limit on a gateway timeout?"*
+
+**2. Policy (binding, never model-judged).** Effective scope is the caller's grants ∩ project scope ∩ registry ∩ data policy: Deep Insights (repo `payments/payment-auth`), Dobby (`skills/payments/`), KaaS (space *PA*), Engram (the caller's own sessions). The procedure *must-consult Dobby for procedure facts in payments* makes Dobby **required**. No model decides access, the required set, or authority.
+
+**3. Ontology assertions used** (as an owner supplies them; all `accepted` in the pinned release):
+
+```yaml
+- Term {source: engram, namespace: sessions,  native: "PA-svc"}       DENOTES svc:payment-auth   # reviewed identity
+- Term {source: dobby,  namespace: Payments,  native: "Auth Service"} DENOTES svc:payment-auth   # reviewed identity
+- Place {source: deep-insights, native: "repo:payments/payment-auth"} SELECTS_FOR svc:payment-auth   # search filter only
+- Place {source: kaas,  native: "space:PA"}                            SELECTS_FOR svc:payment-auth   # search filter only
+- Entity svc:payment-auth MEMBER_OF domain:payments                                                 # reviewed membership
+- Procedure must-consult {source: dobby, fact_kind: procedure} APPLIES_TO domain:payments            # reviewed, versioned
+- Artifact "RetryConfig.java" ABOUT svc:payment-auth ; Artifact "Auth Service / Retries" ABOUT svc:payment-auth, topic:retries
+```
+
+**4. Resolution and query plans.** `PA-svc` has exactly one accepted `DENOTES` candidate in the caller's visible scope: `svc payment-auth` ([§9.2](memory-design.md#section-9-2)). Per-source plans keep the original text and the qualifier "gateway timeout":
+
+| Source | Plan |
+|---|---|
+| Deep Insights | original query + selector `repo:payments/payment-auth` |
+| Dobby (required) | "Auth Service retry limit gateway timeout" + prefix `skills/payments/` |
+| KaaS | original query + selector `space:PA` |
+| Engram | original query, caller's own sessions |
+
+**5. D2 model state, two layouts.** Only optional sources are asked about; Dobby is required and never a candidate.
+
+| Descriptor-only (exercised) | Ontology-enriched (being defined) |
+|---|---|
+| `query` | `query` |
+| per optional source: its pinned descriptor from the release | the same, plus per source only permitted, provenance-backed memory metadata: accepted `SELECTS_FOR` to the resolved entity, declared fact kinds it is authoritative for, and coverage marked `unknown` where none is recorded |
+
+Both layouts are built by the broker from trusted inputs, never by the SUT. The layouts are named entries in [System One providers §14](system-one-providers.md#14-template-and-state-layout-registry), where the ontology-enriched layout is being defined; only the descriptor-only layout has been exercised.
+
+**6. Questions and answers.** One yes/no question per optional source: *"Will this source return necessary supporting evidence for the question?"* Calibrated answers (*illustrative*):
+
+| Question | Calibrated p (*illustrative*) | Band |
+|---|---|---|
+| `d2:deep-insights` | 0.93 | use |
+| `d2:kaas` | 0.46 | uncertain |
+| `d2:engram` | 0.08 | below skip |
+
+**7. Permitted action per source.** Required source: always called (Dobby). Optional, use band or uncertain: called (Deep Insights; KaaS, kept because uncertain). Optional, below the skip band with a usable calibration: may be skipped (Engram, reported as `skipped` with `not_selected`). One line: *a source is eligible only through policy, and the model may only remove an optional source it is confidently sure is not useful; everything else is kept.*
+
+**8. Retrieval and subjects.** Evidence units carry `subjects[]` ([§8.10](memory-design.md#section-8-10)):
+
+| Unit | Content | Subject binding |
+|---|---|---|
+| `RetryConfig.java` @ R42, prod (Deep Insights) | `maxRetries = 5` | `svc payment-auth`, via the accepted `ABOUT` assertion |
+| skill *Auth Service / Retries* v3 (Dobby) | "retry at most 3 times" | `svc payment-auth` and `topic retries`, via accepted `ABOUT` (composite; not a name) |
+| page in space *PA* (KaaS) | retry overview | `svc payment-auth`, via the place only: grouping and ranking, never conflict pairing on its own |
+| page in space *PA* with no subject field (KaaS) | general gateway notes | `unknown`: kept and shown, never assumed to match |
+
+**9. Conflict and status.** The code and the skill share an attested subject and attribute and disagree (5 vs 3): the rules flag `possible_conflict` (`policy_implementation_divergence`) and packing keeps **both witnesses** ([§7.4](hld.md#section-7-4)). Both requested facts, implemented and procedure, have obtainable evidence, so `evidence_status: sufficient` with the conflict flagged. Had Dobby timed out, the status would be `partial` with `required_source_unavailable`, not `insufficient`, because the implemented fact would still be covered ([Ex. 9](contracts-and-scenarios.md#example-9)).
+
+**10. What each layer contributed.**
+
+| Layer | Contribution in this trace |
+|---|---|
+| Policy | Effective scope; Dobby required by procedure; nothing outside scope asked or shown |
+| Judgment rules | Resolution to one entity, query plans, conflict flag on attested subjects, packing that keeps both witnesses and an honest status |
+| System One | One calibrated yes/no per optional source; the only change it made was to allow skipping Engram |
+| Memory and ontology | Names, places, membership and procedure that made the plans and the required set; `ABOUT` bindings that gave evidence its subjects; an unknown subject kept as unknown |
 
 ---
 

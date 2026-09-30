@@ -255,6 +255,16 @@ Two facts shape the design:
 - Questions in one call see the same state and run **independently**. One cannot use another's answer (F03).
 - Vendor calibration is not calibration on our traffic. We calibrate locally (F04, F05).
 
+**Policy rules and judgment rules.** Policy rules (access, required sources, permitted operations) are binding and are never challenged by a model. Judgment rules (usefulness, relevance, possible-conflict heuristics) are the baseline a model is evaluated against. Each decision declares its eligibility rule, the items a model may judge:
+
+| Decision | Eligibility |
+|---|---|
+| D2 | The model judges every optional candidate source the rules selected; required sources are never candidates |
+| D6 | The model judges only rule-produced candidate pairs the strict rule dropped; flagged pairs stay flagged |
+| D4 | The model scores packed units and may reorder or fill; it never removes a rules-packed unit |
+
+A model confined to the rules' abstentions could never correct a confident wrong judgment rule; that is why eligibility is declared per decision rather than fixed to "abstentions only".
+
 <a id="section-6-2"></a>
 
 ### 6.2 What a single Jev call looks like
@@ -299,13 +309,15 @@ Because questions in one call cannot see each other's answers, anything that dep
 ```mermaid
 flowchart LR
     R1["<b>Round 1</b> · before routing<br/>input: query only<br/>• D1 intent<br/>• D3 ambiguity<br/><i>pilot: rules only</i>"]
-    R2["<b>Round 2</b> · routing<br/>input: query + each allowed source's graph neighborhood<br/>• D2 usefulness, one question per source<br/><i>pilot: the one Jev call</i>"]
+    R2["<b>Round 2</b> · routing<br/>input: query + each allowed source's state record<br/>(template's D2 layout)<br/>• D2 usefulness, one question per source<br/><i>pilot: the one Jev call</i>"]
     R3["<b>Round 3</b> · after retrieval<br/>input: evidence units<br/>• D4 relevance<br/>• D5 exact duplicate<br/>• D6 possible conflict (bounded pairs)<br/><i>pilot: existing ranker + exact match</i>"]
     R1 --> R2 --> FO(["fan-out"]) --> R3
 
     classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
     class R1,R2,R3 judge
 ```
+
+Each D2 template names its state layout. A **descriptor-only** layout (the query plus each allowed source's pinned descriptor) and an **ontology-enriched** layout (the same plus permitted, provenance-backed memory metadata about the query's resolved names for that source, with unknown coverage preserved as unknown) are distinct variants with separate calibrations; graph neighbourhoods reach the model only through the enriched layout ([System One providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
 
 Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance that may reorder but never drop a rules-packed unit) are specified in [System One providers §12](system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance).
 
@@ -318,7 +330,7 @@ Round 3 System One decisions (D6 on rule-produced conflict pairs, D4 relevance t
 | D1 | Intent (`why`, `when`, `what`, `how`, `related`, `verify`), multi-label | P(intent applies) per label | Rules; Jev challenger | Balanced `general` weights |
 | D2 | **Expected source usefulness** | P(source returns necessary supporting evidence \| query, authorized source) | **First Jev experiment** | Keep the source |
 | D3 | Ambiguity | P(query needs clarification or decomposition), query only | Rules; Jev challenger | Escalate within budget, else `partial` |
-| D4 | Relevance | Relevance score per unit | Existing cross-encoder | Keep, lower rank |
+| D4 | Relevance | P(unit supports an answer to the query); score variants diagnostic only | Existing ranker, then System One support judgment as a successive stage: the ranker orders candidates, System One may reorder or fill within the packed set | Rules order and rules-packed set |
 | D5 | Duplicate | Exact: same hash + version. Semantic: proposal only | Exact only | Keep both |
 | D6 | Possible conflict | P(two units assert a material typed relation about the same subject and attribute) | Bounded flag on rule-produced pairs | Rule-flagged pairs stay `possible_conflict`; candidate pairs stay unflagged |
 | D7 | Claim support | supported / contradicted / insufficient | Later | `insufficient` |
@@ -340,7 +352,8 @@ flowchart TB
     T1 -- "unsure, no budget" --> FB["<b>Safe fallback</b><br/>per decision (§6.4 last column)"]
     T0 -- settled --> OK(["Result"])
     T1 -- "confident" --> OK
-    T2 --> OK
+    T2 -- "valid, eligible:<br/>permitted actions only" --> OK
+    T2 -- "unavailable, invalid<br/>or unresolved" --> FB
     FB --> OK
 
     classDef judge fill:#e3f0fd,stroke:#1f6fb2,color:#000
@@ -349,6 +362,7 @@ flowchart TB
     class FB safe
 ```
 
+- A valid, eligible Tier 2 judgment may affect only the decision's permitted actions; an unavailable, invalid or unresolved Tier 2 result uses that decision's baseline-preserving default, like Tier 1.
 - "Use" bands are set per decision and per error cost, fitted on one data split and tested on another.
 - A random sample of confident Tier 1 answers is audited to catch confident mistakes.
 - The escalation budget is both a call cap and a time cap tied to the request deadline.
@@ -378,6 +392,7 @@ DecisionResult
 - Report discrimination, class-specific errors, Brier/log loss, and risk-vs-coverage, not just ECE.
 - Model, rubric, options, data slice, and calibration map are versioned together.
 - Question templates and state layouts are named, versioned entries bound into each calibration ([System One providers §14](system-one-providers.md#14-template-and-state-layout-registry)).
+- **Activation.** Each decision names its no-model control: D2 a source-specific prior; D4 a predeclared source or role prior, or the existing ranker; D6 a predeclared source-pair or relation prior. A model is activated only when the decision's named metric improves over both its rules baseline and its no-model control within the unchanged error tolerance, and the metric must be able to observe the effect (D4: ordering or useful additions; D6: eligible rule-missed relations).
 
 ---
 

@@ -22,7 +22,8 @@ flowchart TB
     T1["<b>Tier 1: System One</b><br/>provider.decide(batch) → calibrated p per decision"]
     T1 -- "uncertain band, or unavailable" --> T2
     T2["<b>Tier 2: LLM escalation</b><br/>budgeted, optional, may be off"]
-    T2 --> SD
+    T2 -- "valid, eligible:<br/>permitted actions only" --> OK
+    T2 -- "unavailable, invalid<br/>or unresolved" --> SD
     T1 -- "confident" --> OK(["Result"])
     T0 -- settled --> OK
     SD["<b>Safe default</b><br/>e.g. D2 uncertain or unavailable → keep the source"] --> OK
@@ -33,7 +34,7 @@ flowchart TB
     class SD safe
 ```
 
-Tier 2 is optional and remains an interface until an LLM budget is decided. Rules keep policy: must-consult, access, as-of and data class are settled before any model is asked.
+Tier 2 is optional and remains an interface until an LLM budget is decided. Like Tier 1, a valid and eligible Tier 2 judgment may affect only the decision's permitted actions, and anything else takes the decision's baseline-preserving default. Rules keep policy: must-consult, access, as-of and data class are settled before any model is asked.
 
 ## 2. Provider interface
 
@@ -77,9 +78,11 @@ The **input window** is declared through `max_questions_per_call` and `max_state
 
 Providers are declared in `configs/system_one_providers.yaml`; an arm selects one by name (matrix `decision_provider: named`, plus a provider name). The pipeline never branches on provider identity: every difference is a declared capability.
 
-### 2.1 Hosted and self-hosted provider profiles
+### 2.1 Provider profiles
 
-| Concern | Hosted service (e.g. Jev) | Self-hosted on CPU (e.g. Laya) |
+Batch efficiency and usable input size are properties of a provider profile, established by measurement; hosting location alone determines neither. Hosted Jev and local Laya on CPU illustrate two profiles. A declared character limit (`max_state_chars`) is a conservative backstop, not a precise definition of the input window.
+
+| Concern | Profile A, e.g. Jev (hosted): batching amortises state, large input | Profile B, e.g. Laya (local CPU): per-question cost, small input |
 |---|---|---|
 | Batching | Batch a round's questions into one call: `state` is sent once, so batching amortises it and cost per question falls with batch size | Per-question compute dominates, so batching saves nothing; a small input window forces one item per call |
 | State | Full layouts fit | Compact layouts: the same fields, shorter excerpts, qualifiers admitted first so a tight cap never drops an environment or release |
@@ -87,6 +90,14 @@ Providers are declared in `configs/system_one_providers.yaml`; an arm selects on
 | Per-batch state | Each batch carries only its own items' records, so splitting a round never sends one item's evidence with another's question | same |
 | Versions | Alias resolves to a version per response; calibration binds the resolved version | Responses name only a family; the checkpoint revision is recorded in the binding and pinned by the running server |
 | Per-request caps | Pair and unit caps bound cost | Caps bound latency, which grows with every item |
+
+**Adding a third provider.** Establish and declare, before any calibration:
+
+- which criteria shapes it accepts, especially how `score` levels are sent (ordered list or mapping);
+- how total input admission is determined, including question instructions, not only state;
+- how it reports truncation (state and per question), or that it reports none;
+- how a response that names only a model family is associated with its checkpoint;
+- which template and state-layout combinations it supports per decision.
 
 ## 3. Wire protocol: `POST /v1/systemone`
 
@@ -185,7 +196,8 @@ The SUT asks; the broker decides what may be sent. The broker binds each call in
 - **Layout is part of the binding.** A Round 3 binding names the exact state layout the broker reports for the template; a binding whose layout is `none` matches only the v1 (pointer) layout, never any other. A calibration fitted on one excerpt layout must not bind to a different one.
 - **Shadow-only rule:** with no usable calibration, the provider runs shadow-only: answers are logged, every candidate is preserved. Shadow comes from the absence of a usable binding: a fit whose band does not meet the tolerance is written to `configs/calibration/rejected/`, and a use band outside (0, 1) is refused; there is no never-promote sentinel.
 - Bands are reported with nested case-grouped cross-validation (`sanctum_eval.calibration.nested_cv`): inner folds choose the calibrator and band, outer folds report; denominators and Wilson intervals accompany every rate.
-- **No-model control before any live arm.** Every variant is compared, on the same items and folds, with a source-prior control (every raw p set to 0.5, so only per-source intercepts separate items). A variant whose band does not beat that control shows no model contribution, and no live arm is proposed for it.
+- **No-model control before any live arm.** Each decision names its control, compared on the same items and folds: D2 a source-specific prior; D4 a predeclared source or role prior, or the existing ranker; D6 a predeclared source-pair or relation prior.
+- **Activation.** A model is activated only when the decision's named metric improves over both its rules baseline and its no-model control within the unchanged error tolerance. The metric must be able to observe the effect: for D4, ordering or useful additions; for D6, eligible relations the rules missed.
 - Diagnostic templates (§14) are recorded but never calibrated into a band.
 - Campaigns have a hard ceiling enforced before every HTTP attempt (calls, input and output tokens; retries count; usage recorded once per exchange).
 - Configuration is frozen before the acceptance run.
@@ -254,6 +266,8 @@ flowchart LR
 | Primary metrics | conflict witnesses kept, expected conflicts flagged, false conflicts flagged, relation-type accuracy | necessary-evidence recall within budget, precision proxy, harmful omissions, tokens returned |
 | Calibration labels (evaluator side, dev only) | gold relations: a candidate pair is positive when its units witness a gold relation | necessary-evidence spans: a unit is positive when it covers a gold span |
 
+**D4 stages.** The existing rules ranker and the System One support judgment are successive stages: the ranker orders candidates and fixes the packed set; System One may then reorder within it or fill leftover budget. Score variants are diagnostic only.
+
 **Consequence of the invariants.** D4 can only matter where the rules leave budget unused or where order matters to the caller; D6 can only add conflict flags. Neither can make a response lose evidence the rules would have returned, so their worst case is extra tokens or extra false conflicts, which the metrics count. Each calibration is bound to decision, provider, resolved model (and checkpoint revision for Laya), template and descriptor release.
 
 ## 13. The two integrated providers
@@ -301,6 +315,15 @@ Every question template and every Round 3 state layout is a named, versioned ent
 | `r3-state-v1` (pointer) | source id, version, environment, and a bounded text slice from the start of the pointed span | Baseline; its binding layout is `none` |
 | `r3-state-v2` (labelled excerpt) | source id, artifact id, version, environment, subject, attribute, assertion role, excerpt, excerpt offsets | Hosted providers |
 | `r3-state-v2-compact`, `-compact-150` | the v2 fields with a shorter excerpt cap, qualifiers admitted first | Small-input-window providers |
+
+**State layouts (D2).** Each D2 template names its layout; the layouts are distinct variants with separate calibrations.
+
+| Layout | Record per allowed optional source | Status |
+|---|---|---|
+| Descriptor-only | the query plus the source's pinned descriptor (named descriptor set) | In use |
+| Ontology-enriched | the descriptor-only record plus permitted, provenance-backed memory metadata about the query's resolved names for that source (reviewed names, places, accepted relations); where memory has no record, coverage is stated as unknown, never as absent | Defined, not yet exercised |
+
+The enriched layout tests one hypothesis: does memory-derived context improve routing judgment beyond descriptors alone. It admits only metadata the caller may see, carries each assertion's provenance, and is compared with the descriptor-only layout and the no-model control on the same items.
 
 **Excerpt policy.** Within the pointed span only: select lines holding a query term or an assertion (a name assigned a value) plus their neighbours, and keep every qualifier line of the span (environment, release, version, branch, heading) whenever any line is selected. Lines stay verbatim and in original order, their artifact offsets are recorded, and the cap drops whole lines from the end, never part of a line. With no selected line, a bounded prefix of the span is kept. Subject and attribute come from deterministic, source-supported extraction (front-matter name, heading, place; an assigned name on a selected line) or are null.
 

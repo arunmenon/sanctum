@@ -147,3 +147,17 @@ Disposition values: **adopted** (in the design), **out of scope (research stage)
 | Outage policy (circuit breaking, sustained fallback, recovery probes, purpose-bound LLM use) | Request-level fallback does not cover long outages | R-H 5.3 |
 
 The review's memory-fidelity table and judgments describe the lab implementation and need no design disposition.
+
+<a id="v5-2-2"></a>
+
+## v5.2.2: focused MVP review
+
+A focused review of the decision cascade and the System One layer, kept to rules that prove or protect a tenet. All five findings are **adopted**.
+
+| Finding | Topic | Disposition | Where |
+|---|---|---|---|
+| MVP-5 | Policy rules vs judgment rules; per-decision eligibility (a model confined to abstentions cannot correct a confident wrong judgment rule) | **Adopted** | [HLD §6.1](hld.md#section-6-1) |
+| MVP-6 | D2 state: no implied graph neighbourhoods; descriptor-only and ontology-enriched layouts as separate variants; the enriched layout defined, not yet exercised | **Adopted** | [HLD §6.3](hld.md#section-6-3), [System One providers §14](system-one-providers.md#14-template-and-state-layout-registry) |
+| MVP-7 | Batch efficiency and input size are measured provider-profile properties, not hosting location; checklist for a third provider; a character limit is a backstop | **Adopted** | [System One providers §2.1, §13](system-one-providers.md#21-provider-profiles) |
+| MVP-8 | Tier 2 consistent in both diagrams (permitted actions only, else the baseline-preserving default); D4 ranker and System One as successive stages, score diagnostic | **Adopted** | [HLD §6.4, §6.5](hld.md#section-6-5), [System One providers §1, §12](system-one-providers.md#12-round-3-decisions-d6-conflict-d4-relevance) |
+| MVP-9 | Activation per decision against its rules baseline and a named no-model control, with a metric that can observe the effect; no economic framework | **Adopted** | [HLD §6.7](hld.md#section-6-7), [System One providers §8](system-one-providers.md#8-calibration-binding-and-the-shadow-only-rule) |

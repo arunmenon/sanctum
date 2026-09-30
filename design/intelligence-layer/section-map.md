@@ -37,5 +37,16 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 7.4 Status defaults and conflicts that survive packing | [Architectural proposal](hld.md#section-7-4) |
 | 8.10 Attributed subjects: `Artifact ABOUT Entity` in operation | [Memory design](memory-design.md#section-8-10) |
 | R-Holistic dispositions | [Review history](review-history.md#v5-2-1) |
+| 10 Worked trace through ontology, model state, decision and subjects (v5.2.2) | [Contracts and scenarios](contracts-and-scenarios.md#worked-trace) |
+
+**v5.2.2 additions** (no new top-level sections):
+
+| Addition | Owning page |
+|---|---|
+| Policy rules vs judgment rules; per-decision eligibility | [Architectural proposal §6.1](hld.md#section-6-1) |
+| D2 state layouts (descriptor-only, ontology-enriched) | [Architectural proposal §6.3](hld.md#section-6-3); [System One providers §14](system-one-providers.md#14-template-and-state-layout-registry) |
+| Per-decision no-model control and activation rule | [Architectural proposal §6.7](hld.md#section-6-7); [System One providers §8](system-one-providers.md#8-calibration-binding-and-the-shadow-only-rule) |
+| Provider profiles; adding a third provider | [System One providers §2.1](system-one-providers.md#21-provider-profiles) |
+| Focused MVP review dispositions | [Review history](review-history.md#v5-2-2) |
 
 Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1; it does not own a numbered section. Its lab companion (measurements, owner decisions for the spike, variants and their status) is `docs/experiments/system-one-lab.md`, outside the design set.

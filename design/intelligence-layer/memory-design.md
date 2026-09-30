@@ -240,7 +240,7 @@ flowchart LR
     class DI,DO,KA,EN,t4,t2n,t1,t3,e1,e2,e3,a1,a2,p1 mem
 ```
 
-**Reading it:** two sources have *names* for the service (`PA-svc`, *Auth Service*), both reviewed as denoting it. Two sources have *places* that hold material about it, used only as search filters. The Dobby skill is *about* the service and the retries topic; it is not a name. The service is an explicit member of the payments domain, which is how the domain-level must-consult rule reaches it.
+**Reading it:** two sources have *names* for the service (`PA-svc`, *Auth Service*), both reviewed as denoting it. Two sources have *places* that hold material about it, used only as search filters. The Dobby skill is *about* the service and the retries topic; it is not a name. The service is an explicit member of the payments domain, which is how the domain-level must-consult rule reaches it. The [worked trace](contracts-and-scenarios.md#worked-trace) follows one question through this neighborhood end to end (v5.2.2).
 
 <a id="section-8-9"></a>
 

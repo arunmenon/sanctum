@@ -68,3 +68,30 @@ def test_stress_driver_and_offline_report(case, tmp_path):
     text = render(config, runs, cases)
     assert "| C4+D4 | 2000 |" in text and "SYNTHETIC" in text
     assert order_metrics_for_run(runs[0][2], cases, [1000])["coverage"][1000]["n"] == 1
+
+
+def test_offline_d4_order_report_from_receipts(case, tmp_path):
+    from tools.d4_order_report import d4_order, d4_scores, render, run_order_metrics
+
+    gold, response, receipt, _ = case("m0-001")
+    padding = {**response["evidence"][0], "evidence_id": "ev-pad", "artifact_id": "art-pad",
+               "native_ref": "codehub:art-pad@R42#0-10"}
+    rules = {**response, "evidence": [padding] + response["evidence"]}          # supporting unit at rank 2
+    decision = {"status": "answered", "target": "d4:x", "disposition": "use", "provider": "t", "policy_version": "d4",
+                "latency_ms": 1, "cost": 0.0}
+    decisions = [{**decision, "value": {"item": "d4:ev-pad", "p_raw": 0.1}},
+                 {**decision, "value": {"item": "d4:ev-a1", "p_raw": 0.9}}]
+    scores = d4_scores({"decisions": decisions})
+    assert scores == {"ev-pad": 0.1, "ev-a1": 0.9}
+    reordered = d4_order(EvidenceResponse.model_validate(rules), scores)
+    assert [u.evidence_id for u in reordered.evidence][:2] == ["ev-a1", "ev-pad"]
+    (tmp_path / "responses.jsonl").write_text(json.dumps(rules) + "\n")
+    (tmp_path / "receipts.jsonl").write_text(json.dumps({**receipt, "decisions": decisions}) + "\n")
+    cases = tmp_path / "cases"
+    cases.mkdir()
+    (cases / "m0-001.yaml").write_text((ROOT / "gold" / "m0" / "m0-001.yaml").read_text())
+    metrics = run_order_metrics(tmp_path, cases, (1000,))
+    assert metrics["scored_requests"] == 1
+    assert metrics["rules"]["ranks"] == [first_support_rank(gold, EvidenceResponse.model_validate(rules))]
+    assert metrics["d4"]["ranks"][0] < metrics["rules"]["ranks"][0]
+    assert "| run | order |" in render({"row8": metrics}, (1000,))

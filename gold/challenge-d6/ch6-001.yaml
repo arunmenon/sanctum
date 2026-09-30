@@ -1,0 +1,113 @@
+case_id: ch6-001
+bundle_id: b-ch6-001
+family: conflicting_sources
+request:
+  schema_version: '1.0'
+  request_id: req-cd0e0065b4bec92a
+  query: How many shards does the index run with?
+  mode: explore
+  budget_tokens: 4000
+  deadline_ms: 3000
+  caller_profile: agent
+principal: kestrel-identity
+answerable: true
+interpretation_policy: unique
+interpretations:
+- interpretation_id: i1
+  entity_ref: ent-3ff08d531a
+obligations:
+- obligation_id: o1
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: codehub
+      artifact_id: art-6806ea6a1d
+      version: R42
+      start: 198
+      end: 200
+  acceptable_gap_reasons: []
+  obtainable: true
+- obligation_id: o2
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: skillhub
+      artifact_id: art-8ac544e791
+      version: v1
+      start: 89
+      end: 91
+  acceptable_gap_reasons: []
+  obtainable: true
+- obligation_id: o3
+  interpretation_id: i1
+  weight: 1.0
+  bundles:
+  - spans:
+    - source_id: dochub
+      artifact_id: art-bc483782e6
+      version: v1
+      start: 64
+      end: 66
+  acceptable_gap_reasons: []
+  obtainable: true
+source_obligations:
+- source_id: codehub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+- source_id: dochub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+- source_id: skillhub
+  mandatory: true
+  expected: attempted
+  substitutes: []
+relations:
+- relation_id: r1
+  relation_type: policy_implementation_divergence
+  witness_a:
+    spans:
+    - source_id: codehub
+      artifact_id: art-6806ea6a1d
+      version: R42
+      start: 198
+      end: 200
+  witness_b:
+    spans:
+    - source_id: skillhub
+      artifact_id: art-8ac544e791
+      version: v1
+      start: 89
+      end: 91
+- relation_id: r2
+  relation_type: policy_implementation_divergence
+  witness_a:
+    spans:
+    - source_id: codehub
+      artifact_id: art-6806ea6a1d
+      version: R42
+      start: 198
+      end: 200
+  witness_b:
+    spans:
+    - source_id: dochub
+      artifact_id: art-bc483782e6
+      version: v1
+      start: 64
+      end: 66
+forbidden:
+  canaries:
+  - CANARY-INC-4417
+  - CANARY-INC-9023
+  wrong_entities: []
+  prohibited_activations: []
+expected:
+  evidence_status: sufficient
+  required_reasons: []
+  source_status:
+    codehub: called
+    skillhub: called
+    dochub: called

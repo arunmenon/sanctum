@@ -1,0 +1,9 @@
+id: ch6-007
+family: conflicting_sources
+principal: kestrel-payments
+text: What pricing margin in basis points is applied?
+mode: explore
+entities:
+- svc.price-rounding
+attributes:
+- margin_bps

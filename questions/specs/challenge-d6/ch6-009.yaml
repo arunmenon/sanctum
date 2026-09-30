@@ -1,0 +1,9 @@
+id: ch6-009
+family: conflicting_sources
+principal: kestrel-payments
+text: How many export workers run in parallel?
+mode: explore
+entities:
+- svc.report-export
+attributes:
+- export_workers

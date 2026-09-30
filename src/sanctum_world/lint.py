@@ -36,7 +36,7 @@ from .render import HUB_VISIBLE_KEYS, public_text
 from .filler import filler_natives, load_filler
 from .schema import (
     PlantedCapabilityGap, PlantedConflict, PlantedCoverageGap, PlantedExactDuplicate,
-    PlantedHomonym, PlantedHubSpecificNames, PlantedInjection, PlantedMultiHubFact,
+    PlantedHomonym, PlantedHubSpecificNames, PlantedInjection, PlantedMultiHubFact, PlantedRuleMissedRelation,
     PlantedNewerNotApplicable, PlantedRestricted, PlantedVersionBranching, World, load_world,
 )
 
@@ -226,7 +226,7 @@ def check_planted(world: World, view: BuildView) -> list[Finding]:
             for hub_id, native in sorted(planted.names.items()):
                 if not hub_mentions(hub_id, native):
                     problems.append(f"{native!r} does not appear in {hub_id}")
-        elif isinstance(planted, (PlantedConflict, PlantedMultiHubFact)):
+        elif isinstance(planted, (PlantedConflict, PlantedMultiHubFact, PlantedRuleMissedRelation)):
             for fact_id in planted.facts:
                 if not any(span["fact_id"] == fact_id
                            for artifact_id in planted.artifacts for span in spans_by_artifact[artifact_id]):
@@ -237,6 +237,16 @@ def check_planted(world: World, view: BuildView) -> list[Finding]:
                           if span["fact_id"] in planted.facts and span["release"] == planted.at}
                 if len(values) < 2:
                     problems.append(f"sources do not disagree at {planted.at} (values {sorted(map(str, values))})")
+            elif isinstance(planted, PlantedRuleMissedRelation):
+                by_fact = {span["fact_id"]: span["value"] for artifact_id in planted.artifacts
+                           for span in spans_by_artifact[artifact_id] if span["fact_id"] in planted.facts}
+                for fact_id in planted.facts:
+                    if fact_id.endswith(".impl"):
+                        stem = fact_id[:-len(".impl")]
+                        if by_fact.get(fact_id) == by_fact.get(stem + ".procedure"):
+                            problems.append(f"{stem}: implementation and procedure do not diverge")
+                        if by_fact.get(stem + ".procedure") != by_fact.get(stem + ".policy"):
+                            problems.append(f"{stem}: procedure and policy must agree (hard negative)")
             else:
                 hubs = {span["hub"] for artifact_id in planted.artifacts
                         for span in spans_by_artifact[artifact_id] if span["fact_id"] in planted.facts}

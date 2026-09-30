@@ -1,0 +1,9 @@
+id: ch6-008
+family: conflicting_sources
+principal: kestrel-payments
+text: How many rows go into each export file?
+mode: explore
+entities:
+- svc.report-export
+attributes:
+- export_rows

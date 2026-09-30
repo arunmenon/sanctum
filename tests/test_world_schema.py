@@ -91,7 +91,7 @@ def test_dangling_artifact_and_principal_fail():
 def test_real_world_loads_with_required_shape():
     world = load_world(ROOT / "world" / "world.yaml")
     services = [entity for entity in world.entities if entity.type == "service"]
-    assert 4 <= len(services) <= 6
+    assert 4 <= len(services) <= 10      # 5 core + 4 D6 challenge-slice services (register row 25)
     assert world.releases == ["R40", "R41", "R42"] and [b.id for b in world.branches] == ["exp-branch"]
     assert 3 <= len(world.principals) <= 5
     assert sorted(planted.kind for planted in world.planted) == sorted(PLANTED_KINDS)

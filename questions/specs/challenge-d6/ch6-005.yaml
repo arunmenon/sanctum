@@ -1,0 +1,9 @@
+id: ch6-005
+family: conflicting_sources
+principal: kestrel-identity
+text: How many sender workers deliver the digest?
+mode: explore
+entities:
+- svc.mail-digest
+attributes:
+- sender_workers

@@ -1,0 +1,9 @@
+id: ch6-004
+family: conflicting_sources
+principal: kestrel-identity
+text: At what hour UTC is the daily digest sent?
+mode: explore
+entities:
+- svc.mail-digest
+attributes:
+- digest_hour

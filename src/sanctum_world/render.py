@@ -24,6 +24,7 @@ from .schema import (
     Artifact, PlantedCapabilityGap, PlantedCompositeSubject, PlantedConflict,
     PlantedCoverageGap, PlantedExactDuplicate, PlantedHomonym, PlantedHubSpecificNames,
     PlantedInjection, PlantedMultiHubFact, PlantedNewerNotApplicable, PlantedRestricted,
+    PlantedRuleMissedRelation,
     PlantedVersionBranching, World, load_world, parse_assertion,
 )
 
@@ -450,7 +451,8 @@ def _planted_index(world: World, core_ids: dict[str, str]) -> dict:
         elif isinstance(planted, PlantedHubSpecificNames):
             members = [artifact_id for hub_id, native in sorted(planted.names.items())
                        for artifact_id in in_hub(hub_id, native)]
-        elif isinstance(planted, (PlantedConflict, PlantedExactDuplicate, PlantedMultiHubFact)):
+        elif isinstance(planted, (PlantedConflict, PlantedExactDuplicate, PlantedMultiHubFact,
+                                  PlantedRuleMissedRelation)):
             members = list(planted.artifacts)
         elif isinstance(planted, (PlantedVersionBranching, PlantedNewerNotApplicable,
                                   PlantedCompositeSubject, PlantedInjection)):

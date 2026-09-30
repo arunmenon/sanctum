@@ -1,0 +1,9 @@
+id: ch6-002
+family: conflicting_sources
+principal: kestrel-identity
+text: What is the index refresh interval?
+mode: explore
+entities:
+- svc.search-index
+attributes:
+- refresh_interval

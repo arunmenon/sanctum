@@ -1,0 +1,12 @@
+id: ch6-012
+family: vague
+principal: kestrel-both
+text: How many shards does the index use and to how many digits are amounts rounded?
+mode: explore
+entities:
+- svc.search-index
+- svc.price-rounding
+attributes:
+- shard_count
+- rounding_digits
+expected_ambiguity: clarify

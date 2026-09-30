@@ -1,0 +1,9 @@
+id: ch6-006
+family: conflicting_sources
+principal: kestrel-payments
+text: To how many digits are displayed amounts rounded?
+mode: explore
+entities:
+- svc.price-rounding
+attributes:
+- rounding_digits

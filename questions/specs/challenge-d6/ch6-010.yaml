@@ -1,0 +1,9 @@
+id: ch6-010
+family: conflicting_sources
+principal: kestrel-payments
+text: After how many days are exports archived?
+mode: explore
+entities:
+- svc.report-export
+attributes:
+- archive_days

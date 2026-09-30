@@ -1,0 +1,9 @@
+id: ch6-001
+family: conflicting_sources
+principal: kestrel-identity
+text: How many shards does the index run with?
+mode: explore
+entities:
+- svc.search-index
+attributes:
+- shard_count

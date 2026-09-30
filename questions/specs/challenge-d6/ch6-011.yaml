@@ -1,0 +1,12 @@
+id: ch6-011
+family: vague
+principal: kestrel-both
+text: How many workers do digest delivery and report exports use?
+mode: explore
+entities:
+- svc.mail-digest
+- svc.report-export
+attributes:
+- sender_workers
+- export_workers
+expected_ambiguity: clarify

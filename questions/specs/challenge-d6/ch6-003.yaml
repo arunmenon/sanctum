@@ -1,0 +1,9 @@
+id: ch6-003
+family: conflicting_sources
+principal: kestrel-identity
+text: Which merge factor is used for segment merging?
+mode: explore
+entities:
+- svc.search-index
+attributes:
+- merge_factor

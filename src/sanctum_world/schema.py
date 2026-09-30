@@ -192,19 +192,28 @@ class PlantedMultiHubFact(_PlantedBase):
     artifacts: list[str] = Field(min_length=2)
 
 
+class PlantedRuleMissedRelation(_PlantedBase):
+    """D6 challenge slice (added after E3, for measurement): implemented values restated by
+    procedure and policy artifacts in other wording or units, so typed rules see noise; policy
+    equals procedure, so their pair is a hard negative."""
+    kind: Literal["rule_missed_relation"]
+    facts: list[str] = Field(min_length=2)
+    artifacts: list[str] = Field(min_length=2)
+
+
 Planted = Annotated[
     Union[
         PlantedHomonym, PlantedHubSpecificNames, PlantedConflict, PlantedVersionBranching,
         PlantedNewerNotApplicable, PlantedExactDuplicate, PlantedCompositeSubject,
         PlantedCoverageGap, PlantedInjection, PlantedRestricted, PlantedCapabilityGap,
-        PlantedMultiHubFact,
+        PlantedMultiHubFact, PlantedRuleMissedRelation,
     ],
     Field(discriminator="kind"),
 ]
 PLANTED_KINDS = (
     "homonym", "hub_specific_names", "conflict", "version_branching", "newer_not_applicable",
     "exact_duplicate", "composite_subject", "coverage_gap", "injection", "restricted",
-    "capability_gap", "multi_hub_fact",
+    "capability_gap", "multi_hub_fact", "rule_missed_relation",
 )
 
 
@@ -519,7 +528,7 @@ class World(_W):
                         errors.append(f"{where}: no artifact in the place carries a canary")
                 elif hub.version_reads_for(planted.place):
                     errors.append(f"{where}: {planted.place} advertises version reads")
-            elif isinstance(planted, PlantedMultiHubFact):
+            elif isinstance(planted, (PlantedMultiHubFact, PlantedRuleMissedRelation)):
                 for fact_id in planted.facts:
                     need(f"{where}.facts", "fact", fact_id, fact_ids)
                 for artifact_id in planted.artifacts:

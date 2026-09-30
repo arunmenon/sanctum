@@ -1,39 +1,35 @@
-# D6 prompt ablation, rows 1 to 3 (shadow, dev)
+# Prompt campaign, rows 1 to 3: D6 ablation (shadow, dev)
 
-> SYNTHETIC, NOT PRODUCTION EVIDENCE. Every number is **measured once**, shadow-only, on the 60 dev cases (84 rule-produced D6 pairs). No calibration was applied and nothing was promoted. Acceptance and holdout sets were not touched. Plan: the prompt review, docs/reviews/system-one-prompt-review-full.md, rows 1 to 3; rows 4 to 10 wait for the lead.
+> SYNTHETIC, NOT PRODUCTION EVIDENCE. **Measured once**, shadow-only, dev cases only; no calibration was applied and nothing was promoted. Acceptance and holdout were not touched. Numbers only: these are new models and the measurement changes land alongside, so no conclusion about either model is drawn here. Plan: docs/reviews/system-one-prompt-review-full.md; spend in docs/reports/system-one-prompt-campaign.md.
 
 ## Setup
 
 | Item | Value |
 |---|---|
-| Commit | `94402e2`; raw results in `docs/reports/data/{jev,laya}-d6-noul-v*.json` |
-| Tool | `tools/ablate_system_one.py`: shadow collect through the runner and broker, labels from `sanctum_eval.calibration_labels`, campaign ceiling enforced before every HTTP attempt |
-| Population | 84 pairs per full run: 62 rule-flagged, 22 promotable candidates (attribute clash, no identity overlap) |
-| Labels | 12 positive pairs (a pair covers both witness bundles of a gold relation), **all 12 among the rule-flagged pairs; 0 of the 22 candidates is positive** |
-| Band check | nested case-grouped CV (5 outer, 4 inner folds): Platt and the use band are chosen on inner folds of the outer-train cases, and candidate promotions are counted on outer-test cases at the 20% false-promotion tolerance. m3-data's shared nested-CV helper had not landed; this is the tool's own implementation |
-| Jev ceilings | 30 calls and 40,000 input tokens per row |
+| Population | 60 dev cases; 84 rule-produced D6 pairs per complete run: 62 rule-flagged, 22 promotable candidates |
+| Labels | evaluator side (`sanctum_eval.calibration_labels`): 12 positive pairs, all among the rule-flagged; 0 of 22 candidates positive |
+| Rows 1-2 | commit `94402e2`, tool version 1 (own nested CV, no per-item record); raw results `docs/reports/data/{jev,laya}-d6-noul-v*.json` |
+| Row 3 | commit `43ae50d`, tool version 2: `sanctum_eval.calibration.nested_cv` (calibrator and band chosen on inner case-grouped folds, reported on 5 outer folds), per-item records in `docs/reports/data/row3-*.json` |
+| State | rows 1-2: v1 text slices (`refs`); row 3: labeled assertion-bearing excerpts (`excerpts`, broker-built r3-state-v2) |
+| Tolerance | false-promotion rate 0.2 (unchanged) |
 
 ## Results
 
-Raw answers (no calibration). ROC-AUC and PR-AUC are undefined for the candidate stratum, which has no positive pair.
+Raw `noul` answers. AUC and PR-AUC are undefined where a stratum has no positive.
 
-| Row | Provider | Template | Answered / 84 | ROC-AUC all | PR-AUC all | Brier all | ROC-AUC flagged | Brier candidates | Nested-CV candidate promotions (false) | Calls, input tokens |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Jev | `d6-noul-v1` (baseline repeat) | 84 | 0.804 | 0.530 | 0.154 | 0.793 | 0.117 | 0 (0) | 28, 33,107 |
-| 2 | Jev | `d6-noul-v2-relations` | 80 | 0.812 | 0.532 | 0.433 | 0.766 | 0.461 | 0 (0) | 25 (3 more refused before dispatch), 39,435 |
-| 1 | Laya | `d6-noul-v1` | 84 | 0.271 | 0.101 | 0.289 | 0.282 | 0.323 | 0 (0) | 83, 29,828 |
-| 2 | Laya | `d6-noul-v2-relations` | 38 | 0.688 | 0.356 | 0.265 | 0.649 | 0.235 | 0 (0) | 64 (12 truncated), 30,776 |
-| 3 | both | `d6-noul-v3-excerpts` | not run | | | | | | | |
+| Row | Provider | Template | Pairs answered / asked | Cases | ROC-AUC all (n, pos) | PR-AUC all | Brier all | ROC-AUC flagged (n, pos) | Candidates answered (pos) | Nested-CV candidate promotions (false) | Outcome of provider calls |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Jev | `d6-noul-v1` | 84 / 84 | 60 | 0.804 (84, 12) | 0.530 | 0.154 | 0.793 (62, 12) | 22 (0) | 0 (0) | 28 ok |
+| 2 | Jev | `d6-noul-v2-relations` | 80 / 84 | 60 | 0.812 (80, 11) | 0.532 | 0.433 | 0.766 (58, 11) | 22 (0) | 0 (0) | 25 ok, 3 refused at ceiling |
+| 3 | Jev | `d6-noul-v3-excerpts` | 33 / 84 | 11 | 0.617 (33, 6) | 0.294 | 0.454 | 0.652 (28, 6) | 5 (0) | 0 (0); band 1.0 in all 5 outer folds | 11 ok, 17 refused at ceiling |
+| 1 | Laya | `d6-noul-v1` | 84 / 84 | 60 | 0.271 (84, 12) | 0.101 | 0.289 | 0.282 (62, 12) | 22 (0) | 0 (0) | 28 ok |
+| 2 | Laya | `d6-noul-v2-relations` | 38 / 84 | 60 | 0.688 (38, 6) | 0.356 | 0.265 | 0.649 (25, 6) | 13 (0) | 0 (0) | 16 ok, 12 truncated |
+| 3 | Laya | `d6-noul-v3-excerpts` | 3 / 84 | 2 | undefined (3, 0) | undefined | 0.642 | undefined | 0 | not computed (no positive) | 2 ok, 26 truncated |
 
-Nested-CV bands per outer fold: Jev v1 0.50 to 0.65, Jev v2 0.50 to 0.75 (one fold 1.0), Laya v1 and v2 1.0 in every fold (no band met the tolerance).
+Row 3, Jev, nested CV over 33 pairs in 11 cases: outer-fold AUC mean 0.456 (sd 0.109, 4 folds with both classes), Brier mean 0.151 (sd 0.097), log loss 0.459 (sd 0.259); intercept-only selected in every outer fold. With no promotion, the false-promotion rate has no denominator.
 
-## Reading
+## Notes on the denominators
 
-- **The candidate population holds no positive pair on dev.** All 12 relation-bearing pairs are already rule-flagged, and D6 may only promote candidates. However well a template discriminates, D6 cannot improve any dev metric: the measurement limit the review predicted is confirmed. A D6 benefit needs rule-missed relations in the candidate population, for example the independently authored challenge slice the review proposes.
-- **Jev:** the relation-aligned rubric (row 2) leaves discrimination about the same (AUC 0.80 to 0.81 overall, 0.79 to 0.77 on flagged pairs) and moves raw probabilities up across the board (Brier 0.15 to 0.43); that is a calibration shift, not new discrimination. Row 2 hit its 40,000 input-token ceiling: 3 calls (4 pairs) were refused before dispatch, as designed.
-- **Laya:** with the baseline rubric its raw answers run against the labels (AUC 0.27, the negative calibration slope seen earlier). The relation-aligned rubric turns that around on the pairs it answered (AUC 0.69), but the longer instructions push 12 of 28 calls past Laya's input window (truncated, voided), so only 38 of 84 pairs were answered. The baseline's inversion looks prompt-related rather than a fixed model property, but the evidence is partial.
-- **Row 3** (`d6-noul-v3-excerpts`, labeled assertion-bearing excerpts) needs the broker's excerpt state (m3-data) and was not run.
-
-## Cost
-
-Jev rows 1 and 2: 53 HTTP calls, 72,542 input and 4,383 output tokens, within the review's ceiling for rows 1 to 3 (84 calls, about 95,000 input tokens). Row 3 on Jev would add at most 28 calls and about 22,000 input tokens.
+- Rows 1 and 2 cover all 60 cases; row 3 on Jev covers the first 11 cases reached before its 25,000 input-token ceiling (the review's estimate for this row), so row 3 is not paired with rows 1 and 2. The excerpt state cost about 2,300 input tokens per call against about 1,200 for v1 slices.
+- On Laya, row 2's longer rubric and row 3's excerpt records exceed the model's input window (about 500 tokens, measured) in most calls; truncated calls are voided by the guard, never used.
+- With 0 positives among candidate pairs on dev, no variant can show a candidate promotion that is correct; a candidate promotion here could only be false.

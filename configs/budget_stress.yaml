@@ -1,0 +1,9 @@
+# D4 budget stress (prompt review §4). Budgets are fixed here before any outcome is inspected.
+# Each budget runs the same cases for the rules-only arm and the D4 arm; the D4 reorder-only gate
+# stays active at every budget (D4 may reorder, never drop a rules-packed unit). Measured offline
+# from receipts: necessary-support coverage within the first K tokens and the rank of the first
+# supporting unit, alongside full-response recall.
+budgets: [1000, 2000, 4000]
+prefix_k: [1000, 2000, 4000]
+arms: [C4, C4+D4]
+cases: [gold/dev, gold/scenarios]

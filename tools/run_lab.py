@@ -68,6 +68,8 @@ if __name__ == "__main__":
     parser.add_argument("--round3-provider", default=None, help="System One provider for --round3 (also pass --system-one-provider)")
     parser.add_argument("--release-hub", action="append", default=[], choices=["incidenthub"],
                         help="release a held-back hub for this run (default: configs/hubs.yaml held_back)")
+    parser.add_argument("--budget-tokens", type=int, default=None,
+                        help="override every case's response budget (budget stress: 1000, 2000, 4000)")
     parser.add_argument("--system-one-provider", default=None,
                         help="runner-side System One provider (configs/system_one_providers.yaml)")
     parser.add_argument("--system-one-profile", default="strict", choices=["strict", "relaxed"])
@@ -91,7 +93,8 @@ if __name__ == "__main__":
         failure_profile=arguments.failure_profile,
         world_build_dir=arguments.world_build, include_held_back=bool(arguments.release_hub),
         principal_aliases=principal_aliases_for(arguments.cases, arguments.principal_aliases),
-        entity_alignment=alignment, system_one_provider=arguments.system_one_provider,
+        entity_alignment=alignment, budget_tokens=arguments.budget_tokens,
+        system_one_provider=arguments.system_one_provider,
         system_one_profile=arguments.system_one_profile))
     except (MissingCannedResponse, SUTProcessError) as error:
         raise SystemExit(f"run_lab: {error}") from None

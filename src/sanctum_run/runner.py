@@ -70,6 +70,7 @@ class RunConfig:
     entity_alignment: Optional[dict[str, str]] = None
     # System One (runner-side broker): provider name from configs/system_one_providers.yaml, the
     # latency profile (strict | relaxed), and the data class of this run's data (trusted, not the SUT's)
+    budget_tokens: Optional[int] = None      # override every case's response budget (budget stress)
     system_one_provider: Optional[str] = None
     system_one_profile: str = "strict"
     data_class: str = "synthetic"
@@ -152,6 +153,11 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
 
 async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     cases = load_cases(config.cases_dir)
+    if config.budget_tokens is not None:
+        # budget stress (prompt review §4): the same cases at a fixed, predeclared response budget;
+        # scoring (budget gate, D4 reorder-only gate) uses the same budget
+        cases = [gold.model_copy(update={"request": gold.request.model_copy(
+            update={"budget_tokens": config.budget_tokens})}) for gold in cases]
     check_supported = getattr(sut, "check_supported", None)
     if check_supported is not None:
         check_supported([public_request(gold) for gold in cases])
@@ -204,6 +210,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
         "metrics_revision": METRICS_REVISION,
         "hubs": hub_ids,
         "cases": [gold.case_id for gold in cases],
+        "budget_tokens": config.budget_tokens,
         "system_one": _system_one_manifest(config, traces),
         "entity_alignment": None if config.entity_alignment is None else {
             "table": "entity_alignment.json", "aligned": len(config.entity_alignment)},

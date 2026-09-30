@@ -32,3 +32,18 @@ Reading: Jev as the D2 usefulness model cuts sources called by 12 to 15 percent 
 ### E1 with local Laya on CPU (measured once, commit d4c615d)
 
 Laya 0.3.22, English checkpoint 55cf4c4e, CPU (M1 Pro, about 1.9 GB RSS). Calibration `laya-local@laya-rl-agent` on dev: held-out Brier 0.144 (raw 0.174), ECE 0.029 (raw 0.166); raw Laya is far better calibrated than raw Jev, but at the harm-tolerant skip band only 8 of 204 held-out judgments skip. In runs it makes 0 confident skips on dev and scenarios, so C3/C5 with Laya equal C2/C4 exactly (26/60, 38/60; 16/24, 19/24) and no acceptance or holdout run was spent on it. Latency on CPU grows about 90 ms per question (0.2 to 0.34 s for 1, 1.8 s for 20), so batching saves nothing there, unlike Jev. Laya exposes truncation metadata; the protocol core now voids truncated calls. Reports: docs/reports/system-one-laya-dev.md, system-one-batches-laya-local.md.
+
+## E3 (Round 3: D6 conflict, D4 relevance) with Jev and Laya: result
+
+Measured once at 790f8e9..b26f7b3, relaxed profile, calibrations on dev (CV-separated bands). Every Round 3 arm (C4+D6, C4+D4, for typesafe-jev and laya-local) equals C4 case by case: dev 38/60, scenarios 19/24, identical recall, conflicts and tokens. No acceptance or holdout run was spent on them.
+
+| Fit | Items | Positives | Use band | Held-out Brier (raw) |
+|---|---|---|---|---|
+| Jev D6 | 84 pairs | 12 | 0.61 | 0.098 (0.152) |
+| Laya D6 | 84 pairs | 12 | 1.0 (never promotes) | 0.132 (0.289); negative slope, answers run against the labels |
+| Jev D4 | 361 units | | 1.0 (never adds) | 0.203 (0.315) |
+| Laya D4 | 361 units | | 1.0 (never adds) | 0.192 (0.220) |
+
+Why nothing moves: for D6 the typed rules already flag every pair that carries a gold relation, and the dropped candidates rarely hold one; Jev cleared its band on 2 of 84 judgments, neither a candidate pair. For D4 no add band met the false-promotion tolerance for either provider, so D4 only reorders, and the scored metrics ignore order; the reorder-only gate never fired. Under the strict profile every round hit the deadline and the rules-only fallback applied. The design invariants (D6 add-only on rule-produced pairs, D4 reorder-and-fill only) cap what either decision can change; the null is partly a consequence of those guardrails and partly of the rules already covering the gold conflicts on this world.
+
+Cost and latency (reported, not gated): Jev p50 about 360 to 380 ms, about 1.2k input tokens per request for D4. Laya on CPU: D6 p50 1.0 to 1.9 s (p95 3.1 s), D4 p50 1.6 to 2.3 s (p95 4.7 s), about 3 HTTP calls per round. H3 is not supported for D6 or D4 on this data with either provider. Reports: docs/reports/system-one-d6-dev.md, system-one-d4-dev.md.

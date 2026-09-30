@@ -3,12 +3,13 @@
   "history": [
    "470/420000/45000",
    "600/560000/60000",
-   "800/760000/80000 (owner, before rows 6-10 and the D6 challenge rows)"
+   "800/760000/80000 (owner, before rows 6-10 and the D6 challenge rows)",
+   "1000/950000/100000 (owner: D6 challenge rows on Jev, completing Jev rows 8-9)"
   ],
   "typesafe-jev": {
-   "calls": 800,
-   "input_tokens": 760000,
-   "output_tokens": 80000
+   "calls": 1000,
+   "input_tokens": 950000,
+   "output_tokens": 100000
   }
  },
  "rows": [
@@ -403,6 +404,33 @@
    "row": "c5",
    "template": "d6-choice-v1",
    "world_manifest": "15304c65481ba2bf"
+  },
+  {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider": "typesafe-jev",
+   "row": "8c",
+   "template": "d4-noul-v2-support-excerpts",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 9,
+   "input_tokens": 23373,
+   "output_tokens": 1455,
+   "provider": "typesafe-jev",
+   "row": "8c",
+   "template": "d4-noul-v2-support-excerpts",
+   "world_manifest": "452b57d9686b9582"
+  },
+  {
+   "calls": 38,
+   "input_tokens": 89550,
+   "output_tokens": 4603,
+   "provider": "typesafe-jev",
+   "row": "9c",
+   "template": "d4-score-v1-excerpts",
+   "world_manifest": "452b57d9686b9582"
   }
  ]
 }

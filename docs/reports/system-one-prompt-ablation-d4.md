@@ -22,11 +22,17 @@
 | Jev | `d4-noul-v2-support-excerpts` (v2) | 294 (51) | 0.652 (294, 111) | 0.495 | 0.254 | 0.701 (0.084) | 0.210 (0.018) | source_intercepts x5 | 0.71, 0.74, 0.65, 0.75, 0.80 | 9 (2), 0.063 to 0.547 | 51 ok, 9 refused at row ceiling; 109,092 / 6,423 |
 | Jev | control: source prior only (same units) | 294 | n/a | n/a | n/a | 0.631 (0.037) | 0.222 (0.016) | source_intercepts x5 | 1.0 in all folds | 0 | 0 |
 | Jev | `d4-score-v1-excerpts` (diagnostic, score / 3) | 116 (22) | 0.412 (116, 51) | 0.412 | n/a | n/a | n/a | n/a | n/a | n/a | 22 ok, 38 refused at row ceiling; 45,081 / 2,192 |
+| Jev | `d4-noul-v2-support-excerpts`, completed (8 + 8c) | 361 (60) | 0.680 (361, 127) | 0.494 | 0.244 | 0.697 (0.054) | 0.205 (0.026) | source_intercepts x5 | 0.72, 1.0, 0.83, 0.69, 0.75 | 5 (2), 0.118 to 0.769 | 60 ok; 132,465 / 7,878 |
+| Jev | control: source prior only (all 361 units) | 361 | n/a | n/a | n/a | 0.639 (0.061) | 0.224 (0.029) | source_intercepts x5 | 1.0 in all folds | 0 | 0 |
+| Jev | `d4-score-v1-excerpts`, completed (9r + 9c) | 361 (60) | 0.673 (361, 127) | 0.479 | n/a | n/a | n/a | n/a | n/a | n/a | 60 ok; 134,631 / 6,795 |
 | Laya | `d4-noul-v1` (v1) | 361 (60) | 0.719 (361, 127) | 0.512 | 0.217 | 0.731 (0.059) | 0.198 (0.020) | source_intercepts x5 | 0.76, 0.71, 0.80, 0.80, 0.81 | 2 (0), 0.000 to 0.658 | 361, 70,389 / 0 |
 | Laya | `d4-noul-v2-support-compact-150` | 361 (60) | 0.825 (361, 127) | 0.728 | 0.176 | 0.820 (0.048) | 0.159 (0.023) | platt_l2 x2, source_intercepts x3 | 0.59, 0.59, 0.61, 0.64, 0.57 | 88 (20), 0.152 to 0.325 | 361, 105,189 / 0 |
 | Laya | control: source prior only | 361 | n/a | n/a | n/a | 0.639 (0.061) | 0.224 (0.029) | source_intercepts x5 | 1.0 in all folds | 0 | 0 |
 
 ## Denominators and failures
+
+- Completion (owner, ceiling 1000 / 950k / 100k): the cases Jev did not reach in rows 8 and 9r were run on their own (rows 8c: 9 cases, 9c: 38 cases) on the same world, and the items merged (no overlap), so both Jev rows now cover all 361 units in 60 cases, paired with the Laya rows. The prompt text is identical across parts: between the parts' commits the only template change is the score-criteria list format, which 9r already used. Merged data: `docs/reports/data/row8-complete-*.json`, `row9-complete-*.json`.
+- The first 8c attempt made no call (provider environment not exported to the runner; all 9 requests `not_configured`); its zero-spend ledger row is kept.
 
 - The first Jev score pass returned HTTP 422 for all 51 calls (score criteria sent as a mapping; the hosted protocol takes a list). The ledger charges those exchanges at their input reservations (109,303 tokens), since no usage was reported. A one-call probe identified the format; the rerun (row 9r) sent criteria as an ordered list and was answered, within the remaining ceiling (116 of 361 units, 22 cases).
 - Jev row 8 stopped at its row ceiling (110,000 input tokens) after 51 of 60 requests; the `r3-state-v2` excerpts cost about 2,140 input tokens per D4 call.

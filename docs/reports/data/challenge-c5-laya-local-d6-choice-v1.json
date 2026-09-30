@@ -1,0 +1,1455 @@
+{
+ "campaign_row": {
+  "calls": 58,
+  "input_tokens": 23525,
+  "output_tokens": 0
+ },
+ "ceilings": {
+  "calls": 400,
+  "input_tokens": 400000
+ },
+ "decision": "d6",
+ "diagnostic": true,
+ "git_commit": "dc9fc1e078b7e19c4051b5253d102c29e719c6f0",
+ "items": {
+  "ch6-001\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8512
+   }
+  },
+  "ch6-001\tev-11|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8375
+   }
+  },
+  "ch6-001\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-47deb65b6c",
+     "end": 277,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8515
+   }
+  },
+  "ch6-001\tev-11|ev-9": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "contradiction",
+    "p_relation_diagnostic": 0.821
+   }
+  },
+  "ch6-001\tev-1|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-47deb65b6c",
+     "end": 277,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8644
+   }
+  },
+  "ch6-001\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8554
+   }
+  },
+  "ch6-002\tev-1|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-cdbd168639",
+     "end": 218,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.803
+   }
+  },
+  "ch6-002\tev-1|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-068993eccf",
+     "end": 285,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8166
+   }
+  },
+  "ch6-002\tev-1|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8099
+   }
+  },
+  "ch6-002\tev-1|ev-7": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8091
+   }
+  },
+  "ch6-002\tev-6|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-cdbd168639",
+     "end": 218,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8434
+   }
+  },
+  "ch6-002\tev-6|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-068993eccf",
+     "end": 285,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8306
+   }
+  },
+  "ch6-003\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b19a9c99f8",
+     "end": 398,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8115
+   }
+  },
+  "ch6-003\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b19a9c99f8",
+     "end": 398,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7984
+   }
+  },
+  "ch6-004\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8072
+   }
+  },
+  "ch6-004\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8412
+   }
+  },
+  "ch6-004\tev-1|ev-6": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8113
+   }
+  },
+  "ch6-004\tev-1|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7702
+   }
+  },
+  "ch6-005\tev-11|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7924
+   }
+  },
+  "ch6-005\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8458
+   }
+  },
+  "ch6-005\tev-1|ev-11": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7937
+   }
+  },
+  "ch6-005\tev-1|ev-6": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8321
+   }
+  },
+  "ch6-005\tev-6|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8194
+   }
+  },
+  "ch6-005\tev-7|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8535
+   }
+  },
+  "ch6-006\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.85
+   }
+  },
+  "ch6-006\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "version_difference",
+    "p_relation_diagnostic": 0.8601
+   }
+  },
+  "ch6-006\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-001a4d012a",
+     "end": 239,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8141
+   }
+  },
+  "ch6-006\tev-7|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8506
+   }
+  },
+  "ch6-008\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.825
+   }
+  },
+  "ch6-008\tev-6|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b35161010a",
+     "end": 282,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.853
+   }
+  },
+  "ch6-008\tev-6|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-43f72ae179",
+     "end": 379,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8422
+   }
+  },
+  "ch6-008\tev-7|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-a28e040b50",
+     "end": 248,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8323
+   }
+  },
+  "ch6-008\tev-7|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-a28e040b50",
+     "end": 248,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.817
+   }
+  },
+  "ch6-008\tev-7|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-a28e040b50",
+     "end": 248,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b35161010a",
+     "end": 282,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8309
+   }
+  },
+  "ch6-009\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7965
+   }
+  },
+  "ch6-009\tev-11|ev-13": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-db4ac27354",
+     "end": 293,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8409
+   }
+  },
+  "ch6-009\tev-11|ev-14": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-e2f4c5d683",
+     "end": 336,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8004
+   }
+  },
+  "ch6-009\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c7ed64fd70",
+     "end": 275,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8078
+   }
+  },
+  "ch6-009\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7908
+   }
+  },
+  "ch6-009\tev-6|ev-13": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-db4ac27354",
+     "end": 293,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8028
+   }
+  },
+  "ch6-010\tev-11|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8134
+   }
+  },
+  "ch6-010\tev-11|ev-2": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c7310dba97",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7555
+   }
+  },
+  "ch6-010\tev-1|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.855
+   }
+  },
+  "ch6-010\tev-6|ev-2": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c7310dba97",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8187
+   }
+  },
+  "ch6-010\tev-8|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c7ed64fd70",
+     "end": 275,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8269
+   }
+  },
+  "ch6-010\tev-8|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c7ed64fd70",
+     "end": 275,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.7708
+   }
+  },
+  "ch6-011\tev-12|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.832
+   }
+  },
+  "ch6-011\tev-1|ev-11": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8376
+   }
+  },
+  "ch6-011\tev-1|ev-12": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8355
+   }
+  },
+  "ch6-011\tev-6|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8213
+   }
+  },
+  "ch6-011\tev-6|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8312
+   }
+  },
+  "ch6-011\tev-6|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8367
+   }
+  },
+  "ch6-012\tev-11|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8256
+   }
+  },
+  "ch6-012\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "version_difference",
+    "p_relation_diagnostic": 0.8564
+   }
+  },
+  "ch6-012\tev-1|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-47deb65b6c",
+     "end": 277,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8614
+   }
+  },
+  "ch6-012\tev-1|ev-9": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8535
+   }
+  },
+  "ch6-012\tev-6|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-001a4d012a",
+     "end": 239,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8413
+   }
+  },
+  "ch6-012\tev-7|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "choice": "environment_difference",
+    "p_relation_diagnostic": 0.8471
+   }
+  }
+ },
+ "items_answered": 58,
+ "items_labelled": 58,
+ "items_unavailable": 0,
+ "model_call_outcomes": {
+  "ok": 11
+ },
+ "models": [
+  "laya-rl-agent"
+ ],
+ "provider": "laya-local",
+ "relation_type_accuracy": {
+  "correct": 0,
+  "n": 22,
+  "wilson95": [
+   0.0,
+   0.1487
+  ]
+ },
+ "row": "c5",
+ "signals": {
+  "p_relation_diagnostic": {
+   "all": {
+    "brier_raw": 0.4398,
+    "n": 58,
+    "positives": 22,
+    "pr_auc": 0.3223,
+    "roc_auc": 0.3857
+   },
+   "candidates": {
+    "brier_raw": 0.4398,
+    "n": 58,
+    "positives": 22,
+    "pr_auc": 0.3223,
+    "roc_auc": 0.3857
+   },
+   "rule_flagged": {
+    "n": 0,
+    "positives": 0,
+    "pr_auc": null,
+    "roc_auc": null
+   }
+  }
+ },
+ "state": "refs",
+ "template": "d6-choice-v1",
+ "tolerance": 0.2,
+ "world_manifest": "15304c65481ba2bf"
+}

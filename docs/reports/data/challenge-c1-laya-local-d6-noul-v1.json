@@ -1,0 +1,1481 @@
+{
+ "campaign_row": {
+  "calls": 58,
+  "input_tokens": 17899,
+  "output_tokens": 0
+ },
+ "ceilings": {
+  "calls": 400,
+  "input_tokens": 400000
+ },
+ "decision": "d6",
+ "diagnostic": false,
+ "git_commit": "dc9fc1e078b7e19c4051b5253d102c29e719c6f0",
+ "items": {
+  "ch6-001\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.344
+   }
+  },
+  "ch6-001\tev-11|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4553
+   }
+  },
+  "ch6-001\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-47deb65b6c",
+     "end": 277,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5868
+   }
+  },
+  "ch6-001\tev-11|ev-9": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.8202
+   }
+  },
+  "ch6-001\tev-1|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-47deb65b6c",
+     "end": 277,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4204
+   }
+  },
+  "ch6-001\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3005
+   }
+  },
+  "ch6-002\tev-1|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-cdbd168639",
+     "end": 218,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.559
+   }
+  },
+  "ch6-002\tev-1|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-068993eccf",
+     "end": 285,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5676
+   }
+  },
+  "ch6-002\tev-1|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6893
+   }
+  },
+  "ch6-002\tev-1|ev-7": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-55ea374813",
+     "end": 330,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5417
+   }
+  },
+  "ch6-002\tev-6|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-cdbd168639",
+     "end": 218,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.445
+   }
+  },
+  "ch6-002\tev-6|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-52a827ba84",
+     "end": 221,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-068993eccf",
+     "end": 285,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R41"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5456
+   }
+  },
+  "ch6-003\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-8ac544e791",
+     "end": 365,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b19a9c99f8",
+     "end": 398,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3319
+   }
+  },
+  "ch6-003\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b19a9c99f8",
+     "end": 398,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3972
+   }
+  },
+  "ch6-004\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5314
+   }
+  },
+  "ch6-004\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4168
+   }
+  },
+  "ch6-004\tev-1|ev-6": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3332
+   }
+  },
+  "ch6-004\tev-1|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4291
+   }
+  },
+  "ch6-005\tev-11|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5139
+   }
+  },
+  "ch6-005\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5255
+   }
+  },
+  "ch6-005\tev-1|ev-11": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3092
+   }
+  },
+  "ch6-005\tev-1|ev-6": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2186
+   }
+  },
+  "ch6-005\tev-6|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2683
+   }
+  },
+  "ch6-005\tev-7|ev-2": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c1c73d0313",
+     "end": 226,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-72abcc6678",
+     "end": 321,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3603
+   }
+  },
+  "ch6-006\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4412
+   }
+  },
+  "ch6-006\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4306
+   }
+  },
+  "ch6-006\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-001a4d012a",
+     "end": 239,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4976
+   }
+  },
+  "ch6-006\tev-7|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4024
+   }
+  },
+  "ch6-008\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2504
+   }
+  },
+  "ch6-008\tev-6|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b35161010a",
+     "end": 282,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3283
+   }
+  },
+  "ch6-008\tev-6|ev-5": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-43f72ae179",
+     "end": 379,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4264
+   }
+  },
+  "ch6-008\tev-7|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-a28e040b50",
+     "end": 248,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3545
+   }
+  },
+  "ch6-008\tev-7|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-a28e040b50",
+     "end": 248,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.395
+   }
+  },
+  "ch6-008\tev-7|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-a28e040b50",
+     "end": 248,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-b35161010a",
+     "end": 282,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3642
+   }
+  },
+  "ch6-009\tev-11|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3275
+   }
+  },
+  "ch6-009\tev-11|ev-13": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-db4ac27354",
+     "end": 293,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6787
+   }
+  },
+  "ch6-009\tev-11|ev-14": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-e2f4c5d683",
+     "end": 336,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v3"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.7382
+   }
+  },
+  "ch6-009\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c7ed64fd70",
+     "end": 275,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.7054
+   }
+  },
+  "ch6-009\tev-6|ev-1": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3199
+   }
+  },
+  "ch6-009\tev-6|ev-13": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-db4ac27354",
+     "end": 293,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v2"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6618
+   }
+  },
+  "ch6-010\tev-11|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5301
+   }
+  },
+  "ch6-010\tev-11|ev-2": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c7310dba97",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4721
+   }
+  },
+  "ch6-010\tev-1|ev-6": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5131
+   }
+  },
+  "ch6-010\tev-6|ev-2": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-b2c45e49c8",
+     "end": 251,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-c7310dba97",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3445
+   }
+  },
+  "ch6-010\tev-8|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c7ed64fd70",
+     "end": 275,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-9af5811a2a",
+     "end": 361,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4023
+   }
+  },
+  "ch6-010\tev-8|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-c7ed64fd70",
+     "end": 275,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.5741
+   }
+  },
+  "ch6-011\tev-12|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3899
+   }
+  },
+  "ch6-011\tev-1|ev-11": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6212
+   }
+  },
+  "ch6-011\tev-1|ev-12": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-c6f6b46461",
+     "end": 348,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3634
+   }
+  },
+  "ch6-011\tev-6|ev-1": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-978eeffee6",
+     "end": 319,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.2955
+   }
+  },
+  "ch6-011\tev-6|ev-11": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d40212a32c",
+     "end": 378,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3158
+   }
+  },
+  "ch6-011\tev-6|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-908f1b769f",
+     "end": 178,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-f450b0b8bf",
+     "end": 403,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3818
+   }
+  },
+  "ch6-012\tev-11|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.7618
+   }
+  },
+  "ch6-012\tev-11|ev-7": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-46bf578b71",
+     "end": 281,
+     "source_id": "skillhub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.7423
+   }
+  },
+  "ch6-012\tev-1|ev-8": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-47deb65b6c",
+     "end": 277,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.6916
+   }
+  },
+  "ch6-012\tev-1|ev-9": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-6806ea6a1d",
+     "end": 314,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    },
+    {
+     "artifact_id": "art-bc483782e6",
+     "end": 257,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.8265
+   }
+  },
+  "ch6-012\tev-6|ev-4": {
+   "label": 1,
+   "refs": [
+    {
+     "artifact_id": "art-001a4d012a",
+     "end": 239,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.3718
+   }
+  },
+  "ch6-012\tev-7|ev-4": {
+   "label": 0,
+   "refs": [
+    {
+     "artifact_id": "art-d648816489",
+     "end": 270,
+     "source_id": "dochub",
+     "start": 0,
+     "version": "v1"
+    },
+    {
+     "artifact_id": "art-bcaad19c5d",
+     "end": 388,
+     "source_id": "codehub",
+     "start": 0,
+     "version": "R42"
+    }
+   ],
+   "rule_flagged": false,
+   "signals": {
+    "p": 0.4228
+   }
+  }
+ },
+ "items_answered": 58,
+ "items_labelled": 58,
+ "items_unavailable": 0,
+ "model_call_outcomes": {
+  "ok": 11
+ },
+ "models": [
+  "laya-rl-agent"
+ ],
+ "nested_cv": {
+  "diagnostic": {
+   "isotonic": {
+    "auc": 0.339,
+    "brier": 0.2569,
+    "log_loss": 0.9081,
+    "n": 58
+   }
+  },
+  "folds": [
+   {
+    "band": 0.5,
+    "calibrator": "platt_l2",
+    "eligible": 14,
+    "false_promotions": 0,
+    "n": 14,
+    "positives": 7,
+    "promoted": 0
+   },
+   {
+    "band": 0.57,
+    "calibrator": "platt_l2",
+    "eligible": 10,
+    "false_promotions": 0,
+    "n": 10,
+    "positives": 3,
+    "promoted": 0
+   },
+   {
+    "band": 0.52,
+    "calibrator": "platt_l2",
+    "eligible": 12,
+    "false_promotions": 2,
+    "n": 12,
+    "positives": 5,
+    "promoted": 3
+   },
+   {
+    "band": 0.53,
+    "calibrator": "platt_l2",
+    "eligible": 10,
+    "false_promotions": 0,
+    "n": 10,
+    "positives": 4,
+    "promoted": 0
+   },
+   {
+    "band": 0.66,
+    "calibrator": "platt_l2",
+    "eligible": 12,
+    "false_promotions": 0,
+    "n": 12,
+    "positives": 3,
+    "promoted": 0
+   }
+  ],
+  "summary": {
+   "auc": {
+    "folds": 5,
+    "mean": 0.6729,
+    "sd": 0.1427
+   },
+   "brier": {
+    "folds": 5,
+    "mean": 0.2298,
+    "sd": 0.0247
+   },
+   "calibrators_selected": [
+    "platt_l2",
+    "platt_l2",
+    "platt_l2",
+    "platt_l2",
+    "platt_l2"
+   ],
+   "log_loss": {
+    "folds": 5,
+    "mean": 0.6559,
+    "sd": 0.0596
+   },
+   "n": 58,
+   "positives": 22
+  },
+  "totals": {
+   "eligible": 58,
+   "false_promotion_rate_wilson95": [
+    0.2077,
+    0.9385
+   ],
+   "false_promotions": 2,
+   "promoted": 3
+  }
+ },
+ "provider": "laya-local",
+ "row": "c1",
+ "signals": {
+  "p": {
+   "all": {
+    "brier_raw": 0.3014,
+    "n": 58,
+    "positives": 22,
+    "pr_auc": 0.3551,
+    "roc_auc": 0.327
+   },
+   "candidates": {
+    "brier_raw": 0.3014,
+    "n": 58,
+    "positives": 22,
+    "pr_auc": 0.3551,
+    "roc_auc": 0.327
+   },
+   "rule_flagged": {
+    "n": 0,
+    "positives": 0,
+    "pr_auc": null,
+    "roc_auc": null
+   }
+  }
+ },
+ "state": "refs",
+ "template": "d6-noul-v1",
+ "tolerance": 0.2,
+ "world_manifest": "15304c65481ba2bf"
+}

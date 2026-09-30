@@ -26,7 +26,7 @@ providers:
       primitives: [noul, choice]
       max_questions_per_call: 10
       max_options: 20
-      max_state_chars: 6000              # the runtime is reported to truncate silently; refuse above this
+      max_state_chars: 3000              # Laya truncated D6 states of 4-5 pairs (measured); one pair per call
       batching: true
       reports_usage: true               # verified with local laya 0.3.22
       hosted: false
@@ -57,7 +57,7 @@ providers:
 # Run profiles (design page §5 point 7): latency is measured per profile, never a gate.
 profiles:
   strict:  {deadline_ms: 150, max_calls_per_round: 1}
-  relaxed: {deadline_ms: 60000, max_calls_per_round: 3}
+  relaxed: {deadline_ms: 60000, max_calls_per_round: 12}   # Round 3 on laya-local needs one call per pair
 
 # Round 3 per-request bounds (design page §14). D4 on laya-local costs about 90 ms per unit.
 round3:

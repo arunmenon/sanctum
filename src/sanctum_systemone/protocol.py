@@ -180,19 +180,40 @@ class SystemOneClient:
         self._http.close()
 
     def decide(self, state: Any, questions: dict[str, dict[str, Any]], deadline_s: float,
-               max_calls: int) -> CallOutcome:
+               max_calls: int, state_for=None) -> CallOutcome:
+        """`state_for(batch_qids) -> state` (Round 3): each batch carries only its own items, and
+        batches are split further until each state fits `max_state_chars`. A single question whose
+        own state is still too large is refused, never truncated."""
         started = time.monotonic()
         outcome = CallOutcome(provider=self.spec.name)
-        if len(repr(state)) > self.spec.capabilities.max_state_chars:
-            outcome.unavailable_reason = UnavailableReason.OVER_BUDGET   # refuse rather than risk truncation
-            return outcome
+        limit = self.spec.capabilities.max_state_chars
         batches, refused = split_questions(questions, self.spec.capabilities)
         outcome.invalid_ids.extend(refused)
+        if state_for is None:
+            if len(repr(state)) > limit:
+                outcome.unavailable_reason = UnavailableReason.OVER_BUDGET   # refuse rather than risk truncation
+                return outcome
+            states = [state] * len(batches)
+        else:
+            sized: list[dict[str, dict[str, Any]]] = []
+            for batch in batches:
+                current: dict[str, dict[str, Any]] = {}
+                for qid, question in batch.items():
+                    if len(repr(state_for([qid]))) > limit:
+                        outcome.invalid_ids.append(qid)             # too large on its own
+                        continue
+                    if current and len(repr(state_for([*current, qid]))) > limit:
+                        sized.append(current)
+                        current = {}
+                    current[qid] = question
+                if current:
+                    sized.append(current)
+            batches, states = sized, [state_for(list(batch)) for batch in sized]
         if len(batches) > max_calls:
             outcome.unavailable_reason = UnavailableReason.OVER_BUDGET
             return outcome
-        for batch in batches:
-            response, reason = self._post(state, batch, started, deadline_s, outcome)
+        for batch, batch_state in zip(batches, states):
+            response, reason = self._post(batch_state, batch, started, deadline_s, outcome)
             if reason is not None:
                 outcome.unavailable_reason = reason
                 break

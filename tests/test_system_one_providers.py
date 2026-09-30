@@ -249,3 +249,18 @@ def test_truncated_reads_are_never_trusted():
     with SystemOneTestServer(ServerBehavior(invalid="truncated_question")) as server:
         one = SystemOneClient(spec, server.base_url, spec.model).decide({}, {"a": NOUL, "b": NOUL}, 5, max_calls=1)
     assert one.unavailable_reason is None and one.invalid_ids == ["a"] and set(one.answers) == {"b"}
+
+
+def test_per_batch_state_splits_on_state_size():
+    """Round 3: each batch carries only its own items, and batches split until the state fits;
+    a single oversize item is refused, never truncated."""
+    spec = SPECS["local-test"].model_copy(update={"capabilities": SPECS["local-test"].capabilities.model_copy(
+        update={"max_state_chars": 400, "max_questions_per_call": 10})})
+    texts = {"a": "x" * 150, "b": "y" * 150, "c": "z" * 150, "huge": "w" * 900}
+    state_for = lambda qids: {"items": {q: texts[q] for q in qids}}
+    with SystemOneTestServer() as server:
+        outcome = SystemOneClient(spec, server.base_url, spec.model).decide(
+            {}, {q: NOUL for q in texts}, 5, max_calls=5, state_for=state_for)
+        sent = [set(r["state"]["items"]) for r in server.behavior.requests]
+    assert outcome.invalid_ids == ["huge"] and set(outcome.answers) == {"a", "b", "c"}
+    assert sent == [{"a", "b"}, {"c"}] and all(len(repr(state_for(list(batch)))) <= 400 for batch in sent)

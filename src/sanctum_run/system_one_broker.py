@@ -198,9 +198,22 @@ class SystemOneBroker:
             questions=sorted(questions), outcome="ok" if outcome.unavailable_reason is None else "unavailable",
             reason=None if outcome.unavailable_reason is None else str(outcome.unavailable_reason.value),
             elapsed_ms=float(outcome.latency_ms), usage=outcome.usage, calls=outcome.calls,
-            invalid_ids=list(outcome.invalid_ids), pointers_sha256=pointers_sha256))
+            invalid_ids=list(outcome.invalid_ids), pointers_sha256=pointers_sha256,
+            batch_pointers_sha256=self._batch_pointer_hashes(arguments, exchanges) if round_id in ROUND3 else []))
         self._store(request_id, round_id, outcome, exchanges, release)
         return outcome.model_dump(mode="json")
+
+    @staticmethod
+    def _batch_pointer_hashes(arguments: dict, exchanges: list[dict]) -> list[str]:
+        """Per provider call: the hash of the pointers whose text that call's state carried."""
+        items_in = arguments.get("items") or {}
+        hashes = []
+        for exchange in exchanges:
+            request = exchange.get("request")
+            qids = sorted(((request or {}).get("state") or {}).get("items") or {}) if isinstance(request, dict) else []
+            pointers = {qid: (items_in.get(qid) or {}).get("refs") for qid in qids}
+            hashes.append(hashlib.sha256(json.dumps(pointers, sort_keys=True).encode()).hexdigest())
+        return hashes
 
     def _round3_items(self, gateway, handle, round_id: str, questions: dict, raw_items: Any
                       ) -> tuple[dict[str, list[dict]], list[str]]:

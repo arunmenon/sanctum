@@ -354,6 +354,7 @@ async def _round3_batches(world, broker, out):
                 "round": "d4", "questions": {qid: NOUL for qid in qids},
                 "items": {qid: {"refs": [ref]} for qid, ref in zip(qids, refs)}}, "req-5", caller)
         proxy.unbind("req-5", handle)
+        out["trace"] = gateway.trace("req-5")
 
 
 def test_round3_batches_carry_only_their_own_items(scenario_world, server, tmp_path):  # noqa: F811
@@ -366,3 +367,5 @@ def test_round3_batches_carry_only_their_own_items(scenario_world, server, tmp_p
     assert len(server.behavior.requests) == 3
     for request in server.behavior.requests:
         assert set(request["state"]["items"]) == set(request["questions"])
+    [call] = out["trace"].model_calls
+    assert len(call.batch_pointers_sha256) == 3 and len(set(call.batch_pointers_sha256)) == 3

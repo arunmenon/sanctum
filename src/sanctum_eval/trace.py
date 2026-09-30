@@ -28,6 +28,7 @@ class ModelCall(BaseModel):
     calls: int = 0                       # HTTP calls made, retries included
     invalid_ids: list[str] = []          # questions refused, dropped or answered invalidly
     pointers_sha256: Optional[str] = None  # Round 3: hash of the evidence pointers the broker read
+    batch_pointers_sha256: list[str] = []  # Round 3: the same, per provider call (batch)
 
 
 class ObservedTrace(BaseModel):

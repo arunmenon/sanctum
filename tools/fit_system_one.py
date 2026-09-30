@@ -16,6 +16,7 @@ them makes the SUT run shadow-only.
 """
 import argparse
 import datetime
+import json
 import math
 import os
 import random
@@ -88,6 +89,57 @@ def broker_descriptors(include_held_back: bool = False) -> tuple[dict[str, str],
     return descriptors, release_of(descriptors)
 
 
+def choose_use_band(held_out, max_false_rate):
+    """Lowest use band (0.50 to 0.95) whose held-out promotions stay within the false-positive
+    tolerance; 1.0 (never promote) when none does. Round 3 decisions only promote or add."""
+    for band in [i / 100 for i in range(50, 96)]:
+        promoted = [(p, y) for p, y in held_out if p >= band]
+        if promoted and sum(1 - y for _, y in promoted) / len(promoted) <= max_false_rate:
+            return band
+    return 1.0
+
+
+def round3_fit(arguments, spec, environment):
+    """D6/D4: shadow-collect through the runner and broker, label on the evaluator side, fit."""
+    from sanctum_eval.calibration_labels import labels_from_run
+    from sanctum_run.process_sut import ProcessSUT
+    from sanctum_run.runner import RunConfig, run
+    decision = arguments.decision
+    with tempfile.TemporaryDirectory() as scratch:
+        scratch = Path(scratch)
+        (scratch / "no-calibration").mkdir()                     # shadow-only by construction
+        sut_arguments = ["--config", "C4", "--round3", decision, "--round3-provider", arguments.provider,
+                         "--calibration-dir", str(scratch / "no-calibration")]
+        if arguments.memory_release:
+            sut_arguments += ["--memory-release", arguments.memory_release]
+        result = run(ProcessSUT(sut_arguments), RunConfig(
+            cases_dir=arguments.cases, out_dir=scratch / "collect", seed=20260930, sut_name="ref",
+            config_id=f"C4+{decision.upper()}", world_build_dir=arguments.world_build,
+            system_one_provider=arguments.provider, system_one_profile="relaxed"))
+        raw, models, usage, calls = {}, set(), {}, 0
+        cases = result.manifest["cases"]
+        receipts = [json.loads(line) for line in (result.out_dir / "receipts.jsonl").read_text().splitlines()]
+        traces = [json.loads(line) for line in (result.out_dir / "traces.jsonl").read_text().splitlines()]
+        for case_id, receipt, trace in zip(cases, receipts, traces):
+            for call in trace.get("model_calls") or []:
+                calls += call.get("calls", 0)
+                for name, value in (call.get("usage") or {}).items():
+                    if isinstance(value, (int, float)):
+                        usage[name] = usage.get(name, 0) + value
+            for decision_result in receipt["decisions"]:
+                value = decision_result.get("value") or {}
+                item = str(value.get("item", ""))
+                if item.startswith(f"{decision}:") and value.get("p_raw") is not None:
+                    raw[(case_id, item.split(":", 1)[1])] = value["p_raw"]
+                    models.add(decision_result.get("model_version"))
+        labels = labels_from_run(decision, result.out_dir, arguments.cases)
+    if calls > arguments.max_calls:
+        raise SystemExit(f"collect used {calls} calls, over the cap {arguments.max_calls}; nothing written")
+    if len(models) != 1:
+        raise SystemExit(f"resolved model not unique during collect: {sorted(map(str, models))}; nothing written")
+    return raw, labels, models.pop(), usage, calls
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--provider", required=True)
@@ -96,6 +148,10 @@ if __name__ == "__main__":
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--harm-tolerance", type=float, default=0.05)
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
+    parser.add_argument("--decision", default="d2", choices=["d2", "d6", "d4"])
+    parser.add_argument("--memory-release", default=None)
+    parser.add_argument("--max-false-rate", type=float, default=0.2,
+                        help="Round 3: tolerated share of false positives among held-out promotions")
     parser.add_argument("--model-revision", default=None,
                         help="checkpoint revision when the provider reports only a model family (Laya: /health revisions)")
     arguments = parser.parse_args()
@@ -103,6 +159,45 @@ if __name__ == "__main__":
         raise SystemExit("fit on dev cases only")
     spec = load_provider_specs(ROOT / "configs" / "system_one_providers.yaml")[arguments.provider]
     environment = {**dotenv(), **os.environ}
+    if arguments.decision != "d2":
+        raw, labels, model, usage, calls = round3_fit(arguments, spec, environment)
+        keys = sorted(key for key in raw if key in labels)
+        if not keys or not any(labels[k] for k in keys):
+            raise SystemExit(f"{arguments.decision}: no labelled positives in the collect run; nothing written")
+        case_ids = sorted({case_id for case_id, _ in keys})
+        random.Random(20260930).shuffle(case_ids)
+        folds = [set(case_ids[i::arguments.folds]) for i in range(arguments.folds)]
+        held_out, raw_held_out = [], []
+        for fold in folds:
+            train = [(logit(raw[k]), labels[k]) for k in keys if k[0] not in fold]
+            if not train:
+                continue
+            a, b = platt(train)
+            held_out += [(1 / (1 + math.exp(-(a * logit(raw[k]) + b))), labels[k]) for k in keys if k[0] in fold]
+            raw_held_out += [(raw[k], labels[k]) for k in keys if k[0] in fold]
+        use = choose_use_band(held_out, arguments.max_false_rate)
+        a, b = platt([(logit(raw[k]), labels[k]) for k in keys])
+        from sanctum_ref.providers.http_systemone import TEMPLATES
+        out = ROOT / "configs" / "calibration" / f"{arguments.provider}@{model}.{arguments.decision}.yaml"
+        out.write_text(yaml.safe_dump({
+            "binding": {"provider": arguments.provider, "model": model, "model_revision": arguments.model_revision,
+                        "decision": arguments.decision, "template": TEMPLATES[arguments.decision],
+                        "descriptor_release": "none", "decoding": "provider default"},
+            "platt": {"a": round(a, 4), "b": round(b, 4)},
+            "bands": {"use": use, "skip": 0.0},
+            "provenance": {"fitted_on": "dev", "cases": len(case_ids), "points": len(keys),
+                           "positives": sum(labels[k] for k in keys), "folds": arguments.folds,
+                           "max_false_rate": arguments.max_false_rate, "http_calls": calls, "usage": usage,
+                           "held_out": {"brier_calibrated": round(brier(held_out), 4), "ece_calibrated": round(ece(held_out), 4),
+                                        "brier_raw": round(brier(raw_held_out), 4), "ece_raw": round(ece(raw_held_out), 4),
+                                        "promoted_at_band": sum(1 for p, _ in held_out if p >= use),
+                                        "false_promotions_at_band": sum(1 - y for p, y in held_out if p >= use)},
+                           "label": f"sanctum_eval.calibration_labels ({arguments.decision})",
+                           "fitted_at": datetime.date.today().isoformat(), "git_commit": git_state()["git_commit"]},
+        }, sort_keys=False), encoding="utf-8")
+        print(f"wrote {out}: platt a={a:.3f} b={b:.3f}, use band {use}, {len(keys)} points, {calls} calls, usage {usage}")
+        print(f"held-out Brier {brier(held_out):.4f} (raw {brier(raw_held_out):.4f}), ECE {ece(held_out):.4f} (raw {ece(raw_held_out):.4f})")
+        raise SystemExit(0)
     descriptors, descriptor_release = broker_descriptors()
     client = SystemOneClient(spec, spec.resolved_base_url(environment) or "https://api.typesafe.ai",
                              spec.requested_model(environment),

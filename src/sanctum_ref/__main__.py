@@ -17,6 +17,13 @@ from .server import serve
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def round3_limits(path: Path) -> dict:
+    """Per-request Round 3 bounds from the provider file (`round3:`), with the design defaults."""
+    import yaml
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8")) if Path(path).exists() else {}
+    return {"d4_max_units": 20, **((data or {}).get("round3") or {})}
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="python -m sanctum_ref", description=__doc__)
     parser.add_argument("--config", required=True, help="arm id from configs/matrix.yaml")
@@ -63,7 +70,7 @@ def main(argv=None) -> int:
         arm = dataclasses.replace(arm, config_id=f"{arm.config_id}+{arguments.round3.upper()}")
     anyio.run(serve, arm, arguments.registry, arguments.proxy_read_fd, arguments.proxy_write_fd,
               arguments.memory_seed if arm.uses_memory else None, provider, arguments.memory_release,
-              arguments.round3, round3_provider)
+              arguments.round3, round3_provider, round3_limits(arguments.system_one_providers)["d4_max_units"])
     return 0
 
 

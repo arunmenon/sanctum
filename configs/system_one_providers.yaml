@@ -58,3 +58,7 @@ providers:
 profiles:
   strict:  {deadline_ms: 150, max_calls_per_round: 1}
   relaxed: {deadline_ms: 60000, max_calls_per_round: 3}
+
+# Round 3 per-request bounds (design page §14). D4 on laya-local costs about 90 ms per unit.
+round3:
+  d4_max_units: 20

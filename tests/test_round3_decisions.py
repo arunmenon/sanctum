@@ -104,3 +104,49 @@ def test_d6_sends_refs_not_text_and_cannot_create_pairs(tmp_path):
     assert _pairs(assembled) <= produced
     stranger = (prepared.ranked[0], prepared.ranked[0], prepared.flagged[0][2])
     assert _pairs(finish(prepared, 4000, "cl100k_base", [stranger])) == _pairs(_rules_only())
+
+
+def _d4_units():
+    relevant = _units()
+    unrelated = [_candidate("dochub", f"z{i}", f"Quarterly offsite notes {i}. Lunch at noon.\n", version="v1",
+                            location="space:OTHER", rank=i) for i in range(4)]
+    return relevant + unrelated
+
+
+def test_d4_never_removes_a_rules_packed_unit_under_any_scores():
+    """Superset property (design page §14): for any D4 scores and use band, the packed set
+    contains every unit the rules-only packer would pack, and the budget holds."""
+    import random
+    from sanctum_ref.text import token_count
+    import json as _json
+    rng = random.Random(7)
+    units = _d4_units()
+    fact_kinds = frozenset({"implementation", "procedure"})
+    for trial in range(60):
+        budget = rng.randint(120, 1400)
+        prepared = prepare(units, TERMS, fact_kinds, common=True, dedup_exact=True, domain_terms={"payment"})
+        rules = finish(prepared, budget, "cl100k_base")
+        ids = [item.unit.evidence_id for item in prepared.ranked + prepared.excluded]
+        scores = {evidence_id: rng.random() for evidence_id in ids}
+        if trial % 3 == 0:
+            scores = {evidence_id: 1.0 if evidence_id.startswith("ev-z") else 0.0 for evidence_id in ids}  # adversarial
+        d4 = finish(prepared, budget, "cl100k_base", d4_scores=scores, d4_use=rng.choice([0.0, 0.5, 0.9]))
+        rules_ids = {u.evidence_id for u in rules.evidence}
+        d4_ids = {u.evidence_id for u in d4.evidence}
+        assert rules_ids <= d4_ids, (trial, budget)
+        assert set(d4.rules_packed) == rules_ids
+        assert d4_ids - rules_ids <= {item.unit.evidence_id for item in prepared.excluded}
+        wire = _json.dumps([u.model_dump(mode="json") for u in d4.evidence])
+        assert d4.used_tokens <= budget and token_count(wire, "cl100k_base") <= budget
+
+
+def test_d4_shadow_is_rules_only(tmp_path):
+    adapter = SystemOneHttpAdapter(SPEC, tmp_path, transport=ScriptedTransport(0.99))   # no calibration file
+    retriever = Retriever(load_arm(ROOT / "configs" / "matrix.yaml", "C4"), None, round3="d4", round3_provider=adapter)
+    from sanctum_contracts import RetrieveRequest
+    request = RetrieveRequest(request_id="req-d4", query="payment auth retry limit", mode="scoped",
+                              budget_tokens=4000, deadline_ms=3000)
+    prepared = prepare(_d4_units(), TERMS, frozenset({"implementation"}), common=True, dedup_exact=True, domain_terms={"payment"})
+    scores, use, results, failed = anyio.run(retriever._judge_relevance, request, prepared, None)
+    assert scores is None and use is None and not failed
+    assert all(r.value["shadow"] and r.value["template"] == "d4-noul-v1" for r in results if r.value)

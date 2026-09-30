@@ -61,6 +61,7 @@ class Assembled:
     uncovered_terms: list[str] = field(default_factory=list)
     subject_terms: int = 0
     relevant_ids: list[str] = field(default_factory=list)
+    rules_packed: list[str] = field(default_factory=list)
 
     @property
     def uncovered_share(self) -> float:
@@ -225,7 +226,11 @@ def list_cost(items: list["Ranked"], tokenizer_id: str) -> int:
 
 
 def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, RelationType]],
-         budget_tokens: int, tokenizer_id: str, reserve_witnesses: bool) -> Assembled:
+         budget_tokens: int, tokenizer_id: str, reserve_witnesses: bool,
+         extras: list[Ranked] = (), order_scores: Optional[dict[str, float]] = None) -> Assembled:
+    """Whole units, conflict witnesses reserved, then rank order. `extras` (D4-approved units the
+    rules excluded) are tried only after the rules' own fill, so they can use leftover budget and
+    never displace a rules-packed unit. `order_scores` (D4) reorders the packed units only."""
     chosen: list[Ranked] = []
     used = 0
 
@@ -258,17 +263,29 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
     for item in ranked:
         if not take(item) and item.relevant and item.coverage >= top_coverage - 1e-9:
             truncated_relevant = True
+    rules_packed = [item.unit.evidence_id for item in chosen]
+    for item in extras:                                 # leftover budget only; never displaces
+        take(item)
     if not reserve_witnesses:
         flagged = [(a, b, r) for a, b, r in conflict_pairs
                    if any(a is c for c in chosen) and any(b is c for c in chosen)]
-    chosen_order = {id(item): index for index, item in enumerate(ranked)}
+    chosen_order = {id(item): index for index, item in enumerate(list(ranked) + list(extras))}
     chosen.sort(key=lambda item: chosen_order[id(item)])
     used = list_cost(chosen, tokenizer_id)            # the final order is what goes on the wire
     while chosen and used > budget_tokens:
-        dropped = chosen.pop()                         # lowest ranked first
+        # trim the lowest ranked, but never a rules-packed unit before any D4 extra
+        extra_positions = [i for i, item in enumerate(chosen) if item.unit.evidence_id not in rules_packed]
+        dropped = chosen.pop(extra_positions[-1] if extra_positions else -1)
         flagged = [(a, b, r) for a, b, r in flagged if a is not dropped and b is not dropped]
         truncated_relevant = truncated_relevant or dropped.relevant
         used = list_cost(chosen, tokenizer_id)
+    if order_scores:
+        chosen.sort(key=lambda item: -order_scores.get(item.unit.evidence_id, -1.0))
+        used = list_cost(chosen, tokenizer_id)
+        while chosen and used > budget_tokens:         # a reorder can change the token count slightly
+            extra_positions = [i for i, item in enumerate(chosen) if item.unit.evidence_id not in rules_packed]
+            chosen.pop(extra_positions[-1] if extra_positions else -1)
+            used = list_cost(chosen, tokenizer_id)
     evidence = [item.unit.model_copy(update={"duplicates": list(item.duplicates)}) for item in chosen]
     conflicts = [Conflict(conflict_id=f"cf-{index + 1}", a=a.unit.evidence_id, b=b.unit.evidence_id,
                           relation_type=relation, status=ConflictStatus.possible_conflict)
@@ -276,7 +293,8 @@ def pack(ranked: list[Ranked], conflict_pairs: list[tuple[Ranked, Ranked, Relati
     return Assembled(evidence=evidence, conflicts=conflicts, omitted=[], used_tokens=used,
                      truncated_relevant=truncated_relevant,
                      relevant_packed=sum(1 for item in chosen if item.relevant),
-                     relevant_ids=[item.unit.evidence_id for item in chosen if item.relevant])
+                     relevant_ids=[item.unit.evidence_id for item in chosen if item.relevant],
+                     rules_packed=rules_packed)
 
 
 @dataclass
@@ -290,18 +308,23 @@ class Prepared:
     flagged: list[tuple[Ranked, Ranked, RelationType]]
     pair_candidates: list[tuple[Ranked, Ranked, RelationType]]
     common: bool
+    excluded: list[Ranked] = field(default_factory=list)   # rules-excluded units (no query overlap)
 
 
 def prepare(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: frozenset[str],
             common: bool, dedup_exact: bool, domain_terms: set[str] = frozenset()) -> Prepared:
-    ranked = [item for item in score(candidates, terms) if item.coverage > 0 or not common]
+    scored = score(candidates, terms)
+    ranked = [item for item in scored if item.coverage > 0 or not common]
+    excluded = [item for item in scored if not (item.coverage > 0 or not common)]
     ranked = order(ranked, fact_kinds, by_relevance=common)
     omitted: list[Omitted] = []
     if dedup_exact:
         ranked, omitted = dedup(ranked, fact_kinds)
+        kept_hashes = {item.unit.content_hash for item in ranked}
+        excluded = [item for item in excluded if item.unit.content_hash not in kept_hashes]
     pair_candidates: list = []
     flagged = find_conflicts(ranked, terms, domain_terms, pair_candidates)
-    return Prepared(candidates, terms, ranked, omitted, flagged, pair_candidates, common)
+    return Prepared(candidates, terms, ranked, omitted, flagged, pair_candidates, common, excluded)
 
 
 def assemble(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: frozenset[str],
@@ -313,11 +336,18 @@ def assemble(candidates: list[Candidate], terms: tuple[str, ...], fact_kinds: fr
 
 
 def finish(prepared: Prepared, budget_tokens: int, tokenizer_id: str,
-           promoted: list[tuple[Ranked, Ranked, RelationType]] = ()) -> Assembled:
-    """Pack. Rule-flagged pairs always stay; D6-promoted candidate pairs are added after them."""
+           promoted: list[tuple[Ranked, Ranked, RelationType]] = (),
+           d4_scores: Optional[dict[str, float]] = None, d4_use: Optional[float] = None) -> Assembled:
+    """Pack. Rule-flagged pairs always stay; D6-promoted candidate pairs are added after them.
+    D4 (scores and use band) may add rules-excluded units into leftover budget and reorder."""
     candidates, terms, ranked, omitted = prepared.candidates, prepared.terms, prepared.ranked, prepared.omitted
     pairs = list(prepared.flagged) + [pair for pair in promoted if pair in prepared.pair_candidates]
-    assembled = pack(ranked, pairs, budget_tokens, tokenizer_id, reserve_witnesses=prepared.common)
+    extras = []
+    if d4_scores and d4_use is not None:
+        extras = sorted((item for item in prepared.excluded if d4_scores.get(item.unit.evidence_id, 0.0) >= d4_use),
+                        key=lambda item: -d4_scores[item.unit.evidence_id])
+    assembled = pack(ranked, pairs, budget_tokens, tokenizer_id, reserve_witnesses=prepared.common,
+                     extras=extras, order_scores=d4_scores or None)
     packed_ids = {unit.evidence_id for unit in assembled.evidence}
     duplicate_refs = {ref for unit in assembled.evidence for ref in unit.duplicates}
     # reference closure: keep an omitted entry only for copies a packed unit still points to

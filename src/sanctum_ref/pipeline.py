@@ -22,7 +22,7 @@ from typing import Any, Optional
 import anyio
 
 from sanctum_contracts import (
-    CONTRACT_REVISION, Budget, EvidenceResponse, EvidenceStatus, Interpretation, Receipt,
+    CONTRACT_REVISION, Budget, DecisionResult, EvidenceResponse, EvidenceStatus, Interpretation, Receipt,
     RetrieveRequest, SourceOutcome,
 )
 from sanctum_contracts.receipt import QueryPlan, SelfReportedCall
@@ -32,7 +32,7 @@ from .assembly import finish, prepare
 from .config import ArmConfig
 from .intent import analyze
 from .registry import Registry, RegistryUnavailable
-from .providers import d2_request, unavailable
+from .providers import POLICY_VERSION, d2_request, unavailable
 from .providers.http_systemone import decide_items
 from .memory import LabelTable, MemoryUnavailable, build_store, load_release
 from .resolution import resolve, resolve_label_only
@@ -120,11 +120,12 @@ class MemoryState:
 class Retriever:
     def __init__(self, arm: ArmConfig, registry: Optional[Registry],
                  registry_error: Optional[str] = None, memory: Optional[MemoryState] = None,
-                 provider=None, round3: str = "none", round3_provider=None):
+                 provider=None, round3: str = "none", round3_provider=None, d4_max_units: int = 20):
         self.arm = arm
         self.provider = provider
         self.round3 = round3                      # none | d6 | d4 (design page §14)
         self.round3_provider = round3_provider
+        self.d4_max_units = d4_max_units
         self.registry = registry
         self.registry_error = registry_error
         self.memory = memory
@@ -181,7 +182,19 @@ class Retriever:
             decisions = decisions + round3_decisions
             if round3_failed:
                 degraded = sorted(set(degraded) | {"decision_layer_unavailable"})
-        assembled = finish(prepared, request.budget_tokens, self.arm.tokenizer, promoted)
+        d4_scores, d4_use = None, None
+        if self.round3 == "d4" and self.round3_provider is not None and (prepared.ranked or prepared.excluded):
+            d4_scores, d4_use, round3_decisions, round3_failed = await self._judge_relevance(request, prepared, port)
+            decisions = decisions + round3_decisions
+            if round3_failed:
+                degraded = sorted(set(degraded) | {"decision_layer_unavailable"})
+        assembled = finish(prepared, request.budget_tokens, self.arm.tokenizer, promoted, d4_scores, d4_use)
+        if d4_scores:
+            decisions = decisions + [DecisionResult(
+                status="answered", value={"scores": d4_scores, "rules_only_packed": assembled.rules_packed},
+                target="D4", disposition="use", provider=self.round3_provider.name,
+                model_version=next((d.model_version for d in decisions if d.model_version), None),
+                policy_version=POLICY_VERSION, latency_ms=0, cost=0)]
         sources, response_reasons, required_gap = self._sources(plans, outcomes,
                                                                 intent.detected_fact_kinds or intent.fact_kinds,
                                                                 self._fetch_gaps)
@@ -256,6 +269,27 @@ class Retriever:
                 promoted.append((a, b, relation))
         failed = all(r.status.value != "answered" for r in results)
         return promoted, results, failed
+
+    async def _judge_relevance(self, request: RetrieveRequest, prepared, port: HubPort):
+        """D4 (design page §14): score at most `d4_max_units` units. Scores reorder packed units
+        and let rules-excluded units at or above the use band fill leftover budget; nothing the
+        rules pack is ever removed. Without a matching calibration, no scores are applied."""
+        half = self.d4_max_units // 2
+        units = prepared.ranked[:self.d4_max_units - min(half, len(prepared.excluded))]
+        units += prepared.excluded[:self.d4_max_units - len(units)]
+        items = {f"d4:{item.unit.evidence_id}": [{"source_id": item.unit.source_id, "artifact_id": item.unit.artifact_id,
+                                                   "version": item.unit.source_version, "start": item.unit.span.start,
+                                                   "end": item.unit.span.end}] for item in units}
+        try:
+            judgements, results, calibration = await decide_items(
+                self.round3_provider, "d4", items, request.query, port, self.arm.deadline_ms)
+        except Exception:
+            return None, None, [unavailable(self.round3_provider.name, time.monotonic())], True
+        failed = all(r.status.value != "answered" for r in results)
+        if calibration is None:
+            return None, None, results, failed            # shadow: rules order and rules packing
+        scores = {qid.split(":", 1)[1]: j.p for qid, j in judgements.items() if j.p is not None}
+        return (scores or None), calibration.use, results, failed
 
     async def _judge_usefulness(self, request: RetrieveRequest, plans: list[SourcePlan], port: HubPort):
         """Round 2, D2 (HLD §6.3): one question per optional called source. A confident "not

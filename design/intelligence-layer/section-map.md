@@ -1,6 +1,6 @@
 # Original section ownership
 
-[Overview](README.md) · [Source v5.1](../design/sanctum-intelligence-layer-hld-v5.1.md)
+[Overview](README.md) · [Source v5.1](hld.md)
 
 All 23 numbered sections have one owner. Numbering is retained for compatibility with lab references.
 

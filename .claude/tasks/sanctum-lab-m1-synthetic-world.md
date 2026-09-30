@@ -4,7 +4,7 @@
 
 Build M1 of the Sanctum Lab inside `sanctum-lab-m0/`: the single authored ground-truth file (`world/world.yaml`), a world linter, a deterministic renderer that turns the world into per-hub corpora (~3,000 artifacts with hub-specific vocabulary), and the machinery that derives gold (`sanctum_eval.gold.GoldCase`) from the world plus a small question spec.
 
-Source of requirements: `docs/design/sanctum-lab-plan.md` §5 (world schema, scale, owner manifests, linter, rendering) and §8.3 (gold rules); acceptance in `docs/milestones.md` (M1). Working assumptions in `docs/decisions.md` apply (D-GOAL: real slice + directional evidence; D-GOLD: developer validation until an auditor is named). D8 (LLM paraphrasing) is **off** for M1.
+Source of requirements: `design/intelligence-layer/lab-spike.md` §5 (world schema, scale, owner manifests, linter, rendering) and §8.3 (gold rules); acceptance in `docs/milestones.md` (M1). Working assumptions in `docs/decisions.md` apply (D-GOAL: real slice + directional evidence; D-GOLD: developer validation until an auditor is named). D8 (LLM paraphrasing) is **off** for M1.
 
 Task type: feature. Complexity: medium-complex.
 
@@ -73,8 +73,8 @@ Key decisions:
 
 Use these files to complete the task:
 
-- `docs/design/sanctum-lab-plan.md` §5, §8 - world schema sketch, scale targets, linter rules, rendering rules, gold rules.
-- `docs/design/sanctum-intelligence-layer-hld-v5.1.md` §7.1, §7.5, §8.5, §10 - evidence units, version applicability, names vs subjects vs places, worked examples the planted situations must support.
+- `design/intelligence-layer/lab-spike.md` §5, §8 - world schema sketch, scale targets, linter rules, rendering rules, gold rules.
+- `design/intelligence-layer/hld.md` §7.1, §7.5, §8.5, §10 - evidence units, version applicability, names vs subjects vs places, worked examples the planted situations must support.
 - `docs/milestones.md` - M1 acceptance.
 - `docs/decisions.md` - working assumptions.
 - `docs/scenario-register.yaml` - which scenarios need which planted situations.
@@ -175,7 +175,7 @@ CLIs, isolation test extension, sample specs and gold, README update (layout, ru
 - **Assigned To**: builder-world
 - **Agent Type**: backend-engineer
 - **Parallel**: true
-- Write `world/world.yaml` (seed 20260930) following `docs/design/sanctum-lab-plan.md` §5.1: principals `kestrel-payments`, `kestrel-identity`, `kestrel-both`, `admin-probe`; core services `svc.payment-auth`, `svc.identity-auth`, `svc.fx-quote`, `svc.ledger-post`, `svc.gateway-edge` (5); domains; topic entities; releases R40, R41, R42, branch `exp-branch`; environments prod and experiment.
+- Write `world/world.yaml` (seed 20260930) following `design/intelligence-layer/lab-spike.md` §5.1: principals `kestrel-payments`, `kestrel-identity`, `kestrel-both`, `admin-probe`; core services `svc.payment-auth`, `svc.identity-auth`, `svc.fx-quote`, `svc.ledger-post`, `svc.gateway-edge` (5); domains; topic entities; releases R40, R41, R42, branch `exp-branch`; environments prod and experiment.
 - Author facts and core artifacts so every planted situation in the Solution Approach table is present; add each to `planted:`.
 - Write `world/filler.yaml`: 26 filler service names that do not collide with core names or aliases, per-hub artifact counts sized to ~3,000 total.
 - Must load through `World.model_validate` with no errors.
@@ -202,7 +202,7 @@ CLIs, isolation test extension, sample specs and gold, README update (layout, ru
 - **Assigned To**: builder-world
 - **Agent Type**: backend-engineer
 - **Parallel**: true (with gold-derivation)
-- `lint.py`: `lint(world, build_dir) -> list[Finding]` implementing `docs/design/sanctum-lab-plan.md` §5.4 plus: every `planted` entry rendered and detectable; every fact asserted by at least one artifact unless it is a planted coverage gap; no restricted canary, title or native name appears in any unrestricted artifact; no hub text contains a name that hub does not declare (vocabulary separation); no fact ID, entity ID or planted label appears in hub-visible output; filler names do not collide with core names.
+- `lint.py`: `lint(world, build_dir) -> list[Finding]` implementing `design/intelligence-layer/lab-spike.md` §5.4 plus: every `planted` entry rendered and detectable; every fact asserted by at least one artifact unless it is a planted coverage gap; no restricted canary, title or native name appears in any unrestricted artifact; no hub text contains a name that hub does not declare (vocabulary separation); no fact ID, entity ID or planted label appears in hub-visible output; filler names do not collide with core names.
 - `tools/lint_world.py` exits non-zero with findings printed.
 - `python -m sanctum_world.lint --leak-scan <build_dir>` runs only the hub-visible leak rule, using exact identifiers read from `private/` (no regex guessing).
 - `tests/test_world_lint.py`: real world lints clean; one mutated copy per rule (drop a planted artifact, leak a canary, leak a fact ID, remove an asserting artifact, cross-hub name) each produces the expected finding.
@@ -217,7 +217,7 @@ CLIs, isolation test extension, sample specs and gold, README update (layout, ru
 - `src/sanctum_world/gold.py`: `QuestionSpec` (id, family, principal, text, mode, scope, as_of, target entity or name, attribute, optional expected ambiguity) and `derive(world, build_dir, spec) -> GoldCase`.
 - Derivation rules: interpretations = entities the named term denotes and the principal may see; obligations = provenance spans asserting the fact applicable at `as_of`/prod for each interpretation (bundles for alternatives such as exact duplicates); source obligations from must-consult (SkillHub for procedure facts) and capability gaps; relations from differing values of the same attribute (code vs procedure = `policy_implementation_divergence`, release = `version_difference`, env = `environment_difference`); `forbidden.canaries` from restricted canaries, `wrong_entities` from homonym siblings; `answerable`/`expected.evidence_status` from whether any obligation is obtainable for the principal.
 - `request.request_id` is an opaque hash, never containing case id or family.
-- Write 10 specs in `questions/specs/sample/` (families from `docs/design/sanctum-lab-plan.md` §8.2) and derived output in `gold/m1/`.
+- Write 10 specs in `questions/specs/sample/` (families from `design/intelligence-layer/lab-spike.md` §8.2) and derived output in `gold/m1/`.
 - `tools/derive_gold.py` builds all specs; `tests/test_gold_derivation.py` validates every output with `sanctum_eval.gold.GoldCase` and checks family-specific expectations (homonym gives `separate_alternatives`, coverage gap gives `answerable: false`, restricted gives non-empty canaries, historical R40 yields value 3).
 
 ### 6. Integration, isolation, docs

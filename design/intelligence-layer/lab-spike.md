@@ -14,11 +14,11 @@ The detailed protocol follows: §2 owns the hypothesis register; §16 owns the e
 
 ## Related lab artifacts and precedence
 
-- [Existing scaffold plan](../design/sanctum-lab-plan.md): detailed world, hub, runner, and evaluation design. Its header still says no code exists and some vocabulary predates v5.1; treat it as planning history where it conflicts with current artifacts.
+- [Existing scaffold plan](lab-spike.md): detailed world, hub, runner, and evaluation design. Its header still says no code exists and some vocabulary predates v5.1; treat it as planning history where it conflicts with current artifacts.
 - [Lab package README](../../README.md): package scope and current documented implementation.
-- [Milestone register](../milestones.md): owns the package's milestone numbering and exit criteria.
-- [Discrepancy register](../discrepancy-register.md): proposed contract differences requiring resolution.
-- [Measurement plan](../measurement-plan.md): executable evaluation conventions.
+- [Milestone register](../../docs/milestones.md): owns the package's milestone numbering and exit criteria.
+- [Discrepancy register](../../docs/discrepancy-register.md): proposed contract differences requiring resolution.
+- [Measurement plan](../../docs/measurement-plan.md): executable evaluation conventions.
 
 Use the v5.1 configurations below when interpreting comparisons. Package differences remain explicit proposals until resolved; implementation alone does not amend the architecture.
 
@@ -258,7 +258,7 @@ All primary arms share authentication, assembly, ranker, budgets, tokenizer, cor
 - Every run records config, memory release, world version, and seed.
 - Results report intervals and per-family breakdowns, not only averages. An inconclusive result is an allowed outcome.
 
-The [existing scaffold plan](../design/sanctum-lab-plan.md) contains further lab design detail. Read it with the version and discrepancy guidance at the top of this page; its older wording does not override this v5.1 protocol.
+The [existing scaffold plan](lab-spike.md) contains further lab design detail. Read it with the version and discrepancy guidance at the top of this page; its older wording does not override this v5.1 protocol.
 
 
 ---

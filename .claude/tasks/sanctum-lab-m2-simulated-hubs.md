@@ -4,7 +4,7 @@
 
 Build M2 of the Sanctum Lab in `sanctum-lab-m0/` (M1 committed at `710274f`): the four released hubs (CodeHub, SkillHub, DocHub, MemoryHub) plus held-back IncidentHub as local MCP servers over the M1 corpora, with honest SQLite FTS5 BM25 search, a lab token service, query-time ACLs, declared version reads, capability files, seeded failure knobs, a lab-only admin API with a change feed, a hub conformance suite, and a runner that produces observed traces the M0 evaluator already understands. Covers scenario EX-09c (auth unavailable fails closed; the registry half lands with `sanctum-ref` at M3).
 
-Sources: `docs/design/sanctum-lab-plan.md` §6 (tools, shared behavior, conformance), §2.1 (isolation), `docs/design/sanctum-intelligence-layer-hld-v5.1.md` §9.1 (change feed), §12.3 (adapter contract), §14.1 (token exchange, no passthrough), `docs/milestones.md` M2, `docs/scenario-register.yaml` EX-09c.
+Sources: `design/intelligence-layer/lab-spike.md` §6 (tools, shared behavior, conformance), §2.1 (isolation), `design/intelligence-layer/hld.md` §9.1 (change feed), §12.3 (adapter contract), §14.1 (token exchange, no passthrough), `docs/milestones.md` M2, `docs/scenario-register.yaml` EX-09c.
 
 Task type: feature. Complexity: complex.
 
@@ -71,8 +71,8 @@ Key decisions:
 
 ## Relevant Files
 
-- `docs/design/sanctum-lab-plan.md` §2.1, §6, §9 - hub behavior, conformance, runner outputs.
-- `docs/design/sanctum-intelligence-layer-hld-v5.1.md` §9.1, §12.3, §14.1 - change feed, adapter contract, token exchange.
+- `design/intelligence-layer/lab-spike.md` §2.1, §6, §9 - hub behavior, conformance, runner outputs.
+- `design/intelligence-layer/hld.md` §9.1, §12.3, §14.1 - change feed, adapter contract, token exchange.
 - `docs/milestones.md`, `docs/scenario-register.yaml`, `docs/discrepancy-register.md`, `docs/decisions.md`.
 - `configs/matrix.yaml` - `auth: test_issuer_broker`, `failure_profile: from_run_manifest`, budgets.
 - `src/sanctum_contracts/capability.py` - `HubCapabilities`.

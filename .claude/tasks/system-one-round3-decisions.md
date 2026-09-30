@@ -2,7 +2,7 @@
 
 ## Task Description
 
-Extend the System One provider layer (docs/intelligence-layer/system-one-providers.md) to the post-retrieval decisions of HLD §6.4 Round 3: D6 possible conflict first, then D4 relevance. Reuse the provider strategy interface, HTTP adapter (Jev, Laya), broker, calibration binding and shadow-only rule unchanged; add one decision template per decision, its pipeline placement, its safe default, and its own calibration and measurement. D5 stays exact-hash only. This is lab plan experiment E3, one decision at a time.
+Extend the System One provider layer (design/intelligence-layer/system-one-providers.md) to the post-retrieval decisions of HLD §6.4 Round 3: D6 possible conflict first, then D4 relevance. Reuse the provider strategy interface, HTTP adapter (Jev, Laya), broker, calibration binding and shadow-only rule unchanged; add one decision template per decision, its pipeline placement, its safe default, and its own calibration and measurement. D5 stays exact-hash only. This is lab plan experiment E3, one decision at a time.
 
 ## Objective
 

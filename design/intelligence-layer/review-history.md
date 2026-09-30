@@ -8,7 +8,7 @@ This page preserves the source's review dispositions and v5.1 change record. “
 
 ## Restructuring record
 
-- Source: [unchanged v5.1 document](../design/sanctum-intelligence-layer-hld-v5.1.md).
+- Source: [unchanged v5.1 document](hld.md).
 - Preserved all 23 numbered top-level sections, diagrams, tables, examples, and fixtures. Section numbers remain stable across pages.
 - Added audience guidance, proposal/spike framing, explicit status caveats, navigation, and a phase-based execution guide.
 - Converted section/example/fixture references to links where targets are known, without rewriting code or diagrams.

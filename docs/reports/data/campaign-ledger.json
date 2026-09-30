@@ -459,6 +459,24 @@
    "row": "c3",
    "template": "d6-noul-v3-excerpts",
    "world_manifest": "15304c65481ba2bf"
+  },
+  {
+   "calls": 11,
+   "input_tokens": 34991,
+   "output_tokens": 3466,
+   "provider": "typesafe-jev",
+   "row": "c4",
+   "template": "d6-decomp-v1",
+   "world_manifest": "15304c65481ba2bf"
+  },
+  {
+   "calls": 11,
+   "input_tokens": 27883,
+   "output_tokens": 4494,
+   "provider": "typesafe-jev",
+   "row": "c5",
+   "template": "d6-choice-v1",
+   "world_manifest": "15304c65481ba2bf"
   }
  ]
 }

@@ -8,9 +8,9 @@ This page separates spike execution from possible subsequent engineering. It mak
 
 ## Current evidence and status
 
-The [package README](../../README.md) describes M0 contracts/evaluator, M1 synthetic world, and M2 simulated hubs and runner, and lists the reference SUT (C1-naive, C1-fair, C2) as built at M3. These are documentation claims inspected during restructuring, not newly verified runtime results. The [milestone register](../milestones.md) owns package milestone numbering and exit criteria. Consult run artifacts and reviews before marking a milestone complete.
+The [package README](../../README.md) describes M0 contracts/evaluator, M1 synthetic world, and M2 simulated hubs and runner, and lists the reference SUT (C1-naive, C1-fair, C2) as built at M3. These are documentation claims inspected during restructuring, not newly verified runtime results. The [milestone register](../../docs/milestones.md) owns package milestone numbering and exit criteria. Consult run artifacts and reviews before marking a milestone complete.
 
-The older [scaffold plan](../design/sanctum-lab-plan.md) still says no code exists. Do not use that header as a current progress statement or duplicate it into Confluence.
+The older [scaffold plan](lab-spike.md) still says no code exists. Do not use that header as a current progress statement or duplicate it into Confluence.
 
 ## Spike sequence and decision gates
 

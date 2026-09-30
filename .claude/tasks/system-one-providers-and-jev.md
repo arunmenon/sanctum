@@ -2,13 +2,13 @@
 
 ## Task Description
 
-Make Jev the Tier 1 (System One) model in Sanctum's decision cascade (rules, then System One, then LLM), behind a provider strategy interface with adapters, so the hosted closed model (TypeSafe Jev) and open models (Laya, OpenJevPro, decider-4b, Tev1, CLM, Kev) are interchangeable. Specify the Jev handshake in a dedicated design page cross-referenced from the split HLD set in `docs/intelligence-layer/`. Then integrate it in `sanctum-ref`, calibrate on dev, and rerun the C3/C5 comparisons.
+Make Jev the Tier 1 (System One) model in Sanctum's decision cascade (rules, then System One, then LLM), behind a provider strategy interface with adapters, so the hosted closed model (TypeSafe Jev) and open models (Laya, OpenJevPro, decider-4b, Tev1, CLM, Kev) are interchangeable. Specify the Jev handshake in a dedicated design page cross-referenced from the split HLD set in `design/intelligence-layer/`. Then integrate it in `sanctum-ref`, calibrate on dev, and rerun the C3/C5 comparisons.
 
 Task type: feature. Complexity: medium-complex.
 
 ## Objective
 
-- A design page `docs/intelligence-layer/system-one-providers.md` that specifies the provider interface, the `/v1/systemone` wire protocol, how Sanctum decisions map to protocol primitives, and the handshake nuances (auth, model pinning, batching, deadlines, retries, calibration, data classes, validation, receipts, replay), with cross-references from `hld.md`, `contracts-and-scenarios.md`, `memory-design.md`, `lab-spike.md`, `spike-plan.md`, `README.md` and `section-map.md`.
+- A design page `design/intelligence-layer/system-one-providers.md` that specifies the provider interface, the `/v1/systemone` wire protocol, how Sanctum decisions map to protocol primitives, and the handshake nuances (auth, model pinning, batching, deadlines, retries, calibration, data classes, validation, receipts, replay), with cross-references from `hld.md`, `contracts-and-scenarios.md`, `memory-design.md`, `lab-spike.md`, `spike-plan.md`, `README.md` and `section-map.md`.
 - `sanctum_ref` decision providers are strategy objects selected by config; one `SystemOneHttpAdapter` serves every `/v1/systemone` backend; capability differences (batching, primitives, max options, usage reporting) are declared per provider, not special-cased in the pipeline.
 - The Jev API key never reaches the SUT process: a runner-side System One broker (proxy tool) holds credentials, enforces data-class eligibility and output validation, and records every call in the observed trace.
 - C3 and C5 run with Jev on dev (calibrated on dev only), results reported against C2/C4, then one holdout run.
@@ -92,7 +92,7 @@ The SUT runs out of process with no secrets. The gateway proxy gains a `system_o
 
 ## Relevant Files
 
-- `docs/intelligence-layer/hld.md` (§6.2 single Jev call, §6.4 catalog, §6.5 escalation, §6.6 decision result, §6.7 calibration, §14.1 data classes, §14.2 latency), `contracts-and-scenarios.md` (Ex. 1, Ex. 9), `memory-design.md` (layer 5, M11), `lab-spike.md` (E1, C3/C5), `spike-plan.md`, `README.md`, `section-map.md`.
+- `design/intelligence-layer/hld.md` (§6.2 single Jev call, §6.4 catalog, §6.5 escalation, §6.6 decision result, §6.7 calibration, §14.1 data classes, §14.2 latency), `contracts-and-scenarios.md` (Ex. 1, Ex. 9), `memory-design.md` (layer 5, M11), `lab-spike.md` (E1, C3/C5), `spike-plan.md`, `README.md`, `section-map.md`.
 - `src/sanctum_contracts/decision.py` (DecisionRequest/DecisionResult; frozen, extend only via discrepancy register if needed).
 - `src/sanctum_ref/decision.py` (current rules/standin/jev-refusal), `src/sanctum_ref/pipeline.py`, `configs/d2_standin.yaml`, `tools/fit_d2_standin.py`.
 - `src/sanctum_run/proxy.py`, `gateway.py`, `process_sut.py` (broker tool), `configs/matrix.yaml`, `src/sanctum_eval/provenance.py`.
@@ -101,7 +101,7 @@ The SUT runs out of process with no secrets. The gateway proxy gains a `system_o
 
 ### New Files
 
-- `docs/intelligence-layer/system-one-providers.md`
+- `design/intelligence-layer/system-one-providers.md`
 - `configs/system_one_providers.yaml` (typesafe-jev, laya-local, standin, local-test), `configs/calibration/<provider>@<model>.yaml`
 - `tools/measure_system_one_batches.py` (batch-size measurement, once per provider)
 - `src/sanctum_ref/providers/{__init__,interface,http_systemone,standin,llm_escalation}.py`

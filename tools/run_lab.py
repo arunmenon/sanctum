@@ -53,8 +53,8 @@ if __name__ == "__main__":
     parser.add_argument("--config", "--config-id", dest="config_id", default=None,
                         help="arm id (ref: C1-naive, C1-fair, C2); defaults to 'stub' for the stub")
     parser.add_argument("--registry", type=Path, default=None, help="owner manifests (ref only)")
-    parser.add_argument("--decision-provider", default=None, choices=["rules", "standin", "jev"],
-                        help="D2 provider for C3/C5 (default standin)")
+    parser.add_argument("--decision-provider", default=None,
+                        help="D2 provider for C3/C5 (configs/system_one_providers.yaml names, rules, standin; default: the arm's provider)")
     parser.add_argument("--world-build", type=Path, default=DEFAULT_WORLD_BUILD)
     parser.add_argument("--principal-aliases", type=Path, default=None,
                         help="alias YAML (default: configs/m0_principal_aliases.yaml for gold/m0 only)")
@@ -62,6 +62,9 @@ if __name__ == "__main__":
                         help="memory release for memory arms (default: owners/memory_seed/ACTIVE, r1); r2 adds IncidentHub")
     parser.add_argument("--release-hub", action="append", default=[], choices=["incidenthub"],
                         help="release a held-back hub for this run (default: configs/hubs.yaml held_back)")
+    parser.add_argument("--system-one-provider", default=None,
+                        help="runner-side System One provider (configs/system_one_providers.yaml)")
+    parser.add_argument("--system-one-profile", default="strict", choices=["strict", "relaxed"])
     parser.add_argument("--out", type=Path, required=True)
     arguments = parser.parse_args()
     arguments.config_id = arguments.config_id or ("C2" if arguments.sut == "ref" else "stub")
@@ -81,7 +84,8 @@ if __name__ == "__main__":
         config_id=arguments.config_id, failure_profile=arguments.failure_profile,
         world_build_dir=arguments.world_build, include_held_back=bool(arguments.release_hub),
         principal_aliases=principal_aliases_for(arguments.cases, arguments.principal_aliases),
-        entity_alignment=alignment))
+        entity_alignment=alignment, system_one_provider=arguments.system_one_provider,
+        system_one_profile=arguments.system_one_profile))
     except (MissingCannedResponse, SUTProcessError) as error:
         raise SystemExit(f"run_lab: {error}") from None
     memory_release = None

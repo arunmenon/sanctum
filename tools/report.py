@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from sanctum_eval.budget import serialized_evidence_tokens
-from sanctum_eval.degradation import deltas_vs_none, summarize_run
+from sanctum_eval.degradation import deltas_vs_none, percentile, summarize_run
 from sanctum_eval.gold import GoldCase
 from sanctum_eval.leak_scan import LeakScanner, principals_for, request_texts_for
 from sanctum_eval.load import load_gold
@@ -141,6 +141,7 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
     if not compared:
         out += ["No matrix comparison has both arms in this run set.", ""]
 
+    out += render_system_one(runs)
     if any(run.manifest["failure_profile"] != "none" for run in runs):
         out += render_degradation([run.dir for run in runs], golds)
     out += ["## Failures", ""]
@@ -154,6 +155,34 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
         out.append("")
     out += [f"> {CAVEAT}", ""]
     return "\n".join(out)
+
+
+def render_system_one(runs: list["RunView"]) -> list[str]:
+    """Model calls observed by the runner-side broker, per run (provider, profile). Reported, never a
+    gate: latency is dominated by the laptop-to-hosted network (design page, owner decision)."""
+    rows = []
+    for run in runs:
+        calls = [call for trace in _read_jsonl(run.dir / "traces.jsonl") for call in trace.get("model_calls", [])]
+        if not calls:
+            continue
+        system_one = run.manifest.get("system_one") or {}
+        latencies = [call["elapsed_ms"] for call in calls if call["outcome"] != "refused"]
+        outcomes = defaultdict(int)
+        for call in calls:
+            outcomes[call["outcome"]] += 1
+        rows.append(f"| {run.config_id} | {system_one.get('provider', calls[0]['provider'])} | "
+                    f"{', '.join(system_one.get('resolved_models') or sorted({c['model'] for c in calls if c.get('model')})) or '-'} | "
+                    f"{system_one.get('profile', calls[0]['profile'])} | {len(calls)} | "
+                    f"{', '.join(f'{k} {v}' for k, v in sorted(outcomes.items()))} | "
+                    f"{_fmt(percentile(latencies, 0.5), 1)} | {_fmt(percentile(latencies, 0.95), 1)} |")
+    if not rows:
+        return []
+    return ["## System One model calls (reported, not gated)", "",
+            "Runner-side broker observations, separate from source calls. Latency includes broker, network, "
+            "validation, batching and retries; from a laptop to a hosted endpoint it is not evidence about the "
+            "fast path.", "",
+            "| config | provider | resolved model | profile | calls | outcomes | p50 ms | p95 ms |",
+            "|---|---|---|---|---|---|---|---|", *rows, ""]
 
 
 def render_degradation(run_dirs: list[Path], golds: dict[str, GoldCase]) -> list[str]:

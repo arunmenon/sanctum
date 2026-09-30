@@ -30,6 +30,7 @@ from sanctum_hubs.tokens import TokenService
 
 from .gateway import HubGateway, TokenMode, released_hub_ids
 from .sut import SUTContext, SystemUnderTest
+from .system_one_broker import DEFAULT_PROVIDERS as DEFAULT_SYSTEM_ONE_PROVIDERS, SystemOneBroker, load_provider, load_secret
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_HUBS_CONFIG = ROOT / "configs" / "hubs.yaml"
@@ -64,6 +65,12 @@ class RunConfig:
     principal_aliases: Optional[dict[str, str]] = None
     # SUT memory entity id -> world entity ref (`alignment.load_alignment`); scoring only
     entity_alignment: Optional[dict[str, str]] = None
+    # System One (runner-side broker): provider name from configs/system_one_providers.yaml, the
+    # latency profile (strict | relaxed), and the data class of this run's data (trusted, not the SUT's)
+    system_one_provider: Optional[str] = None
+    system_one_profile: str = "strict"
+    data_class: str = "synthetic"
+    system_one_providers_path: Path = DEFAULT_SYSTEM_ONE_PROVIDERS
 
 
 @dataclass
@@ -114,6 +121,28 @@ def _failure_injector(config: RunConfig) -> FailureInjector:
                                  config.time_scale)
 
 
+def _system_one_broker(config: RunConfig, hub_ids: list[str]) -> SystemOneBroker:
+    provider, profile = load_provider(config.system_one_provider, config.system_one_profile,
+                                      config.system_one_providers_path)
+    descriptors = {hub_id: json.loads((config.world_build_dir / "hubs" / hub_id / "capabilities.json").read_text())
+                   for hub_id in hub_ids}
+    return SystemOneBroker(provider=provider, profile=profile, data_class=config.data_class,
+                           allowed_sources=list(hub_ids), descriptors=descriptors,
+                           store_dir=Path(config.out_dir) / "system_one", secret=load_secret(provider.credential_env))
+
+
+def _system_one_manifest(config: RunConfig, traces: list[dict]) -> Optional[dict]:
+    """Provider, profile, data class and the resolved model versions seen (never the credential)."""
+    if config.system_one_provider is None:
+        return None
+    calls = [call for trace in traces for call in trace.get("model_calls", [])]
+    provider, _profile = load_provider(config.system_one_provider, config.system_one_profile,
+                                       config.system_one_providers_path)
+    return {"provider": provider.name, "requested_model": provider.model, "profile": config.system_one_profile,
+            "data_class": config.data_class, "resolved_models": sorted({c["model"] for c in calls if c.get("model")}),
+            "model_calls": len(calls)}
+
+
 def _write_jsonl(path: Path, rows: list[dict]) -> None:
     path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
 
@@ -129,6 +158,8 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
     aligned_responses, aligned_receipts = [], []
     async with HubGateway(config.world_build_dir, hub_ids, token_service, _failure_injector(config),
                           config.token_mode) as gateway, AsyncExitStack() as sut_stack:
+        if config.system_one_provider is not None:
+            gateway.system_one = _system_one_broker(config, hub_ids)
         # An out-of-process SUT (`process_sut.ProcessSUT`) starts its process and gateway proxy here.
         open_sut = getattr(sut, "open", None)
         if open_sut is not None:
@@ -170,6 +201,7 @@ async def run_cases(sut: SystemUnderTest, config: RunConfig) -> RunResult:
         "metrics_revision": METRICS_REVISION,
         "hubs": hub_ids,
         "cases": [gold.case_id for gold in cases],
+        "system_one": _system_one_manifest(config, traces),
         "entity_alignment": None if config.entity_alignment is None else {
             "table": "entity_alignment.json", "aligned": len(config.entity_alignment)},
     }

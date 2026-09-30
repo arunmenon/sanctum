@@ -38,7 +38,7 @@ import anyio
 import yaml
 from mcp.shared.memory import create_connected_server_and_client_session
 
-from sanctum_eval.trace import ObservedCall, ObservedTrace
+from sanctum_eval.trace import ModelCall, ObservedCall, ObservedTrace
 from sanctum_hubs.client import call_hub_tool, tool_payload
 from sanctum_hubs.corpus import HubStore
 from sanctum_hubs.interfaces import (
@@ -91,6 +91,8 @@ class HubGateway:
         self._stores: dict[str, HubStore] = {}
         self.change_feed_path = Path(change_feed_path) if change_feed_path else None
         self._calls_by_request: dict[str, list[ObservedCall]] = {}
+        self._model_calls_by_request: dict[str, list[ModelCall]] = {}
+        self.system_one = None      # runner-side SystemOneBroker, when the run configures a provider
         self._exit_stack: Optional[AsyncExitStack] = None
         # invocation id -> (request id, caller token, principal): fixed when the handle is made
         self._invocations: dict[str, tuple[str, Optional[str], Optional[str]]] = {}
@@ -164,7 +166,12 @@ class HubGateway:
         return list(self._hub_ids)
 
     def trace(self, request_id: str) -> ObservedTrace:
-        return ObservedTrace(request_id=request_id, calls=list(self._calls_by_request.get(request_id, [])))
+        return ObservedTrace(request_id=request_id, calls=list(self._calls_by_request.get(request_id, [])),
+                             model_calls=list(self._model_calls_by_request.get(request_id, [])))
+
+    def record_model_call(self, request_id: str, call: ModelCall) -> None:
+        """A broker-made System One call, observed apart from source calls."""
+        self._model_calls_by_request.setdefault(request_id, []).append(call)
 
     def _record(self, request_id: str, hub_id: str, tool: str, outcome: str, audience_valid: bool) -> None:
         self._calls_by_request.setdefault(request_id, []).append(

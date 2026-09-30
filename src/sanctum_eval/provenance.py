@@ -59,6 +59,10 @@ def effective_configuration(*, sut: str, config_id: str, hubs: list[str], cases_
 def record_effective(run_dir: Path, effective: dict) -> dict:
     path = Path(run_dir) / "manifest.json"
     manifest = json.loads(path.read_text())
+    system_one = manifest.get("system_one")
+    # provider and resolved model versions are effective inputs (handshake point 12); counts are not
+    effective = {**effective, "system_one": None if not system_one else {
+        key: system_one.get(key) for key in ("provider", "requested_model", "resolved_models", "profile", "data_class")}}
     manifest["effective"] = effective
     path.write_text(json.dumps(manifest, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return manifest
@@ -68,7 +72,7 @@ def record_effective(run_dir: Path, effective: dict) -> dict:
 INPUTS_BY_SWITCH = {
     "memory_store": ("memory_release", "memory_release_sha256"),
     "resolution": ("memory_release", "memory_release_sha256"),
-    "decision_provider": ("decision_provider", "decision_params_sha256"),
+    "decision_provider": ("decision_provider", "decision_params_sha256", "system_one"),
 }
 
 

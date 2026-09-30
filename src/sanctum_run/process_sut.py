@@ -116,7 +116,7 @@ class ProcessSUT:
                        context: SUTContext) -> tuple[EvidenceResponse, Receipt]:
         if self._session is None or self._proxy is None:
             raise SUTProcessError("ProcessSUT is not open")
-        self._proxy.bind(request.request_id, context.caller_token, context.gateway)
+        self._proxy.bind(request.request_id, context.caller_token, context.gateway, query=request.query)
         try:
             params = types.CallToolRequestParams.model_validate({
                 "name": RETRIEVE_TOOL, "arguments": request.model_dump(mode="json"),

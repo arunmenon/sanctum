@@ -25,6 +25,7 @@ from mcp.server.lowlevel import Server
 from sanctum_hubs.interfaces import META_REQUEST_ID, ErrorCode
 
 from .gateway import DuplicateRequestBinding, GatewayHandle, HubGateway
+from .system_one_broker import DECIDE_TOOL
 
 META_CALLER_TOKEN = "lab/caller_token"
 CAPABILITIES_TOOL = "hub_capabilities"
@@ -48,6 +49,7 @@ class GatewayProxy:
         self._tool_targets = {tool.name: tuple(tool.name.split(TOOL_SEPARATOR, 1)) for tool in tools}
         # request_id -> (caller_token, handle); several requests may be in flight at once (M8)
         self._bindings: dict[str, tuple[str, GatewayHandle]] = {}
+        self._queries: dict[str, str] = {}
         self._anomalies: list[dict[str, Any]] = []
         self.server = self._build_server()
 
@@ -67,12 +69,19 @@ class GatewayProxy:
                                 inputSchema={"type": "object", "properties": {}}))
         tools.append(types.Tool(name=CHANGES_TOOL, description="The bound caller's change feed after a cursor.",
                                 inputSchema={"type": "object", "properties": {"after_seq": {"type": "integer"}}}))
+        tools.append(types.Tool(
+            name=DECIDE_TOOL, description="Ask the run's System One provider (runner-side broker).",
+            inputSchema={"type": "object", "required": ["questions"], "properties": {
+                "round": {"type": "string"},
+                "questions": {"type": "object", "additionalProperties": {"type": "object", "required": ["type"], "properties": {
+                    "type": {"enum": ["noul", "choice", "score"]}, "instructions": {"type": "string"},
+                    "criteria": {"type": ["array", "object"]}}}}}}))
         tools.append(types.Tool(name=CAPABILITIES_TOOL, description="Released hubs and their capabilities.",
                                 inputSchema={"type": "object", "properties": {}}))
         return cls(gateway, capabilities, tools)
 
     # ---- binding ------------------------------------------------------------------------------
-    def bind(self, request_id: str, caller_token: str, handle: GatewayHandle) -> None:
+    def bind(self, request_id: str, caller_token: str, handle: GatewayHandle, query: Optional[str] = None) -> None:
         """Bind one request id to one gateway invocation. The handle must be for that request id,
         and an active binding is never replaced (duplicate ids are refused, with an anomaly)."""
         if handle._GatewayHandle__request_id != request_id:
@@ -82,12 +91,14 @@ class GatewayProxy:
             self._anomalies.append({"request_id": request_id, "kind": "duplicate_request_binding"})
             raise DuplicateRequestBinding(f"request {request_id!r} is already bound")
         self._bindings[request_id] = (caller_token, handle)
+        self._queries[request_id] = query or ""     # the trusted request text, for the System One broker
 
     def unbind(self, request_id: str, handle: Optional[GatewayHandle] = None) -> None:
         """Drop this request's binding only if it is still the given handle's (invocation-specific)."""
         binding = self._bindings.get(request_id)
         if binding is not None and (handle is None or binding[1] is handle):
             del self._bindings[request_id]
+            self._queries.pop(request_id, None)
 
     def anomalies(self) -> list[dict[str, Any]]:
         return [dict(entry) for entry in self._anomalies]
@@ -124,6 +135,15 @@ class GatewayProxy:
             if events is None:
                 return {"error": {"code": "auth_unavailable_or_denied", "message": "caller not verified"}}
             return {"events": events}
+        if name == DECIDE_TOOL:
+            broker = self._gateway.system_one
+            if not bound:
+                self._anomalies.append({"request_id": request_id if binding is not None else None,
+                                        "kind": "proxy_call_outside_binding", "hub": "system_one", "tool": "decide"})
+                return _denied_body()
+            if broker is None:
+                return {"error": {"code": "decision_layer_unavailable", "message": "no System One provider in this run"}}
+            return await broker.decide(self._gateway, request_id, self._queries.get(request_id, ""), arguments)
         target = self._tool_targets.get(name)
         if target is None:
             return {"error": {"code": ErrorCode.INVALID_ARGUMENT.value, "message": "invalid argument: unknown tool"}}

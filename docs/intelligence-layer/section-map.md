@@ -29,3 +29,5 @@ All 23 numbered sections have one owner. Numbering is retained for compatibility
 | 20 | Anticipated questions | [Sanctum intelligence layer — architectural proposal](hld.md#section-20) |
 | 21 | Decisions needed from the group | [Sanctum intelligence layer — architectural proposal](hld.md#section-21) |
 | 22 | What changed in v5.1 | [Sanctum review history and restructuring record](review-history.md#section-22) |
+
+Pages without an original section: [System One providers and the Jev handshake](system-one-providers.md) expands §6.2, §6.5 and §14.1 for experiment E1; it does not own a numbered section.

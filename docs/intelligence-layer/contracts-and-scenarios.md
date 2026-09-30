@@ -395,6 +395,8 @@ flowchart TB
 
 **Takeaway.** Every failure has a defined, visible behavior. Graph failure does not turn into "call every backend," which would amplify an outage. A timeout is never reported as "the source had nothing."
 
+For the decision-layer failure, a System One timeout, error, invalid output or data-class refusal each yields `unavailable`, the safe default (keep the source) and `decision_layer_unavailable`; see [System One providers and the Jev handshake](system-one-providers.md).
+
 ---
 
 <a id="example-10"></a>

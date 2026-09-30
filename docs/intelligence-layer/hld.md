@@ -288,6 +288,8 @@ flowchart LR
     class J judge
 ```
 
+The wire protocol, question mapping and handshake rules for this call (auth, model pinning, batching, deadlines, validation, calibration binding, data classes, receipts) are specified in [System One providers and the Jev handshake](system-one-providers.md). One live call (measured once): 2 questions, 531 ms, `jev-latest` resolved to `jev-1.13.0`.
+
 <a id="section-6-3"></a>
 
 ### 6.3 Decisions run in rounds
@@ -348,6 +350,7 @@ flowchart TB
 - "Use" bands are set per decision and per error cost, fitted on one data split and tested on another.
 - A random sample of confident Tier 1 answers is audited to catch confident mistakes.
 - The escalation budget is both a call cap and a time cap tied to the request deadline.
+- Tier 1 is a provider strategy (hosted Jev, open models, or the local stand-in) behind one interface; which provider may see which state, and what it can never remove, is in [System One providers and the Jev handshake](system-one-providers.md).
 
 <a id="section-6-6"></a>
 

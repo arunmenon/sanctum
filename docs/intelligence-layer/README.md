@@ -19,6 +19,7 @@ Sanctum would first establish what the caller may access, then choose useful sou
 | [Architectural proposal](hld.md) | What is proposed, how a request flows, what the boundaries and tradeoffs are | Working group, architects, technical stakeholders |
 | [Memory and meta-taxonomy](memory-design.md) | How identities, locations, procedures, ownership and releases work | Memory, source integration and governance reviewers |
 | [Contracts and worked scenarios](contracts-and-scenarios.md) | Exact response expectations and normal, ambiguous, conflicting and failed cases | Implementers, adapter owners and evaluators |
+| [System One providers and the Jev handshake](system-one-providers.md) | How decisions reach a System One model: provider interface, `/v1/systemone` protocol, broker isolation, calibration and conformance | Decision-layer, provider and security reviewers |
 | [Hypothesis-validation spike](lab-spike.md) | What the lab investigates, how comparisons work, and what results can establish | Research and evaluation contributors |
 | [Execution and follow-on decisions](spike-plan.md) | Spike sequence, evidence gates, current artifact pointers and adoption prerequisites | Contributors and delivery stakeholders |
 | [Review history](review-history.md) | Prior findings, editorial changes and their traceability | Reviewers needing the history |

@@ -111,7 +111,7 @@ A rung is kept only if it beats the rung below it on the same traffic.
 |---|---|---|---|
 | E0b | H0: is a unified layer better than direct hubs? | Agent-level: agent with direct hub access vs. agent using Sanctum (C0 vs. C2/C4, [§17.2](lab-spike.md#section-17-2)) | Proceed only if evidence per token and answer quality improve |
 | E0 | Is the harness trustworthy? | None; run [§10](contracts-and-scenarios.md#section-10) examples as fixtures | Every fixture has an explicit, deterministic outcome |
-| E1 | H1: does Jev route better? | Replace D2 scoring only | Adopt if non-inferior on evidence and better on cost/latency |
+| E1 | H1: does Jev route better? | Replace D2 scoring only | Adopt if non-inferior on evidence and better on cost/latency (latency is measured per profile, not a gate in the spike; see [System One providers](system-one-providers.md)) |
 | E2 | H2: do observation priors help? | Toggle observation-derived priors; vocabulary, rules, queries and source snapshots fixed | Non-inferior on evidence within an owner-agreed margin plus a predeclared benefit; intervals reported; small samples are inconclusive |
 | E2b | Storage | Same queries on tables+cache vs. graph DB | Pick on latency, rebuild cost, access enforcement |
 | E3 | H3: ranking / dedup / conflicts | One at a time | Adopt per component |

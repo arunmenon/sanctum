@@ -441,6 +441,8 @@ flowchart TB
 | 7. Clean | Exact copies, version applicability | Keep evidence | Keep evidence | Flag, do not hide |
 | 8. Record | Release manifest | Never fabricate lineage | – | Mark incomplete receipts; rollback annotates, never rewrites |
 
+Step 5 is answered by a System One provider through a runner-side broker; the descriptor snapshot sent is the pinned, scope-filtered set, and calibration is bound to the descriptor set and memory release. See [System One providers and the Jev handshake](system-one-providers.md).
+
 **The four indirect paths to authority.** Memory never grants credentials, but it could still act like authority through:
 
 1. **Identity → membership → ownership:** a wrong identity applies the wrong owner. Guarded by reviewed `DENOTES` and `MEMBER_OF` ([§8.7](memory-design.md#section-8-7)).
@@ -586,7 +588,7 @@ flowchart LR
     class A policy
 ```
 
-**Jev's role (M11).** Jev can **prioritize** mapping proposals for review. It cannot establish identity. Mapping labels are *same entity*, *different entity*, *related or composite*, and *insufficient evidence* (abstain). Shared owners and similar names are clues, not proof. D2 calibration is never reused for mapping. No score is an acceptance cutoff in v0; every operational identity is reviewed.
+**Jev's role (M11).** Jev can **prioritize** mapping proposals for review. It cannot establish identity. Mapping labels are *same entity*, *different entity*, *related or composite*, and *insufficient evidence* (abstain). Shared owners and similar names are clues, not proof. D2 calibration is never reused for mapping. No score is an acceptance cutoff in v0; every operational identity is reviewed. Proposal ranking as a protocol question is future design in [System One providers and the Jev handshake](system-one-providers.md).
 
 **Keeping evaluation honest (M13).** A frozen set can still be overfit by repeated tuning against it.
 

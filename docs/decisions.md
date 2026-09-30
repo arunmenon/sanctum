@@ -11,6 +11,7 @@
 | D-KESTREL | Use harvested Kestrel questions to shape families | Yes, at M1 | Question families |
 | D-REF | Is sanctum-ref disposable or production seed? | Disposable reference | Code standards |
 | D-EXT | External model use and spend | None before M6 | M6 |
+| D-JEV | May hosted Jev see lab state? | Yes, synthetic lab data only; real data waits on data-class and egress approval (HLD Q6/Q13). Latency is measured per profile and is not a gate in the spike. See [System One providers](intelligence-layer/system-one-providers.md) | E1 (C3/C5 with Jev) |
 
 ## Working assumptions (adopted 2026-09-29 to unblock M1)
 

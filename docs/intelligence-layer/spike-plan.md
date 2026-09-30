@@ -20,7 +20,7 @@ The older [scaffold plan](../design/sanctum-lab-plan.md) still says no code exis
 | Synthetic world and hubs | Render independently auditable evidence; implement honest retrieval, ACLs, versions and observed calls | Reproducible corpus, source-backed gold, hub conformance and isolation evidence | To be assigned |
 | Rules baseline | Run C1-fair and C2 with the same assembly, budgets and ranker | Per-question evidence, omission and status checks; repeatable paired runs | To be assigned |
 | Memory hypothesis | Add C4 and the equivalent-table and label-only controls | Memory fixtures; equivalent semantics check; hybrid DocHub before H5 conclusions | To be assigned |
-| Decision-provider hypothesis | Compare C3/C5 against matching rules baselines | Named provider, calibration, bounded failures, latency and cost measurements | To be assigned |
+| Decision-provider hypothesis | Compare C3/C5 against matching rules baselines ([System One providers and the Jev handshake](system-one-providers.md)) | Named provider, calibration bound to the resolved model version, bounded failures, harmful omissions, latency per profile and cost; M6 overclaim blockers fixed; fresh acceptance set | To be assigned |
 | Broader experiments | Agent-level H0, onboarding, release changes, improvement proposals | Independent acceptance evidence for each claim; safe failure and rollback behavior | To be assigned |
 | Spike conclusion | Summarize supported, rejected and unresolved hypotheses | Reproducible reports, limitations and recommendations back to the HLD | To be assigned |
 

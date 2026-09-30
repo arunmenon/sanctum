@@ -227,7 +227,7 @@ def test_report_section_counts_model_calls(tmp_path):
         "provider": "local-test", "resolved_models": ["test-model-1.2"], "profile": "strict"}})
     text = "\n".join(render_system_one([view]))
     assert "## System One model calls (reported, not gated)" in text
-    assert "| C3 | local-test | test-model-1.2 | strict | 3 | ok 2, timeout 1 | 60.0 | 150.0 |" in text
+    assert "| C3 | D2 | local-test | test-model-1.2 | strict | 3 | ok 2, timeout 1 | 60.0 | 150.0 |" in text
     assert render_system_one([SimpleNamespace(dir=tmp_path, config_id="C2", manifest={})]) == []
 
 

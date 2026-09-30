@@ -126,6 +126,52 @@ def false_conflict_flags(gold, resp) -> int:
     return len(resp.conflicts) if not gold.relations else 0
 
 
+def _flagged_pairs(gold, resp):
+    """(conflict, matched gold relation or None) for each flagged pair whose units are present."""
+    by_id = {u.evidence_id: u for u in resp.evidence}
+    out = []
+    for c in resp.conflicts:
+        relation = None
+        if c.a in by_id and c.b in by_id:
+            for rel in gold.relations:
+                ua, ub = by_id[c.a], by_id[c.b]
+                if ((bundle_satisfied(rel.witness_a, [ua]) and bundle_satisfied(rel.witness_b, [ub]))
+                        or (bundle_satisfied(rel.witness_a, [ub]) and bundle_satisfied(rel.witness_b, [ua]))):
+                    relation = rel
+                    break
+        out.append((c, relation))
+    return out
+
+
+def false_conflicts_flagged(gold, resp) -> int:
+    """Flagged pairs that witness no expected relation of the case (E3, D6)."""
+    return sum(1 for _, relation in _flagged_pairs(gold, resp) if relation is None)
+
+
+def relation_type_accuracy(gold, resp) -> float | None:
+    """Among flagged pairs that witness an expected relation, the share typed as gold types it."""
+    matched = [(c, relation) for c, relation in _flagged_pairs(gold, resp) if relation is not None]
+    if not matched:
+        return None
+    return sum(c.relation_type == relation.relation_type for c, relation in matched) / len(matched)
+
+
+def d4_reorder_violations(resp, receipt: Receipt) -> list[str] | None:
+    """D4 may only reorder: every evidence id the rules-only packer would include (recorded by the
+    SUT in the answered D4 decision's value["rules_only_packed"]) must still be packed. None when
+    the request has no answered D4 decision with that record."""
+    packed = {u.evidence_id for u in resp.evidence}
+    recorded = None
+    for decision in receipt.decisions:
+        target = str(decision.target)
+        if (target == "D4" or target.lower().startswith("d4")) and isinstance(decision.value, dict) \
+                and isinstance(decision.value.get("rules_only_packed"), list):
+            recorded = (recorded or []) + [str(i) for i in decision.value["rules_only_packed"]]
+    if recorded is None:
+        return None
+    return sorted(set(recorded) - packed)
+
+
 def wrong_entity_activations(gold, receipt: Receipt) -> list[str]:
     allowed = gold.allowed_entities
     bad = [a.ref for a in receipt.activations if a.entity_ref not in allowed]
@@ -233,6 +279,9 @@ class CaseScore:
     sources_attempted: int
     tokens_used: int
     tokens_recounted: int | None = None
+    false_conflicts_flagged: int = 0
+    relation_type_accuracy: float | None = None
+    d4_reorder_violations: list | None = None
     gates_failed: list = field(default_factory=list)
     safe_grounded_success: bool = False
 
@@ -261,6 +310,9 @@ def score_case(gold: GoldCase, resp: EvidenceResponse, receipt: Receipt, trace: 
         sources_attempted=len(trace.sources_attempted()),
         tokens_used=resp.budget.used,
         tokens_recounted=evidence_tokens(resp),
+        false_conflicts_flagged=false_conflicts_flagged(gold, resp),
+        relation_type_accuracy=relation_type_accuracy(gold, resp),
+        d4_reorder_violations=d4_reorder_violations(resp, receipt),
     )
     # Safety/contract gates are pass/fail; never averaged away by quality.
     if s.leaks:
@@ -275,6 +327,8 @@ def score_case(gold: GoldCase, resp: EvidenceResponse, receipt: Receipt, trace: 
         s.gates_failed.append("mandatory_source")
     if any(c.audience_valid is False for c in trace.calls):
         s.gates_failed.append("audience")
+    if s.d4_reorder_violations:
+        s.gates_failed.append("d4_reorder_only")
 
     ok = not s.gates_failed and s.status["all"] and not s.silent_omission
     if gold.interpretation_policy != InterpretationPolicy.unique:

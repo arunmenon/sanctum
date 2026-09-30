@@ -24,7 +24,7 @@ PAIRED_METRICS = ("safe_grounded_success", "recall", "sources_attempted", "wrong
 # Hard gates, pass/fail per run, never averaged. Scope: no gateway anomaly (out-of-scope or
 # unauthorised call) and no token audience failure. Budget: the evaluator's own cl100k recount of
 # every response's serialized evidence is within the request's budget_tokens.
-GATES = ("leakage", "scope", "wrong_entity", "budget")
+GATES = ("leakage", "scope", "wrong_entity", "budget", "d4_reorder_only")
 
 
 def _read_jsonl(path: Path) -> list[dict]:
@@ -57,6 +57,7 @@ class RunView:
             "scope": not self.anomalies and not any("audience" in s["gates_failed"] for s in self.scores.values()),
             "wrong_entity": not any(s["wrong_entity"] for s in self.scores.values()),
             "budget": not self.over_budget and not any("budget" in s["gates_failed"] for s in self.scores.values()),
+            "d4_reorder_only": not any("d4_reorder_only" in s["gates_failed"] for s in self.scores.values()),
         }
 
 
@@ -142,6 +143,7 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
         out += ["No matrix comparison has both arms in this run set.", ""]
 
     out += render_system_one(runs)
+    out += render_conflicts(runs)
     if any(run.manifest["failure_profile"] != "none" for run in runs):
         out += render_degradation([run.dir for run in runs], golds)
     out += ["## Failures", ""]
@@ -157,32 +159,59 @@ def render(runs: list[RunView], golds: dict[str, GoldCase], report_dir: Path,
     return "\n".join(out)
 
 
+def _decision_of(call: dict) -> str:
+    """D2, D4 or D6 from the question ids of a model call ("d6:<pair>" -> D6)."""
+    prefixes = {str(qid).split(":", 1)[0].upper() for qid in call.get("questions", []) if ":" in str(qid)}
+    return "/".join(sorted(prefixes)) or str(call.get("round", "-")).upper()
+
+
 def render_system_one(runs: list["RunView"]) -> list[str]:
-    """Model calls observed by the runner-side broker, per run (provider, profile). Reported, never a
-    gate: latency is dominated by the laptop-to-hosted network (design page, owner decision)."""
+    """Model calls observed by the runner-side broker, per run and decision (D2, D4, D6). Reported,
+    never a gate: latency is dominated by the laptop-to-hosted network (design page, owner decision)."""
     rows = []
     for run in runs:
         calls = [call for trace in _read_jsonl(run.dir / "traces.jsonl") for call in trace.get("model_calls", [])]
-        if not calls:
-            continue
         system_one = run.manifest.get("system_one") or {}
-        latencies = [call["elapsed_ms"] for call in calls if call.get("calls")]    # calls that reached the provider
-        outcomes = defaultdict(int)
+        by_decision: dict[str, list[dict]] = defaultdict(list)
         for call in calls:
-            outcomes[call.get("reason") or call["outcome"]] += 1
-        rows.append(f"| {run.config_id} | {system_one.get('provider', calls[0]['provider'])} | "
-                    f"{', '.join(system_one.get('resolved_models') or sorted({c['model'] for c in calls if c.get('model')})) or '-'} | "
-                    f"{system_one.get('profile', calls[0]['profile'])} | {len(calls)} | "
-                    f"{', '.join(f'{k} {v}' for k, v in sorted(outcomes.items()))} | "
-                    f"{_fmt(percentile(latencies, 0.5), 1)} | {_fmt(percentile(latencies, 0.95), 1)} |")
+            by_decision[_decision_of(call)].append(call)
+        for decision, group in sorted(by_decision.items()):
+            latencies = [call["elapsed_ms"] for call in group if call.get("calls")]   # reached the provider
+            outcomes = defaultdict(int)
+            for call in group:
+                outcomes[call.get("reason") or call["outcome"]] += 1
+            models = system_one.get("resolved_models") or sorted({c["model"] for c in group if c.get("model")})
+            rows.append(f"| {run.config_id} | {decision} | {system_one.get('provider', group[0]['provider'])} | "
+                        f"{', '.join(models) or '-'} | {system_one.get('profile', group[0]['profile'])} | {len(group)} | "
+                        f"{', '.join(f'{k} {v}' for k, v in sorted(outcomes.items()))} | "
+                        f"{_fmt(percentile(latencies, 0.5), 1)} | {_fmt(percentile(latencies, 0.95), 1)} |")
     if not rows:
         return []
     return ["## System One model calls (reported, not gated)", "",
             "Runner-side broker observations, separate from source calls. Latency includes broker, network, "
             "validation, batching and retries; from a laptop to a hosted endpoint it is not evidence about the "
             "fast path.", "",
-            "| config | provider | resolved model | profile | tool calls | outcomes | p50 ms | p95 ms |",
-            "|---|---|---|---|---|---|---|---|", *rows, ""]
+            "| config | decision | provider | resolved model | profile | tool calls | outcomes | p50 ms | p95 ms |",
+            "|---|---|---|---|---|---|---|---|---|", *rows, ""]
+
+
+def render_conflicts(runs: list["RunView"]) -> list[str]:
+    """E3 D6 metrics per run: expected conflicts flagged (conflict witnesses kept), false conflicts
+    flagged, relation type accuracy; D4 reorder-only violations are a gate."""
+    rows = []
+    for run in runs:
+        scores = list(run.scores.values())
+        if not any(s.get("false_conflicts_flagged") or s.get("relation_type_accuracy") is not None for s in scores):
+            continue
+        witnesses = [s["conflict_witnesses"] for s in scores if s.get("conflict_witnesses") is not None]
+        accuracy = [s["relation_type_accuracy"] for s in scores if s.get("relation_type_accuracy") is not None]
+        rows.append(f"| {run.config_id} | {_fmt(sum(witnesses) / len(witnesses) if witnesses else None)} | "
+                    f"{sum(s.get('false_conflicts_flagged', 0) for s in scores)} | "
+                    f"{_fmt(sum(accuracy) / len(accuracy) if accuracy else None)} |")
+    if not rows:
+        return []
+    return ["## Conflicts (E3)", "", "| config | expected conflicts flagged | false conflicts flagged | "
+            "relation type accuracy |", "|---|---|---|---|", *rows, ""]
 
 
 def render_degradation(run_dirs: list[Path], golds: dict[str, GoldCase]) -> list[str]:

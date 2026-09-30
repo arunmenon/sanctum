@@ -28,7 +28,7 @@ providers:
       max_options: 20
       max_state_chars: 6000              # the runtime is reported to truncate silently; refuse above this
       batching: true
-      reports_usage: false
+      reports_usage: true               # verified with local laya 0.3.22
       hosted: false
       data_classes_allowed: [synthetic]
       conformance: experimental

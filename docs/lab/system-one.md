@@ -23,3 +23,5 @@ Credential variables are resolved at the broker boundary. `.env`, provider keys 
 Verification tests: [test_system_one_providers.py](../../tests/test_system_one_providers.py), [test_system_one_broker.py](../../tests/test_system_one_broker.py), [test_agent_runtime.py](../../tests/test_agent_runtime.py).
 
 Next: [agent harness](agent-harness.md), [scoring](scoring.md).
+
+The separate `jev_unconstrained` experimental switch lets raw Jev usefulness decisions select among all four hubs, including selecting none, without forced-source or nonempty fallbacks. See the [follow-on experiment](../experiments/pdlc-jev-active-plan.md#follow-on-jev-owns-candidate-selection); the earlier shadow and calibrated modes retain their behavior.

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -142,7 +142,10 @@ class Retriever:
             return self._fail_closed(request, receipt_id, "caller")
         releases = {release for manifest in self.registry.manifests.values() for release in manifest.versions.releases}
         intent = analyze(request.query, self.registry.domains, releases, verify=request.mode.value == "verify")
-        plans = plan_sources(request, self.arm, self.registry, intent, capabilities, set(groups))
+        selection_arm = (replace(self.arm, routing="fanout_all", procedures=False)
+                         if self.arm.routing == "jev_unconstrained" else self.arm)
+        plans = plan_sources(request, selection_arm, self.registry, intent, capabilities, set(groups))
+        eligible = {p.hub_id: p for p in plans if p.call}
 
         # memory: pin one release for the whole request (HLD §9.6); failure degrades, never widens
         release_id, degraded, resolution, activations, memory_reasons = MEMORY_RELEASE, [], None, [], []
@@ -164,6 +167,15 @@ class Retriever:
             except MemoryUnavailable:
                 degraded = ["memory_unavailable"]
                 resolution = None
+
+        if self.arm.routing == "jev_unconstrained":
+            # Memory may translate queries, but cannot force or exclude a hub in this experiment.
+            plans = [p for p in plans if p.hub_id in eligible]
+            present = {p.hub_id for p in plans}
+            plans.extend(p for hub, p in eligible.items() if hub not in present)
+            for plan in plans:
+                plan.call, plan.required, plan.status = True, False, "called"
+                plan.reasons = ["routing_selected"]
 
         decisions = []
         if self.arm.decision_provider == "named":
@@ -332,13 +344,29 @@ class Retriever:
         optional = sorted({plan.hub_id for plan in plans if plan.call and not plan.required}
                           - {plan.hub_id for plan in plans if plan.required})
         if self.provider is None:
+            if self.arm.routing == "jev_unconstrained":
+                for plan in plans:
+                    plan.call, plan.status, plan.reasons = False, "skipped", ["decision_layer_unavailable"]
             return [], ["decision_layer_unavailable"]
         requests = [d2_request(hub_id, request.query, self.arm.deadline_ms) for hub_id in optional]
         try:
-            answered = await self.provider.decide_batch(requests, port, self.arm.deadline_ms) if requests else []
+            if self.arm.routing == "jev_unconstrained":
+                answered = await self.provider.decide_batch(requests, port, self.arm.deadline_ms,
+                                                           raw_selection=True) if requests else []
+            else:
+                answered = await self.provider.decide_batch(requests, port, self.arm.deadline_ms) if requests else []
         except Exception:                      # a provider failure is never a routing decision
             answered = [unavailable(self.provider.name, time.monotonic()) for _ in requests]
         results = dict(zip(optional, answered))
+        if self.arm.routing == "jev_unconstrained":
+            # No must-consult override, uncertain-preserve band, or nonempty fallback.
+            for plan in plans:
+                result = results.get(plan.hub_id)
+                plan.call = bool(result and result.status.value == "answered" and result.value["call"])
+                plan.status = "called" if plan.call else "skipped"
+                plan.reasons = ["routing_selected" if plan.call else "not_selected"]
+            failed = len(results) != len(optional) or any(r.status.value != "answered" for r in results.values())
+            return list(results.values()), ["decision_layer_unavailable"] if failed else []
         if any(result.status.value != "answered" for result in results.values()):
             return list(results.values()), ["decision_layer_unavailable"]
         skip = {hub_id for hub_id, result in results.items() if not result.value["call"]}

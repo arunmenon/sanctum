@@ -13,7 +13,7 @@ from typing import Any
 import yaml
 
 IMPLEMENTED = {
-    "routing": {"fanout_all", "rules"},
+    "routing": {"fanout_all", "rules", "jev_unconstrained"},
     "assembly": {"concatenate", "common"},
     "resolution": {"none", "denotes", "label_only"},
     "translation": {False, True},

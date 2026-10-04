@@ -173,7 +173,7 @@ class SystemOneHttpAdapter:
             return None
 
     async def decide_batch(self, requests: list[DecisionRequest], port: Any,
-                           deadline_ms: int) -> list[DecisionResult]:
+                           deadline_ms: int, *, raw_selection: bool = False) -> list[DecisionResult]:
         started = time.monotonic()
         if not requests:
             return []
@@ -202,7 +202,11 @@ class SystemOneHttpAdapter:
             value = {"source": source_id, "p_raw": round(p_raw, 4), "call": True, "shadow": shadow,
                      "request_hash": digest, "usage": outcome.usage, "calls": outcome.calls,
                      "template": template.id}
-            if shadow:
+            if raw_selection:
+                # Experimental binary decision: choose the more likely raw label, with no calibration gate.
+                value.update(call=p_raw >= 0.5, shadow=False, selection_policy="raw_argmax")
+                disposition = "use"
+            elif shadow:
                 disposition = "preserve_candidate"
             else:
                 p = calibration.apply(p_raw)
@@ -216,7 +220,7 @@ class SystemOneHttpAdapter:
             results.append(DecisionResult(
                 status="answered", value=value, target=TARGET,
                 distribution={"useful": round(p_raw, 4), "not_useful": round(1 - p_raw, 4)},
-                calibration=None if shadow else {"method": "platt_on_logit", "binding": f"{self.name}@{outcome.model}"},
+                calibration=None if shadow or raw_selection else {"method": "platt_on_logit", "binding": f"{self.name}@{outcome.model}"},
                 disposition=disposition, provider=self.name, model_version=outcome.model,
                 policy_version=POLICY_VERSION, latency_ms=outcome.latency_ms, cost=0))
         return results

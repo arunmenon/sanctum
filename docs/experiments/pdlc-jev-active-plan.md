@@ -36,3 +36,24 @@ Accordingly, distinguish activation readiness from pruning proof: a calibrated n
 Local outputs: `build/pdlc-jev-active/`, `build/agent-bundles/pdlc-sonnet-55-jev-active-01/`, `build/agent-runs/sonnet55-jev-active-01/`. These remain ignored; commands and source are versioned.
 
 Verification: 54 calibration/runtime/provider/schedule/quality checks passed, two live-provider tests skipped; one additional ablation test passed to distinguish applied from guarded skip recommendations. Source code compiles and staged whitespace checks pass.
+
+## Follow-on: Jev owns candidate selection
+
+User authorized this experiment on 4 October 2026 after the calibrated trial completed. That trial scored all 90 answers: +3.04 percentage points overall against historical shadow mode, descriptive interval -1.13 to +7.41 points. Its 134 active D2 decisions proposed three skips, all overridden by the nonempty-source guard; hub calls were 881 versus 852. This did not demonstrate source-selection benefit.
+
+The new `jev_unconstrained` routing switch offers all four accessible, version-readable synthetic hubs to Jev on every retrieval. Authority-based shortlisting is bypassed. Memory remains loaded for resolution and query translation, but cannot force or exclude a hub. Jev's raw binary usefulness label controls selection (`p_raw >= 0.5` selects, below skips); this is argmax of the model's two labels, not a fitted safety threshold. No calibrated skip band, uncertain-preserve band, must-consult override, or nonempty-source fallback applies. Zero selected hubs returns no evidence. Missing model answers are recorded as unavailable and do not trigger a rules fallback.
+
+This is an experimental arm, not a change to existing C5 bundles or an HLD conformance claim. All source credentials, caller authorization, protocol validation, factual provenance, and answer scoring retain their existing meaning. Agent limits stay at eight rounds, 32 tool calls, 8,000 cumulative evidence tokens and 120 seconds. The former two-call broker limit is expanded to 32 calls and 500,000 input tokens per attempt so it does not bind normal agent retrieval iterations. These finite execution limits are reported explicitly; they do not override any source-selection decision. Maximum reserved nested Jev spend is $1.89 for 90 attempts; Claude uses the already-authorized Max subscription.
+
+New bundle: `build/agent-bundles/pdlc-sonnet-55-jev-unconstrained-01/experiment.yaml`. New output: `build/agent-runs/sonnet55-jev-unconstrained-01/`. Compare with the completed calibrated/guarded cohort using the same questions, gold, corpus, Claude model, memory and evidence limits. This changes candidate policy, raw decision policy, override behavior and broker capacity together; it tests the requested complete Jev selection mode, not any one switch causally. Historical timing remains a confound, and human/gold acceptance remains pending.
+
+- [x] Implement separate selection mode and raw adapter decisions.
+- [x] Unit checks cover empty, single, multiple and all-hub selections, and missing calibration.
+- [x] Live MCP proof: all four hubs evaluated; CodeHub selected; three other hubs actually skipped (`build/pdlc-jev-unconstrained/activation-proof-02/proof.json`).
+- [x] Complete affected regression checks: 103 passed, 2 live-test skips.
+- [x] Dispatch the 90-attempt campaign with automatic scoring afterward; completion remains pending. Native worker and comparison worker are running.
+- [ ] Score all saved answers and publish the comparison, including actual applied skips, missing decisions and zero-source requests.
+
+The first live probe exposed unsupported receipt reason labels and returned infrastructure failures. Existing reason codes replaced those labels; its raw traces remain in `activation-proof-01`. The successful second probe is not a selective agent rerun: no Claude attempts were dispatched by either probe.
+
+A separate live out-of-scope probe asked for a weather forecast: Jev rejected all four hubs, the backend made zero hub calls, and no fallback occurred (`build/pdlc-jev-unconstrained/empty-selection-proof/`).

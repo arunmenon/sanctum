@@ -101,3 +101,5 @@ Quality evaluation resumed in `quality-evaluation-05`, preserving the 17 complet
 Evaluation-05 stopped at 35 scores on a missing top-level model label; native usage verified Sonnet 5.5. Evaluation-06 resumes all 35 scores with the same one-retry schema limit, now covering this error. Original outputs retained; 39 focused checks pass.
 
 Evaluation-06 reached 131 scores, then a judge used `claim_reviews` instead of required `claims` on both initial and single retry replies. Evaluation-07 preserves the unscored review failure and continues remaining judgments; missing quality is unknown, not zero. A report with missing grades must remain incomplete/exploratory. Documentation delivery is tracked in [the lab documentation plan](../lab-documentation-plan.md).
+
+Quality-driver processing finished: 179 scored (175 semantic + four protocol failures), one preserved unknown judge failure, no score-binding issues. Full primary comparison remains incomplete. See [exploratory quality results](pilot-0-quality-results.md); independent gold and human acceptance are still pending.

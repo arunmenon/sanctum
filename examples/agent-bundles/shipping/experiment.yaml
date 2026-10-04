@@ -1,0 +1,45 @@
+schema_version: 1
+experiment_id: shipping-independence-fixture
+mode: evidence_only
+corpus:
+  manifest: corpus/manifest.json
+  expected_sha256: 607af772b19a68c199bbd8cd6cd14f1de0a6f059c25154fe44c23322bdbe5867
+caller:
+  principal: shipping-reader
+  principal_file: connections/principals.json
+  expected_sha256: e4466649c3c8949e57e9cd71a9ea8e8b66ebfe39bdea3cb04bfe297380c5cc81
+tasks: public/tasks.jsonl
+gold: private/gold.jsonl
+instructions: public/instructions.txt
+agent:
+  adapter: claude_code
+  model: null
+  effort: null
+workspace:
+  kind: empty
+arms:
+  direct:
+    tool_surface: direct_hubs
+limits:
+  agent_rounds: 8
+  cumulative_evidence_tokens: 8000
+  tool_response_evidence_tokens: 4000
+  task_deadline_seconds: 120
+  total_inference_spend_usd: 0
+execution:
+  repetitions: 1
+  random_seed: 42
+  fresh_session_per_attempt: true
+diversity:
+  family_counts:
+    behavior: 1
+  scope_counts:
+    in_scope: 1
+  required_domains:
+  - shipping
+  required_sources:
+  - codehub
+  reject_duplicate_fact_sets: true
+readiness:
+  paid_budget_approved: false
+  frozen: false

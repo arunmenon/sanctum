@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "total_artifacts": 1,
+  "files": {
+    "hubs/codehub/artifacts.jsonl": "f98a7c3a8a004d1edbcb68c5d7aacba5d37accdceb277fe3a29afbcec4dff299",
+    "hubs/codehub/capabilities.json": "cc3af425893af388ab0d075d2b45acdfa148f7f4930c46617774764aabae629f"
+  },
+  "status": "fixture"
+}

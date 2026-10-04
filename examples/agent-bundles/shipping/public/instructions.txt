@@ -1,0 +1,1 @@
+Use authorized MCP evidence; return the evidence_answer_v1 JSON envelope. State supported facts, uncertainty and unmet requirements.

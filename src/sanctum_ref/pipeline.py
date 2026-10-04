@@ -25,7 +25,7 @@ from sanctum_contracts import (
     CONTRACT_REVISION, Budget, DecisionResult, EvidenceResponse, EvidenceStatus, Interpretation, Receipt,
     RetrieveRequest, SourceOutcome,
 )
-from sanctum_contracts.receipt import QueryPlan, SelfReportedCall
+from sanctum_contracts.receipt import Activation, QueryPlan, SelfReportedCall
 
 from .adapters import Candidate, HubPort, evidence_unit, fetch_arguments, search_arguments
 from .assembly import finish, prepare
@@ -34,7 +34,7 @@ from .intent import analyze
 from .registry import Registry, RegistryUnavailable
 from .providers import POLICY_VERSION, d2_request, unavailable
 from .providers.http_systemone import decide_items
-from .memory import LabelTable, MemoryUnavailable, build_store, load_release
+from .memory import LabelTable, MemoryUnavailable, authority_for, build_store, load_release
 from .resolution import resolve, resolve_label_only
 from .routing import SourcePlan, apply_memory, plan_sources
 from .text import stem, words
@@ -147,6 +147,7 @@ class Retriever:
         # memory: pin one release for the whole request (HLD §9.6); failure degrades, never widens
         release_id, degraded, resolution, activations, memory_reasons = MEMORY_RELEASE, [], None, [], []
         pinned_at_ms = None
+        store = None
         if self.arm.uses_memory:
             try:
                 invalidated = await self.memory.consume_changes(port, getattr(port, "reader", None))
@@ -173,6 +174,36 @@ class Retriever:
         self._fetch_gaps: set[str] = set()
         candidates = await self._ask(request, plans, port, clock, deadline, intent.fact_kinds, outcomes,
                                      capabilities)
+        if self.arm.uses_memory and (store is None or release.artifact_subject_bindings_required):
+            for candidate in candidates:
+                candidate.accepted_subjects = frozenset()
+                candidate.unit = candidate.unit.model_copy(update={'authority_assertion_ref':None})
+                if store is None:
+                    continue
+                # _ask emits only successfully fetched, caller-authorized artifacts.
+                # Re-check their exact bytes/version against the pinned graph; a
+                # harvest snapshot alone is never permission to disclose a binding.
+                bindings = store.subjects_for(
+                    candidate.source_id, candidate.artifact['artifact_id'],
+                    candidate.unit.source_version or '',
+                    hashlib.sha256(candidate.text.encode()).hexdigest(), set(groups), None,
+                    live_authorized=True)
+                candidate.accepted_subjects = frozenset(b.entity_id for b in bindings
+                                                       if b.status == 'accepted' and b.entity_id)
+                candidate.subject_provenance = [b.provenance for b in bindings if b.entity_id]
+                authority=authority_for(release,candidate.source_id,candidate.accepted_subjects,intent.fact_kinds)
+                if authority:
+                    ref=f"AUTHORITATIVE_FOR:{authority['id']}@{release_id}"
+                    candidate.unit=candidate.unit.model_copy(update={'authority_assertion_ref':ref})
+                    activations.append(Activation(kind='authority',ref=ref,
+                        entity_ref=next(e.ref for e in release.entities if e.id==authority['to']),
+                        source_id=candidate.source_id))
+                entity_refs = {entity.id: entity.ref for entity in release.entities}
+                for binding in bindings:
+                    if binding.entity_id in candidate.accepted_subjects:
+                        activations.append(Activation(kind='subject_binding',
+                            ref=f"ABOUT:{binding.provenance['assertion_id']}@{release_id}",
+                            entity_ref=entity_refs[binding.entity_id], source_id=candidate.source_id))
         prepared = prepare(candidates, intent.terms, intent.fact_kinds, common=self.arm.common_assembly,
                            dedup_exact=self.arm.exact_dedup,
                            domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})

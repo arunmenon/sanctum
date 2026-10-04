@@ -181,6 +181,8 @@ def identity_signature(candidate: Candidate, domain_terms: set[str]) -> set[str]
 def same_subject(a: Candidate, b: Candidate, domain_terms: set[str]) -> bool:
     """Conflict rule precondition (same entity): identity signatures overlap, or one unit has
     no identity fields at all (a session note)."""
+    if a.accepted_subjects is not None or b.accepted_subjects is not None:
+        return bool((a.accepted_subjects or frozenset()) & (b.accepted_subjects or frozenset()))
     signature_a, signature_b = identity_signature(a, domain_terms), identity_signature(b, domain_terms)
     return not signature_a or not signature_b or bool(signature_a & signature_b)
 

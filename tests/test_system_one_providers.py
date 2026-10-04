@@ -323,6 +323,24 @@ def test_campaign_budget_is_enforced_before_dispatch():
         set_campaign_budget(None)
 
 
+def test_client_owned_budgets_do_not_share_exposure_between_attempts():
+    from sanctum_systemone import CampaignBudget
+    spec = SPECS['local-test']
+    first_budget = CampaignBudget(max_calls=1, max_input_tokens=10000)
+    second_budget = CampaignBudget(max_calls=1, max_input_tokens=10000)
+    with SystemOneTestServer() as server:
+        first = SystemOneClient(spec, server.base_url, spec.model, campaign_budget=first_budget)
+        second = SystemOneClient(spec, server.base_url, spec.model, campaign_budget=second_budget)
+        try:
+            assert first.decide({}, {'q': NOUL}, 5, max_calls=1).calls == 1
+            refused = first.decide({}, {'q': NOUL}, 5, max_calls=1)
+            assert refused.calls == 0 and refused.unavailable_reason == 'over_budget'
+            assert second.decide({}, {'q': NOUL}, 5, max_calls=1).calls == 1
+            assert len(server.behavior.requests) == 2
+        finally:
+            first.close(); second.close()
+
+
 def test_shadow_comes_from_a_missing_binding_not_a_sentinel(tmp_path):
     """Review A2: a calibration whose use band is 1.0 (or missing) is not usable; the adapter runs
     shadow-only, exactly as when no calibration file exists."""

@@ -1,0 +1,1 @@
+{"artifact_id": "shipping-dispatch-v1", "version": "v1", "environment": null, "kind": "code", "location": "repo:shipping/dispatch", "path": "src/dispatch.py", "title": "Shipping dispatch eligibility", "text": "def can_dispatch(payment_status):\n    return payment_status == \"paid\"\n", "acl": ["shipping-engineering"], "metadata": {}}

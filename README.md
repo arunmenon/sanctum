@@ -1,15 +1,10 @@
-# sanctum-lab (M0 scaffold, M1 synthetic world, M2 simulated hubs)
+# Sanctum lab
 
-An evaluation harness for the Sanctum HLD (v5.1). It will run a reference Sanctum
-against simulated knowledge hubs built from a synthetic world, and score it with an
-independent evaluator. **This is M0: contracts, gold model, evaluator, stub, and the
-experiment definition.** M1 adds the synthetic world: one authored ground-truth file, a
-deterministic renderer into per-hub corpora, a world linter, and gold derived from the
-world. M2 serves the rendered corpora as simulated hubs over MCP (token service, query-time
-ACLs, version reads, seeded failure knobs, lab admin API) and adds a runner that observes
-every hub call itself. M3 adds `sanctum_ref` (C1-naive, C1-fair, C2), run out of process behind a gateway proxy.
+Start with the [engineer documentation pack](docs/lab/README.md): an offline tutorial, architecture, subsystem contracts, scoring, operations and extension guidance. A small [shipping bundle](examples/agent-bundles/shipping/README.md) is included for inference-free harness checks.
 
-> Every result this repo produces is **SYNTHETIC — NOT PRODUCTION EVIDENCE**.
+The implementation includes simulated MCP hubs, a reference Sanctum router, routing memory, System One and a reusable evidence-only Claude Code harness. Generated PDLC artifacts and run records remain local under ignored build directories. **All evidence is synthetic; this is a research lab.**
+
+The milestone descriptions and tables below retain historical experiment records. For current behavior and command prerequisites, use the documentation pack; for dated pilot status, use [readiness records](docs/experiments/pilot-0-readiness.md).
 
 ## Layout
 

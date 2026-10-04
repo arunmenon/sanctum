@@ -1,0 +1,17 @@
+# Design corpus draft audit and hydration
+
+Reviewed by root source inspection, 3 October 2026. This is a developer audit for read-only synthetic drafts, not independent human acceptance, design approval, test execution or deployment certification.
+
+All eighteen document bodies were inspected against existing source-described code, tests and contextual documents. Six HLDs and twelve LLDs preserve distinct historical/current/proposed behavior, uncertain integrations, missing producer/schema bindings, unknown deduplication and operational gaps. Shared tooling remains a collection rather than an invented deployed service. New design suggestions are explicitly proposals.
+
+Seven citation mismatches were resolved: four were line-wrap/indentation differences and three cited review metadata as if it were artifact text. The repaired private claims carry exact source fields, coordinates and content hashes. All 102 literal references now resolve. Source response documents remain unchanged; structural normalization is recorded privately. One high-level claim calling the 800 ms transport timeout a deadline was corrected. Broken repo-prefixed relative document links were repaired and all internal HLD/LLD links verified.
+
+Hash-bound review records and candidate artifacts are under `build/pdlc-authoring`. Packaging checks require matching reviewed text hashes and review/candidate hashes. Documents carry HLD/LLD type, synthetic module key, repo association, source links, native document navigation and draft/unapproved status. Domain/service associations derive from repo code references rather than unverified design speculation. Eighteen navigation collections distinguish repo design groups and modules; they do not create runtime identity or membership claims.
+
+The corpus now has **120 development artifacts**: CodeHub 25, DocHub 49, SkillHub 16, MemoryHub 30. All 120 were retrieved and checked through the four MCP hubs. Search, manifest hashes, denied access and private loader boundaries passed. No model calls were used for that verification. Original public artifact IDs remain stable; only new documents were added.
+
+Human realism/independent acceptance, task/gold repair and freeze remain pending. The existing task drafts and their Astra report were evaluated against the earlier 102-record manifest and must not be presented as validated against this expanded corpus. Routing-memory refresh is a candidate-only operation; activation still requires its outstanding declarations, review and wiring.
+
+Candidate refresh completed: 120 artifacts, 661 proposed assertions (ABOUT 293, DENOTES 195, SELECTS_FOR 142, PARENT 31), five unsupported-quote proposals quarantined. Release `pilot-memory-178bbbb2fc81` is inactive; no membership/authority was invented or ACTIVE pointer written. Sixteen focused tests passed, including rejection of post-review text, status and review-record tampering. Developer checks do not close the outstanding independent acceptance or routing-memory findings.
+
+The subsequent [one-pass Astra review](pdlc-routing-memory-review-astra-low.md) found RM-02: qualify frozen/extra-forbid statements to the outer `FraudEvaluationRequest`, not nested `AuthenticatedSubjectContext`. Both affected identity documents were corrected as draft-2, reloaded and verified in the 120-read MCP report. The prior memory summary is explicitly marked stale/inactive pending corrected-source refresh. Runtime subject wiring, projected navigation and DCM-01–04 remain open. No second review loop was commissioned.

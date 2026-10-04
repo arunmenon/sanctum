@@ -1,0 +1,16 @@
+{
+  "contract": {
+    "hub_id": "codehub",
+    "version_reads": true,
+    "filters": [
+      "repo",
+      "ref"
+    ],
+    "max_results": 25,
+    "principal_scoped": false,
+    "error_semantics": "timeout_distinct_from_empty"
+  },
+  "place_version_reads": {
+    "repo:shipping/dispatch": true
+  }
+}

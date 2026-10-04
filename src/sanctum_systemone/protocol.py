@@ -247,9 +247,10 @@ class SystemOneClient:
     or a lab tool); this module never reads the environment for it."""
 
     def __init__(self, spec: ProviderSpec, base_url: str, model: Optional[str], api_key: Optional[str] = None,
-                 transport: Optional[httpx.BaseTransport] = None):
+                 transport: Optional[httpx.BaseTransport] = None, campaign_budget: Optional[CampaignBudget] = None):
         self.spec = spec
         self.model = model
+        self.campaign_budget = campaign_budget
         headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
         self._http = httpx.Client(base_url=base_url, headers=headers, transport=transport)
 
@@ -320,6 +321,7 @@ class SystemOneClient:
         """One exchange with retries. `max_calls` bounds HTTP attempts for the whole round,
         retries included: a retry that would exceed it is not sent."""
         body = build_request(state, self.model, batch)
+        campaign = self.campaign_budget if self.campaign_budget is not None else _CAMPAIGN
         reason = UnavailableReason.TIMEOUT
         for attempt in range(1 + self.spec.timeout_retry):
             if max_calls is not None and outcome.calls >= max_calls:
@@ -328,7 +330,7 @@ class SystemOneClient:
             if remaining <= 0.01:
                 return None, UnavailableReason.TIMEOUT
             estimate = estimate_input_tokens(body)
-            if _CAMPAIGN is not None and not _CAMPAIGN.reserve(estimate):
+            if campaign is not None and not campaign.reserve(estimate):
                 return None, UnavailableReason.OVER_BUDGET          # refused before dispatch
             outcome.calls += 1
             usage_seen: Any = None
@@ -341,17 +343,17 @@ class SystemOneClient:
                     except ValueError:
                         usage_seen = None
             except httpx.TimeoutException:
-                if _CAMPAIGN is not None:
-                    _CAMPAIGN.settle(estimate, None)
+                if campaign is not None:
+                    campaign.settle(estimate, None)
                 reason = UnavailableReason.TIMEOUT
                 continue
             except httpx.HTTPError:
-                if _CAMPAIGN is not None:
-                    _CAMPAIGN.settle(estimate, None)
+                if campaign is not None:
+                    campaign.settle(estimate, None)
                 reason = UnavailableReason.ERROR
                 continue
-            if _CAMPAIGN is not None:
-                _CAMPAIGN.settle(estimate, usage_seen)             # counted once per exchange
+            if campaign is not None:
+                campaign.settle(estimate, usage_seen)             # counted once per exchange
             if response.status_code >= 500:
                 reason = UnavailableReason.ERROR
                 continue

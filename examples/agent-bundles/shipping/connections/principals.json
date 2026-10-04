@@ -1,0 +1,8 @@
+[
+  {
+    "principal": "shipping-reader",
+    "groups": [
+      "shipping-engineering"
+    ]
+  }
+]

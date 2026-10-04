@@ -24,6 +24,21 @@ BOTH = {"payments-eng", "identity-eng"}
 PAYMENTS = {"payments-eng", "platform-eng"}
 
 
+@pytest.mark.parametrize('groups,allowed',[({'payments-eng'},True),({'unrelated'},False)])
+def test_source_wide_must_consult_uses_source_access_without_inventing_a_place(groups,allowed):
+    from sanctum_ref.registry import Procedure
+    from sanctum_ref.routing import _apply_must_consult
+    procedure=Procedure.model_validate(dict(procedure_id='whole-source',version=1,status='accepted',
+        owner='fixture-owner',attested_by='fixture-reviewer',trigger=dict(domain='payments',fact_kind_needed='implementation'),
+        action=dict(must_consult='codehub',selector={})))
+    plans={};request=RetrieveRequest(request_id='source-wide-policy',query='Payment implementation',mode='explore',
+        budget_tokens=4000,deadline_ms=3000)
+    _apply_must_consult(procedure,REGISTRY,plans,request,CAPABILITIES,groups)
+    assert plans['codehub'].call is allowed
+    assert plans['codehub'].required is True
+    assert plans['codehub'].selectors=={}
+
+
 def req(query, **fields):
     return RetrieveRequest(request_id="req-mem", query=query, mode=fields.pop("mode", "scoped"),
                            budget_tokens=4000, deadline_ms=3000, **fields)

@@ -71,7 +71,20 @@ def search_query(query: str) -> str:
     extra = [form for token in words(query) if token not in STOPWORDS and token.isalpha()
              for form in inflections(token)[1:]]
     added = [form for form in dict.fromkeys(extra) if form not in set(words(query))]
-    return query if not added else f"{query} {' '.join(added)}"
+    expanded = query if not added else f"{query} {' '.join(added)}"
+    # The lab hub search contract accepts at most 64 distinct word tokens and
+    # 4,000 characters. Long planning prompts plus inflections can exceed that
+    # limit. Preserve original content words before spending space on variants.
+    if len(set(words(expanded))) <= 64 and len(expanded) <= 4000:
+        return expanded
+    original = list(dict.fromkeys(words(query)))
+    ordered = [w for w in original if w not in STOPWORDS] + [w for w in original if w in STOPWORDS] + added
+    selected = []
+    for token in dict.fromkeys(ordered):
+        if len(selected) == 64 or len(' '.join([*selected, token])) > 4000:
+            break
+        selected.append(token)
+    return ' '.join(selected)
 
 
 def term_counts(text: str) -> dict[str, int]:

@@ -99,6 +99,14 @@ def test_search_query_adds_inflections_only():
     assert "retries" in search_query("retry limit") and "r40s" not in search_query("R40")
 
 
+def test_long_design_question_remains_within_hub_search_contract():
+    from sanctum_hubs.index import match_expression
+    query = 'Explain gateway routing tradeoffs and ' + ' '.join(f'component{i}' for i in range(90))
+    bounded = search_query(query)
+    assert 'gateway' in bounded and 'routing' in bounded
+    assert match_expression(bounded)  # Previously rejected as INVALID_ARGUMENT.
+
+
 def _candidate(hub, artifact_id, text, version="R42", environment="prod", location="repo:payments/payment-auth", rank=0):
     registry = load_registry(MANIFESTS)
     manifest = registry.manifest(hub)
@@ -107,6 +115,19 @@ def _candidate(hub, artifact_id, text, version="R42", environment="prod", locati
     unit = evidence_unit(manifest, artifact, f"ev-{artifact_id}", "2026-01-01T00:00:00Z", "cl100k_base",
                          frozenset({"implementation"}))
     return Candidate(hub, rank, manifest, artifact, unit)
+
+
+def test_graph_subjects_do_not_treat_missing_identity_as_a_match():
+    from sanctum_ref.assembly import same_subject
+    first = _candidate('codehub', 'first', 'timeout = 5')
+    second = _candidate('dochub', 'second', 'timeout = 3', location='')
+    first.accepted_subjects = frozenset({'svc.pay'})
+    second.accepted_subjects = frozenset()
+    assert not same_subject(first, second, set())
+    second.accepted_subjects = frozenset({'svc.other'})
+    assert not same_subject(first, second, set())
+    second.accepted_subjects = frozenset({'svc.pay', 'svc.other'})
+    assert same_subject(first, second, set())
 
 
 def test_assembly_dedups_types_conflicts_and_reserves_witnesses():

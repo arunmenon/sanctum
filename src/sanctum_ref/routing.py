@@ -123,7 +123,7 @@ def _apply_must_consult(procedure: Procedure, registry: Registry, plans: dict[st
     manifest = registry.manifest(hub_id)
     selector = dict(procedure.action.selector)
     place = next(iter(selector.values()), "")
-    readable = manifest.place_accessible(place, groups) if manifest else False
+    readable = (manifest.place_accessible(place, groups) if selector else manifest.accessible(groups)) if manifest else False
     if hub_id not in capabilities or not readable:
         plans[hub_id] = SourcePlan(hub_id, manifest, False, "skipped", ["required_source_denied"],
                                    required=True, procedure_refs=[procedure.procedure_id])
@@ -172,7 +172,8 @@ def apply_memory(base: list[SourcePlan], resolution, store, registry: Registry, 
             manifest = registry.manifest(hub_id)
             place = next(iter(procedure.action.selector.values()), "")
             plan = by_hub.get(hub_id)
-            if manifest is None or not manifest.place_accessible(place, groups):
+            readable = (manifest.place_accessible(place, groups) if procedure.action.selector else manifest.accessible(groups)) if manifest else False
+            if not readable:
                 by_hub[hub_id] = SourcePlan(hub_id, manifest, False, "skipped", ["required_source_denied"],
                                             required=True, procedure_refs=[procedure.procedure_id],
                                             interpretation=index)

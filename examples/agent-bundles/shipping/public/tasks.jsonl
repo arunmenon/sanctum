@@ -1,0 +1,1 @@
+{"task_id": "shipping-eligibility", "family": "behavior", "prompt": "Explain when the versioned shipping dispatch helper permits dispatch.", "caller_requirements": [], "answer_format": "evidence_answer_v1"}

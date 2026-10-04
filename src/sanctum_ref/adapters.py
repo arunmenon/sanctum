@@ -61,6 +61,10 @@ class Candidate:
     artifact: dict[str, Any]
     unit: EvidenceUnit
     interpretations: set[int] = field(default_factory=set)   # which interpretations' plans found it
+    # None is the legacy ablation; an empty set is an explicitly unknown
+    # subject in the graph-backed runtime, never a wildcard match.
+    accepted_subjects: Optional[frozenset[str]] = None
+    subject_provenance: list[dict[str, Any]] = field(default_factory=list)
 
     @property
     def text(self) -> str:

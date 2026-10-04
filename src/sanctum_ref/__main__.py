@@ -36,6 +36,7 @@ def main(argv=None) -> int:
     parser.add_argument("--decision-provider", default=None,
                         help="D2 provider name (configs/system_one_providers.yaml, or rules/standin); default: the arm's provider switch")
     parser.add_argument("--system-one-providers", type=Path, default=ROOT / "configs" / "system_one_providers.yaml")
+    parser.add_argument("--system-one-templates", type=Path, default=ROOT / "configs" / "system_one_templates.yaml")
     parser.add_argument("--calibration-dir", type=Path, default=ROOT / "configs" / "calibration")
     parser.add_argument("--decision-params", type=Path, default=ROOT / "configs" / "d2_standin.yaml")
     parser.add_argument("--d2-template", default=None, help="template id for D2 (configs/system_one_templates.yaml)")
@@ -56,7 +57,8 @@ def main(argv=None) -> int:
         try:
             provider = build_provider(arguments.decision_provider or arm.provider, arguments.decision_params,
                                       arguments.system_one_providers, arguments.calibration_dir,
-                                      template_ids={"d2": arguments.d2_template} if arguments.d2_template else None)
+                                      template_ids={"d2": arguments.d2_template} if arguments.d2_template else None,
+                                      templates_path=arguments.system_one_templates)
         except (ProviderNotApproved, ValueError) as error:
             print(f"sanctum_ref: {error}", file=sys.stderr)
             return 2
@@ -68,7 +70,8 @@ def main(argv=None) -> int:
         round3_provider = build_provider(arguments.round3_provider, arguments.decision_params,
                                          arguments.system_one_providers, arguments.calibration_dir,
                                          template_ids={arguments.round3: arguments.round3_template}
-                                         if arguments.round3_template else None)
+                                         if arguments.round3_template else None,
+                                         templates_path=arguments.system_one_templates)
         if not hasattr(round3_provider, "_transport"):
             print("sanctum_ref: Round 3 needs a System One HTTP provider", file=sys.stderr)
             return 2

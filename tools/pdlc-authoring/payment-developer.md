@@ -1,0 +1,7 @@
+# Payment developer packet
+
+Write fictional engineering material from a payment developer's perspective. Return JSON with an `artifacts` list, each containing `path`, `title`, `version`, `text`, and a separate `introduced_claims` list for audit. The text should be native Python/config/test content. Do not mention benchmarks, private fact identifiers or this instruction. Use only the local facts below; leave unavailable details unresolved.
+
+Local knowledge: R41 authorization returns a generic dependency error when the fraud request times out. The R42 implementation uses an 800 ms fraud response deadline and still returns that generic error. A new pending-review requirement is proposed but is not deployed. The fraud request receives tenant and authenticated-subject context. Retry attempts preserve the authorization idempotency key. A feature flag for the proposed change defaults to disabled. You have not established the required canary duration or production capacity.
+
+Produce six artifacts: R41 handler, R42 handler, fraud-client wrapper, feature-flag config, timeout regression tests and retry/idempotency tests. Code should be inspectable and internally plausible, with uneven comments, shorthand and a TODO where appropriate. Do not implement the proposal as if already released. Do not invent approval decisions or production measurements. Separate code facts from added assumptions in `introduced_claims`.

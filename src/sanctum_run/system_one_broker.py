@@ -44,7 +44,7 @@ import yaml
 from sanctum_eval.trace import ModelCall
 
 from .round3_state import STATE_LAYOUTS, STATE_V1, build_record
-from sanctum_systemone import CallOutcome, ProviderSpec, SystemOneClient, UnavailableReason, load_provider_specs
+from sanctum_systemone import CampaignBudget, CallOutcome, ProviderSpec, SystemOneClient, UnavailableReason, load_provider_specs
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PROVIDERS = ROOT / "configs" / "system_one_providers.yaml"
@@ -144,6 +144,7 @@ class SystemOneBroker:
     secret: Optional[str] = None
     environment: dict[str, str] = field(default_factory=lambda: dict(os.environ))
     transport: Optional[httpx.BaseTransport] = None     # tests may inject; default is real HTTP
+    campaign_budget: Optional[CampaignBudget] = None  # one controller attempt, across rounds and retries
     _stored: int = 0
 
     async def decide(self, gateway, request_id: str, query: str, arguments: dict[str, Any],
@@ -203,7 +204,7 @@ class SystemOneBroker:
         else:
             recorder = _RecordingTransport(self.transport or httpx.HTTPTransport())
             client = SystemOneClient(self.spec, base_url, self.spec.requested_model(self.environment),
-                                     api_key=self.secret, transport=recorder)
+                                     api_key=self.secret, transport=recorder, campaign_budget=self.campaign_budget)
             try:
                 outcome = await anyio.to_thread.run_sync(
                     lambda: client.decide(state, asked, self.profile.deadline_ms / 1000.0, max_calls,

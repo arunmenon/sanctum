@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional, Protocol
+from typing import Any, Literal, Optional, Protocol
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -102,6 +102,22 @@ class RelationRecord(_Model):
     status: str
 
 
+class SubjectBinding(_Model):
+    entity_id: Optional[str] = None
+    status: Literal['proposed', 'accepted', 'rejected', 'unknown']
+    provenance: dict[str, Any] = Field(default_factory=dict)
+
+
+class ArtifactRecord(_Model):
+    source_id: str
+    artifact_id: str
+    version: str
+    content_hash: str
+    visibility_groups: list[str]
+    principal: Optional[str] = None
+    subjects: list[SubjectBinding] = Field(default_factory=list)
+
+
 class Release(_Model):
     release_id: str
     schema_version: int
@@ -114,6 +130,12 @@ class Release(_Model):
     procedures: list[MemoryProcedure] = Field(default_factory=list)
     relations: list[RelationRecord] = Field(default_factory=list)
     descriptors: dict[str, dict[str, str]] = Field(default_factory=dict)
+    artifacts: list[ArtifactRecord] = Field(default_factory=list)
+    # Authority declarations travel with the exact release instead of a mutable
+    # global sidecar. Their runtime policy consumer remains explicit.
+    authority_assertions: list[dict[str, Any]] = Field(default_factory=list)
+    review_binding: dict[str, str] = Field(default_factory=dict)
+    artifact_subject_bindings_required: bool = False  # old lab seeds are explicit legacy controls
 
 
 def normalize_label(label: str) -> tuple[str, ...]:
@@ -135,8 +157,14 @@ def load_release(seed_dir: Path, release_id: Optional[str] = None) -> Release:
                [p.selects_for for p in release.places if p.selects_for not in ids] + \
                [m for e in release.entities for m in e.member_of if m not in ids] + \
                [c.selects_for for c in release.contexts if c.selects_for not in ids]
+    dangling += [s.entity_id for a in release.artifacts for s in a.subjects
+                 if s.entity_id is not None and s.entity_id not in ids]
     if dangling:
         raise MemoryUnavailable("release references unknown entities")
+    if any(s.status == ACCEPTED and s.entity_id is not None and
+           (not s.provenance.get('assertion_id') or not s.provenance.get('reviewed_by') or not s.provenance.get('evidence'))
+           for a in release.artifacts for s in a.subjects):
+        raise MemoryUnavailable('accepted subject binding lacks reviewed provenance')
     return release
 
 
@@ -161,6 +189,40 @@ class MemoryStore(Protocol):
     def procedures(self) -> list[MemoryProcedure]: ...
     def preferred_label(self, entity_id: str, source: str) -> Optional[str]: ...
     def context_entity(self, scope: str) -> Optional[tuple[str, str]]: ...
+    def subjects_for(self, source_id: str, artifact_id: str, version: str, content_hash: str,
+                     groups: set[str], principal: Optional[str], *, live_authorized: bool = False) -> list[SubjectBinding]: ...
+
+
+def _subjects_for(release: Release, source_id: str, artifact_id: str, version: str,
+                  content_hash: str, groups: set[str], principal: Optional[str], *,
+                  live_authorized: bool = False) -> list[SubjectBinding]:
+    for artifact in release.artifacts:
+        if (artifact.source_id, artifact.artifact_id, artifact.version, artifact.content_hash) != \
+                (source_id, artifact_id, version, content_hash):
+            continue
+        if not groups.intersection(artifact.visibility_groups) or \
+                (not live_authorized and artifact.principal is not None and artifact.principal != principal):
+            continue
+        accepted = [s for s in artifact.subjects if s.status == ACCEPTED and s.entity_id is not None]
+        if accepted:
+            return accepted
+    return [SubjectBinding(status='unknown', provenance={'release_id': release.release_id,
+                                                        'reason': 'no_visible_accepted_binding'})]
+
+
+def authority_for(release: Release, source_id: str, subjects: frozenset[str], fact_kinds):
+    """Authority applies to reviewed subjects and their declared domain ancestry."""
+    ancestry={entity.id: entity.member_of for entity in release.entities}
+    scopes=set(subjects)
+    pending=list(subjects)
+    while pending:
+        for parent in ancestry.get(pending.pop(), []):
+            if parent not in scopes:
+                scopes.add(parent);pending.append(parent)
+    matches=[a for a in release.authority_assertions if a.get('status')=='accepted'
+             and a.get('from')=='source:'+source_id and a.get('to') in scopes
+             and a.get('fact_kind') in fact_kinds and a.get('reviewed_by') and a.get('evidence')]
+    return min(matches,key=lambda a:a['id']) if matches else None
 
 
 def _term_ref(term: TermRecord, release_id: str) -> str:
@@ -173,6 +235,7 @@ class RelationStore:
 
     def __init__(self, release: Release):
         self.release_id = release.release_id
+        self._release = release
         self._entities = {entity.id: entity for entity in release.entities}
         self._edges: dict[tuple[str, str], list[tuple[str, Any]]] = {}
         for term in release.terms:
@@ -221,12 +284,19 @@ class RelationStore:
         return next(((c.selects_for, f"CONTEXT:{c.scope}@v{c.version}@{self.release_id}")
                      for qualifier, c in self._edges.get(("scope", "SELECTS_FOR"), []) if qualifier == scope), None)
 
+    def subjects_for(self, source_id, artifact_id, version, content_hash, groups, principal, *, live_authorized=False):
+        # Only the trusted retrieval layer may assert a successful current read.
+        # This is not an agent-supplied argument or snapshot ACL inference.
+        return _subjects_for(self._release, source_id, artifact_id, version, content_hash,
+                             groups, principal, live_authorized=live_authorized)
+
 
 class TableStore:
     """Flat tables, one per relation (C4a-equivalent storage)."""
 
     def __init__(self, release: Release):
         self.release_id = release.release_id
+        self._release = release
         self._entity_table = {entity.id: entity for entity in release.entities}
         self._name_table = [(normalize_label(t.label), t) for t in release.terms if t.status == ACCEPTED and t.kind == "name"]
         self._place_table = [p for p in release.places if p.status == ACCEPTED]
@@ -257,6 +327,12 @@ class TableStore:
 
     def context_entity(self, scope):
         return next(((c.selects_for, f"CONTEXT:{c.scope}@v{c.version}@{self.release_id}") for c in self._context_table if c.scope == scope), None)
+
+    def subjects_for(self, source_id, artifact_id, version, content_hash, groups, principal, *, live_authorized=False):
+        # Only the trusted retrieval layer may assert a successful current read.
+        # This is not an agent-supplied argument or snapshot ACL inference.
+        return _subjects_for(self._release, source_id, artifact_id, version, content_hash,
+                             groups, principal, live_authorized=live_authorized)
 
 
 class LabelTable:

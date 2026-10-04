@@ -145,6 +145,12 @@ class Retriever:
         selection_arm = (replace(self.arm, routing="fanout_all", procedures=False)
                          if self.arm.routing == "jev_unconstrained" else self.arm)
         plans = plan_sources(request, selection_arm, self.registry, intent, capabilities, set(groups))
+        if self.arm.routing == "jev_unconstrained":
+            # Version-read support is evidence applicability, not a hub-selection veto.
+            for plan in plans:
+                if plan.status == "unsupported_for_mode":
+                    plan.call, plan.status = True, "called"
+                    plan.version_refs, plan.as_of = [None], None
         eligible = {p.hub_id: p for p in plans if p.call}
 
         # memory: pin one release for the whole request (HLD §9.6); failure degrades, never widens

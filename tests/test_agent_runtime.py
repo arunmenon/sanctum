@@ -155,3 +155,27 @@ def test_stale_subject_snapshot_does_not_disclose_revoked_artifact(tmp_path, sce
                     assert not any(a['kind'] == 'subject_binding' for a in receipt['activations'])
                     await adapter.close()
         anyio.run(exercise)
+
+
+def test_unconstrained_offers_four_hubs_even_for_release_query(tmp_path, scenario_world, monkeypatch):
+    runtime, records = runtime_fixture(tmp_path, scenario_world)
+    matrix_path=tmp_path/'matrix.yaml'
+    matrix=yaml.safe_load(matrix_path.read_text());matrix['arms']['C5']['routing']='jev_unconstrained'
+    matrix_path.write_text(yaml.safe_dump(matrix));runtime['files']['matrix.yaml']=hashlib.sha256(matrix_path.read_bytes()).hexdigest()
+    with SystemOneTestServer() as server:
+        monkeypatch.setenv('SANCTUM_SYSTEMONE_TEST_URL', server.base_url)
+        async def exercise():
+            tokens=TokenService(scenario_world/'identity/principals.json','runtime-test-only')
+            async with HubGateway(scenario_world,HUBS,tokens) as gateway:
+                async with open_agent_runtime(tmp_path,runtime,gateway,scenario_world,tmp_path/'observed',fixture=True) as sut:
+                    adapter=await AgentMCP(gateway,tokens.issue_caller_token('kestrel-payments'),'sanctum',EvidenceNormalizer([{**r,'source_id':'codehub'} for r in records]),DeliveryBudget(8000,4000),sut=sut).initialize()
+                    result=await adapter.dispatch('sanctum_retrieve',dict(query='What is the payment-auth retry limit in R42?',mode='explore'))
+                    assert result.get('error') is None
+                    trace=adapter.calls[0]
+                    decisions=[d['value'] for d in trace['router_receipt']['decisions'] if (d.get('value') or {}).get('source')]
+                    assert {d['source'] for d in decisions} == set(HUBS)
+                    assert all(d['selection_policy']=='raw_argmax' and not d['shadow'] for d in decisions)
+                    called={c['source_id'] for c in trace['backend_trace']['calls']}
+                    assert called == {d['source'] for d in decisions if d['call']}
+                    await adapter.close()
+        anyio.run(exercise)

@@ -14,7 +14,7 @@ Runtime bundles pin provider configuration, descriptors, prompt templates, calib
 
 Required source obligations are applied by routing policy. Optional-source usefulness decisions are not permission checks and cannot override source ACLs. When the decision layer is unavailable or uncertain, preserve candidates and record the fallback rather than pretending a successful model decision occurred.
 
-Calibration is scoped by decision/profile. In the pilot, uncalibrated D2 decisions preserve sources in shadow mode; making a live call does not prove pruning benefit. Model probabilities alone are not a quality result.
+Calibration is scoped by decision/profile. In the original pilot, uncalibrated D2 decisions preserve sources in shadow mode; making a live call does not prove pruning benefit. A [new active-Jev development ablation](../experiments/pdlc-jev-active-plan.md) binds a separate calibration and is running. Non-shadow decisions are verified, but source pruning remains constrained by required-source and no-empty-source guards; no quality improvement is claimed. Model probabilities alone are not a quality result.
 
 The agent runtime requires positive per-attempt call and input-token limits. The current pilot uses at most two broker calls and a 10,000-input-token reservation per attempt. Limits live in the bundle, not the generic harness. Agent calls and nested System One calls are accounted separately; unknown provider usage stays unknown and stops reconciliation. A rejected call that provably never dispatched is distinct from a failed request with missing usage.
 

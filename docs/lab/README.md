@@ -1,21 +1,41 @@
 # Sanctum lab: start here
 
-The lab compares evidence retrieval and agent answers against synthetic, versioned sources. It is a research implementation; results are not production evidence. Start with the [offline tutorial](quickstart.md), then choose the path you need.
+Sanctum helps a coding agent find evidence across code, documents, procedures and past investigations. This lab tests whether that help produces better answers than letting the agent search those sources directly.
 
-| Path | What runs | Where to read |
+**All lab evidence is synthetic.** The hubs are working local services. The experiments test a research implementation, not a production deployment.
+
+## For tomorrow’s walkthrough
+
+Start with the [guided walkthrough](walkthrough.md). It follows one question through the system and explains the terms as they appear. Then open these pages in order:
+
+| Order | Page | Question it answers |
 |---|---|---|
-| Reference retrieval | A reference Sanctum process retrieves from simulated MCP hubs; the world evaluator scores evidence and receipts | [Architecture](architecture.md), [corpus and hubs](corpus-and-hubs.md) |
-| Agent comparison | Headless Claude answers tasks with direct hub tools or Sanctum; a separate scorer checks grounded answers and plans | [Agent harness](agent-harness.md), [scoring](scoring.md) |
+| 1 | [Architecture](architecture.md) | Who calls whom, and where does the evidence go? |
+| 2 | [Corpus and hubs](corpus-and-hubs.md) | What information is stored, and how is it organized? |
+| 3 | [Routing memory](routing-memory.md) | How does Sanctum connect names, subjects and search locations? |
+| 4 | [System One](system-one.md) | What does Jev decide, and which decisions actually affect routing? |
+| 5 | [Agent harness](agent-harness.md) | How do we run the same questions fairly? |
+| 6 | [Scoring](scoring.md) | How do we tell whether an answer is good? |
 
-| Engineer goal | Page |
+## For hands-on work
+
+| Goal | Page |
 |---|---|
-| Set up and run without inference | [Quickstart](quickstart.md) |
-| Understand routing knowledge and activation | [Routing memory](routing-memory.md) |
-| Understand the decision model and fallback | [System One](system-one.md) |
-| Run, inspect, resume or troubleshoot | [Runbook](runbook.md) |
-| Bring a new corpus, hub or agent | [Extending the lab](extending.md) |
-| Find code and tests | [Codebase map](../codebase-map.md) |
+| Try the lab without model calls | [Quickstart](quickstart.md) |
+| Run, inspect, resume or troubleshoot an experiment | [Runbook](runbook.md) |
+| Bring a different corpus, hub or coding agent | [Extending](extending.md) |
+| Locate implementation and tests | [Codebase map](../codebase-map.md) |
 
-This pack describes implementation as of 2026-10-04. The [architecture artifacts](../../design/intelligence-layer/README.md) own design intent; [experiment records](../experiments/pilot-0-readiness.md) document dated observations. The root README's milestone sections retain historical results.
+## What is available in Git?
 
-The checked-in shipping fixture runs from a checkout. The 120-artifact PDLC corpus, reviewed memory release, private task bundle and 180 native run records are generated local inputs under ignored `build/`; pushing code does not publish those inputs. Pilot quality judging remains exploratory until independent gold and human acceptance are complete.
+The code, documentation and small [shipping example](../../examples/agent-bundles/shipping/README.md) are checked in. That example is enough to try the harness without Claude or Jev.
+
+The larger PDLC corpus contains 120 artifacts. Its corpus files, reviewed memory release, private task bundle and raw run records are generated local inputs under ignored `build/` directories. A fresh checkout does not contain them. See [corpus and hubs](corpus-and-hubs.md) before trying to reproduce that campaign.
+
+## Current behavior and experiment history
+
+This pack describes implementation as of **2026-10-05**. The [HLD artifacts](../../design/intelligence-layer/README.md) describe design intent. The root README’s milestones preserve older experiments.
+
+The lab supports several System One modes. Earlier campaigns recorded Jev advice without applying it, or applied it with routing overrides. Later experiments let Jev choose all, some or none of the eligible hubs. These are different conditions; see [System One](system-one.md).
+
+For results, read the [unconstrained Jev comparison](../experiments/pdlc-jev-unconstrained-results.md) and the [four-variant follow-up](../experiments/pdlc-rubric-followup-results.md). The follow-up compares Sanctum configurations, not Sanctum against direct hub access. Its changes have not been promoted. Human acceptance is still pending, and grading disagreements remain under investigation. These records support exploratory findings, not a production recommendation.

@@ -2,6 +2,17 @@
 
 Use this page after the [offline tutorial](quickstart.md). Commands run from repository root with Python 3.12. Paths below beginning `build/` are local inputs, not files included in a checkout.
 
+## Choose the operation you need
+
+| Goal | Use |
+|---|---|
+| Try a checkout without model calls | The [quickstart](quickstart.md) shipping example |
+| Start or resume real agent attempts | Plan and dispatch below |
+| Inspect progress or evaluate saved answers | Inspect and score below |
+| Diagnose a stop or mismatched input | Recovery table below |
+
+“Dispatch” means starting an actual attempt. A frozen schedule records which attempts are intended; it does not start them.
+
 ## Plan and dispatch
 
 For any complete bundle, validate and freeze a schedule before running it:
@@ -56,3 +67,5 @@ Reporting invokes no inference, but it validates the experiment and installed-CL
 | Protocol-invalid agent answer | Original `answer.json` | Retain zero-credit failure; no selective agent rerun |
 
 Next: [agent harness](agent-harness.md), [scoring](scoring.md), [extending](extending.md).
+
+[Back to start](README.md).

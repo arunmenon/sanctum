@@ -1,27 +1,64 @@
-# System One decisions
+# System One: what Jev decides
 
-System One is a bounded decision-provider layer used by Sanctum. This page owns its contract and fallback behavior; the [runbook](runbook.md) owns execution prerequisites.
+System One is Sanctum’s decision layer. In the hosted experiments, Jev judges which hubs are likely to help answer a retrieval question. It selects evidence sources; Claude still writes the answer.
 
-## Provider and broker boundary
+A **hub description** is the text Jev reads about a source’s contents. Changing that text changes the information available to Jev, even when the hub’s actual documents stay the same.
 
-[sanctum_systemone.protocol](../../src/sanctum_systemone/protocol.py) defines provider capabilities, request/answer validation, token estimates and campaign budgets. [system_one_broker.py](../../src/sanctum_run/system_one_broker.py) holds credentials, records requests/responses and mediates external calls on the runner side. Sanctum reaches it through the gateway rather than receiving a provider key.
+## The call path
 
-[providers/](../../src/sanctum_ref/providers/__init__.py) implements decision behavior. Rules and the local stand-in provide baselines; the named provider path permits configured hosted or verified local implementations. A test provider exercises transport without making a real inference claim.
+```mermaid
+flowchart TD
+    S[Sanctum retrieval question] --> B[Runner-owned broker]
+    D[Hub descriptions and prompt] --> B
+    B --> J[Jev provider]
+    J --> U[Source-usefulness decisions]
+    U --> M[Configured routing mode]
+    M --> H[Selected hubs searched by Sanctum]
+```
 
-Runtime bundles pin provider configuration, descriptors, prompt templates, calibration files, resolved model and verification proof. An environment alias cannot silently replace the verified model during a campaign. Actual native/provider records are the evidence for which model ran.
+The broker holds provider credentials and saves model-call records. Sanctum calls through the gateway; Claude has no Jev tool or provider key.
 
-## Safe routing behavior and accounting
+## Which Jev advice actually affects routing?
 
-Required source obligations are applied by routing policy. Optional-source usefulness decisions are not permission checks and cannot override source ACLs. When the decision layer is unavailable or uncertain, preserve candidates and record the fallback rather than pretending a successful model decision occurred.
+The lab retains three experimental behaviors. A real Jev call alone does not tell you which one ran.
 
-Calibration is scoped by decision/profile. In the original pilot, uncalibrated D2 decisions preserve sources in shadow mode; making a live call does not prove pruning benefit. A [new active-Jev development ablation](../experiments/pdlc-jev-active-plan.md) binds a separate calibration and is running. Non-shadow decisions are verified, but source pruning remains constrained by required-source and no-empty-source guards; no quality improvement is claimed. Model probabilities alone are not a quality result.
+| Mode | What happens to Jev’s advice? | What it tests |
+|---|---|---|
+| Original shadow mode | Advice is recorded; uncalibrated skip advice does not remove sources | Sanctum with Jev calls and overhead, without that source-pruning effect |
+| Calibrated guarded mode | Jev can prune candidates, but required-source and nonempty-source rules can override it | Jev filtering within the earlier routing rules |
+| `jev_unconstrained` | Jev considers all eligible hubs and can choose all, some or none; no forced-source or nonempty override | Jev’s source-selection choices, including mistakes |
 
-The agent runtime requires positive per-attempt call and input-token limits. The current pilot uses at most two broker calls and a 10,000-input-token reservation per attempt. Limits live in the bundle, not the generic harness. Agent calls and nested System One calls are accounted separately; unknown provider usage stays unknown and stops reconciliation. A rejected call that provably never dispatched is distinct from a failed request with missing usage.
+Calibration means checking decisions on separate development examples before choosing a threshold. Earlier modes use scoped calibration. The unconstrained mode deliberately applies raw decisions without that calibration gate.
 
-Credential variables are resolved at the broker boundary. `.env`, provider keys and auth tokens are ignored/local inputs, never authored evidence or release content. Provider choice does not authorize sending nonsynthetic content externally.
+“Unconstrained” refers to hub selection. Caller access checks, process isolation and run budgets still apply. In that mode, memory may help resolve names and translate searches, but it cannot force or exclude a hub. Selecting zero hubs is a possible recorded outcome.
 
-Verification tests: [test_system_one_providers.py](../../tests/test_system_one_providers.py), [test_system_one_broker.py](../../tests/test_system_one_broker.py), [test_agent_runtime.py](../../tests/test_agent_runtime.py).
+The [active-Jev plan](../experiments/pdlc-jev-active-plan.md) preserves the transition between modes. The [unconstrained results](../experiments/pdlc-jev-unconstrained-results.md) and [four-variant follow-up](../experiments/pdlc-rubric-followup-results.md) record completed experiments. The follow-up’s richer descriptions and memory changes have not been promoted.
 
-Next: [agent harness](agent-harness.md), [scoring](scoring.md).
+## Provider configuration and verification
 
-The separate `jev_unconstrained` experimental switch lets raw Jev usefulness decisions select among all four hubs, including selecting none, without forced-source or nonempty fallbacks. See the [follow-on experiment](../experiments/pdlc-jev-active-plan.md#follow-on-jev-owns-candidate-selection); the earlier shadow and calibrated modes retain their behavior.
+Runtime bundles record the provider, descriptors, prompts, calibration files where applicable, resolved model and verification proof. A pinned model means a specific verified identifier, not a name that can silently resolve to a different model later.
+
+Use native agent and broker records to establish what actually ran. Test providers exercise the connection without proving real model inference.
+
+If a provider is unavailable, inspect the recorded error and the configured fallback. Earlier guarded behavior preserves candidates on uncertainty. Do not assume that behavior describes every experimental mode.
+
+## Budgets and credentials
+
+System One calls have their own accounting, separate from Claude’s tool calls. The pilot runtime requires positive per-attempt call and input-token limits; its configured allowance is at most two broker calls and a 10,000-input-token reservation per attempt. Other experiments must read their own bundle limits.
+
+Unknown provider usage remains unknown and must be reconciled. An unissued request is different from a dispatched request whose usage receipt is missing.
+
+Keys and authentication tokens stay in ignored local inputs. They are not corpus evidence or memory-release content. The hosted experiments use synthetic evidence.
+
+## Find the code
+
+| Responsibility | Entry point |
+|---|---|
+| Provider contract and budgets | [protocol.py](../../src/sanctum_systemone/protocol.py) |
+| Broker, credentials and call records | [system_one_broker.py](../../src/sanctum_run/system_one_broker.py) |
+| Decision implementations | [providers](../../src/sanctum_ref/providers/__init__.py) |
+| Apply routing mode | [pipeline.py](../../src/sanctum_ref/pipeline.py) |
+
+Verification: [provider tests](../../tests/test_system_one_providers.py), [broker tests](../../tests/test_system_one_broker.py), [runtime tests](../../tests/test_agent_runtime.py).
+
+Next: [agent harness](agent-harness.md). [Back to start](README.md).

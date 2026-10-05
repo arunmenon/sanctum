@@ -1,6 +1,8 @@
 # Run the lab without inference
 
-Use this page to verify a checkout and exercise a real MCP-backed agent fixture. Run every command from the repository root. You need Python 3.12 and POSIX process/socket support; the subscription helper also has a macOS Keychain fallback.
+This tutorial checks that the lab works on your machine. It uses a small scripted stand-in for an agent, so it makes no Claude or Jev calls.
+
+You will build a synthetic world, check it, then run one task through the MCP tools. The expected outputs below tell you whether each step worked. Run every command from the repository root. You need Python 3.12 and POSIX process/socket support; the subscription helper also has a macOS Keychain fallback.
 
 ## Install and bootstrap
 
@@ -41,3 +43,5 @@ PYTHONPATH=src:. .venv/bin/pytest -q
 The suite verifies contracts, source isolation, failure handling, routing, memory and agent controls. Live-provider tests are skipped unless explicitly enabled; expected failures are documented in their tests. It does not independently accept private benchmark gold.
 
 Next: [architecture](architecture.md), [runbook](runbook.md).
+
+[Back to start](README.md).

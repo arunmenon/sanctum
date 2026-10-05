@@ -1,6 +1,6 @@
 # Sanctum lab
 
-Start with the [engineer documentation pack](docs/lab/README.md): an offline tutorial, architecture, subsystem contracts, scoring, operations and extension guidance. A small [shipping bundle](examples/agent-bundles/shipping/README.md) is included for inference-free harness checks.
+Start with the [guided walkthrough](docs/lab/walkthrough.md) for the question-to-answer flow, or the [engineer documentation pack](docs/lab/README.md) for architecture, an offline tutorial, scoring, operations and extension guidance. A small [shipping bundle](examples/agent-bundles/shipping/README.md) is included for inference-free harness checks.
 
 The implementation includes simulated MCP hubs, a reference Sanctum router, routing memory, System One and a reusable evidence-only Claude Code harness. Generated PDLC artifacts and run records remain local under ignored build directories. **All evidence is synthetic; this is a research lab.**
 

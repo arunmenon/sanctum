@@ -1,6 +1,8 @@
 # Extending the lab
 
-Use existing contracts before adding scenario-specific code. This page separates reusable contracts from executable support.
+To test another repository or domain, supply a different scenario bundle. The same harness can then schedule questions, record searches and score answers against that bundle’s private criteria.
+
+Some parts are reusable today; others still need implementation. Check the table before treating a new bundle as a complete integration.
 
 | Capability | Current support |
 |---|---|
@@ -34,3 +36,5 @@ An adapter must start a fresh session, expose only the arm's tools, enforce shar
 Useful checks: [test_agent_bundle.py](../../tests/test_agent_bundle.py), [test_agent_contract.py](../../tests/test_agent_contract.py), [test_agent_session.py](../../tests/test_agent_session.py), [test_memory_harvest.py](../../tests/test_memory_harvest.py), [test_agent_runtime.py](../../tests/test_agent_runtime.py).
 
 Next: [codebase map](../codebase-map.md), [runbook](runbook.md).
+
+[Back to start](README.md).

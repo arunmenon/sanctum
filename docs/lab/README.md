@@ -38,3 +38,4 @@ The larger PDLC corpus contains 120 artifacts. Its corpus files, reviewed memory
 - **Setup:** [experiment method](../experiments/method/README.md), separate from findings.
 - **Findings and open questions:** [results index](../experiments/README.md), with one entry per experiment.
 - **History:** the root README’s milestones and preserved plans describe earlier work, not current status.
+- **Browsable copy:** [Sanctum Lab Docs artifact](https://claude.ai/artifact/K6gba21YwSrzau1JDBJs3V), a single-page snapshot of this guide and the experiment records at commit `285de6d`. Access is by invitation from the owner; the Markdown in Git remains the source.

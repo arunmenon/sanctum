@@ -8,6 +8,24 @@ Use saved runs before dispatching more agents. Separate scoring problems from re
 
 ## Current rubric position
 
+### Execution update: 5 October 2026
+
+- [x] Recover the missing direct-hub judgment with one explicitly recorded format repair; preserve the failed response, original packet and original reports.
+- [x] Recompute all 360 score records with mechanical v3 and validate their evidence bindings. The complete unconstrained-versus-direct comparison is +13.63 percentage points overall, with a descriptive task-cluster interval of +7.33 to +20.39. This remains an exploratory historical comparison.
+- [x] Produce family/scope/design breakdowns and a trace-backed ledger: 37 gap observations across 16 tasks, not 37 independent failures.
+- [x] Prepare four isolated development variants: unchanged unconstrained routing, richer grounded Jev descriptors, operational reviewed place mappings, and both changes.
+- [x] Validate the four descriptor proposals against 30 exact source quotations. Review 142 grounded SELECTS_FOR assertions, projecting 52 operational places into a separate experimental release. This is Codex technical curation with inherited prior review decisions, not independent human acceptance.
+- [x] Pass 28 focused gap-tool, harvest, runtime and unconstrained-routing checks, including false target-credit cases.
+- [x] Complete paired retrieval probes on 36 separate development cases per variant (144 total). These measure target-source selection and exact bound target-quote delivery, not answer quality. Baseline and memory recall 24/36 targets; descriptions and combined recall 20/36. Rich descriptions improve MemoryHub targets from 5/10 to 7/10 but reduce SkillHub from 8/10 to 3/10. No candidate is promoted from this result.
+- [x] Author and technically verify 12 fresh development tasks: two per family, six supported, three partial and three outside scope, including explicit HLD and LLD. Check historical/development evidence overlap and verify every boundary against all 120 artifacts. Repair family drift, remove a repeated index fact and disclose shared premises. New questions on the same corpus do not establish independent generalization; independent acceptance is pending.
+- [ ] Run and score the four variants on the identical fresh tasks, with the same Sonnet 5.5 settings and budgets, then report isolated and joint effects.
+
+The 48-attempt follow-up has started: twelve tasks, one fresh session per variant, randomized variant order within each task. The unchanged baseline is rerun alongside the three variations, avoiding a historical-only comparison. Sonnet 5.5 uses the approved subscription; Jev remains raw/unconstrained in every arm. The subscription SDK-estimate ceiling is $144, not an Anthropic API purchase; nested Jev rate-card exposure is bounded at $1.008. Scoring and paired reports are queued automatically after all scheduled outcomes are terminal. Existing calibration judgments are rechecked for exact packet equality and mechanically regraded before reuse; no fresh fixture calls are intended. All trial input validation passed before dispatch.
+
+Predeclared decision rule for this small follow-up: report paired graded fact coverage by scope, checklist quality, citation support and material unsupported claims. A variation is promising only if coverage improves without new material unsupported claims or a decline in boundary diagnosis; otherwise revise or reject it. Report effect sizes and uncertainty, not a production win. The 36-case probes are diagnostic and cannot satisfy that answer-quality rule. Extra calls are not a rejection criterion.
+
+Local evidence: `build/rubric-gap-audit/mechanical-v3-03/`, `trace-analysis-03/`, `descriptor-candidate-01/`, `place-memory-01/`, `variants-01/`, `retrieval-probes-01/`, `fresh-task-curation-01/`, `build/agent-bundles/pdlc-rubric-followup-01/`, and `build/agent-runs/sonnet55-rubric-followup-01/`. Historical bundles and active releases are unchanged.
+
 Verified from the saved calibrated/guarded and unconstrained reports and score files on 5 October 2026. These are development results; independent gold and human acceptance remain pending.
 
 | Dimension | Calibrated / guarded | Unconstrained | Meaning |
@@ -35,6 +53,8 @@ Checklist means apply only to tasks containing that dimension; they do not imply
 - [x] Version mechanical criteria, preserve unchanged judge packets and judgments, and regrade all available cohorts. If policy changes are justified, version the scorer/packet, validate positive and negative cases, and regrade every cohort consistently. Keep old scores and publish the effect of the correction separately from product improvements. Do not modify task gold to fit answers.
 
 ## 2. Build a failure ledger grounded in traces
+
+The [first gap diagnosis](pdlc-rubric-gap-diagnosis.md) records the completed family breakdown and representative cases. Its evidence and candidate tests are tracked in the execution checklist above.
 
 For every missing required fact, incomplete plan item and material unsupported claim, record the task/repetition, rubric item, gold evidence, source decision, query/alias/selector, fetched passages, delivered passages and judge rationale. Classify: source not selected; wrong query/subject; evidence fetched but omitted; relevant evidence delivered but answer missed it; missing corpus evidence correctly diagnosed; or scoring dispute. Gold evidence identifies an investigation target; absence of its exact artifact alone is not proof that alternate supporting evidence was unavailable.
 

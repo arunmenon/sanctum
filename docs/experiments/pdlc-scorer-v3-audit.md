@@ -1,5 +1,11 @@
 # Mechanical scorer v3 audit and correction
 
+## Complete-cohort update
+
+The missing direct-hub judgment was recovered on 5 October with one recorded schema-repair judge call, preserving its original packet and failed response. This exception involved no agent rerun and supersedes the earlier incomplete-comparison status below. The merged recovery lives in `quality-recovery-01/` under the original run, and all 360 records were rescored separately in `build/rubric-gap-audit/mechanical-v3-03/`.
+
+Unconstrained versus direct access now covers all thirty tasks: overall +13.63 percentage points (descriptive task-cluster interval +7.33 to +20.39); supported +11.67, partial +13.70 and boundary +19.44 points. Historical-cohort confounding, same-model judging and pending independent/human acceptance still apply. The [gap diagnosis](pdlc-rubric-gap-diagnosis.md) separates family results and remaining failure causes.
+
 ## What changed
 
 The 0/1/2 checklist scale is unchanged. Two mechanical criteria were corrected:

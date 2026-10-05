@@ -22,17 +22,37 @@ The broker holds provider credentials and saves model-call records. Sanctum call
 
 The lab retains three experimental behaviors. A real Jev call alone does not tell you which one ran.
 
-| Mode | What happens to Jev’s advice? | What it tests |
+| Mode | Selection behavior | Result record |
 |---|---|---|
-| Original shadow mode | Advice is recorded; uncalibrated skip advice does not remove sources | Sanctum with Jev calls and overhead, without that source-pruning effect |
-| Calibrated guarded mode | Jev can prune candidates, but required-source and nonempty-source rules can override it | Jev filtering within the earlier routing rules |
-| `jev_unconstrained` | Jev considers all eligible hubs and can choose all, some or none; no forced-source or nonempty override | Jev’s source-selection choices, including mistakes |
+| Shadow | Record advice; keep candidates when skip decisions are uncalibrated | [Original comparison](../experiments/pilot-0-quality-results.md) |
+| Guarded | Apply calibrated filtering; required-source and nonempty rules can override it | [Guarded findings](../experiments/pdlc-jev-guarded-results.md) |
+| Unconstrained | Select on raw usefulness probability ≥ 0.5; no selection overrides | [Unconstrained findings](../experiments/pdlc-jev-unconstrained-results.md) |
 
-Calibration means checking decisions on separate development examples before choosing a threshold. Earlier modes use scoped calibration. The unconstrained mode deliberately applies raw decisions without that calibration gate.
+Calibration means checking decisions on separate development examples before choosing a threshold. The unconstrained mode deliberately uses raw decisions without that fitted threshold.
 
-“Unconstrained” refers to hub selection. Caller access checks, process isolation and run budgets still apply. In that mode, memory may help resolve names and translate searches, but it cannot force or exclude a hub. Selecting zero hubs is a possible recorded outcome.
+```mermaid
+flowchart TD
+    J[Jev advice] --> S[Shadow: record advice]
+    J --> G[Guarded: apply calibration]
+    J --> U[Unconstrained: apply raw yes or no]
+    S --> K[Keep routing candidates]
+    G --> R[Required-source and nonempty overrides]
+    U --> N[Search chosen hubs, possibly none]
+    K --> H[Hubs searched]
+    R --> H
+    N --> H
+```
 
-The [active-Jev plan](../experiments/pdlc-jev-active-plan.md) preserves the transition between modes. The [unconstrained results](../experiments/pdlc-jev-unconstrained-results.md) and [four-variant follow-up](../experiments/pdlc-rubric-followup-results.md) record completed experiments. The follow-up’s richer descriptions and memory changes have not been promoted.
+**In unconstrained mode:**
+
+- Jev considers all eligible pilot hubs, rather than a rule-selected shortlist.
+- Sanctum searches the hubs Jev selects. That can be none.
+- No rule adds a hub back, and no calibration adjusts the raw decision.
+- Memory can translate names and search scopes; it cannot add or remove a hub.
+- Access checks, process isolation and run limits still apply.
+- Missing model answers are recorded as unavailable; they do not trigger rules-based selection.
+
+Experiment setup and budgets are in the [method guide](../experiments/method/README.md). Outcomes are in the [results index](../experiments/README.md).
 
 ## Provider configuration and verification
 
@@ -44,7 +64,14 @@ If a provider is unavailable, inspect the recorded error and the configured fall
 
 ## Budgets and credentials
 
-System One calls have their own accounting, separate from Claude’s tool calls. The pilot runtime requires positive per-attempt call and input-token limits; its configured allowance is at most two broker calls and a 10,000-input-token reservation per attempt. Other experiments must read their own bundle limits.
+System One calls are accounted separately from Claude’s tool calls. Budgets belong to a campaign’s bundle, not to a routing mode globally.
+
+| PDLC campaign | Broker calls per attempt | Input-token reservation per attempt |
+|---|---:|---:|
+| Original shadow and guarded | 2 | 10,000 |
+| Unconstrained and four-variant follow-up | 32 | 500,000 |
+
+Read the [method guide](../experiments/method/README.md#resource-limits) for the agent’s separate limits. New experiments must verify their own settings.
 
 Unknown provider usage remains unknown and must be reconciled. An unissued request is different from a dispatched request whose usage receipt is missing.
 

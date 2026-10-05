@@ -23,7 +23,23 @@ PYTHONPATH=src:. .venv/bin/python tools/plan_agent_run.py examples/agent-bundles
 PYTHONPATH=src:. .venv/bin/python tools/run_agent_attempt.py examples/agent-bundles/shipping/experiment.yaml --out build/my-fixture-run --task-id shipping-eligibility --arm direct --fixture
 ```
 
-For real Claude execution, supply an accepted bundle with model/effort, explicit budget, verified installed-CLI isolation and round-limit proofs, caller snapshot and spend ledger. Sanctum also requires reviewed memory and verified System One pins. Use the matching binary on PATH. The shipping fixture deliberately cannot dispatch inference.
+### Before a real Claude run
+
+You need:
+
+- An accepted bundle with reviewed questions and private criteria.
+- An exact model and effort setting.
+- An explicit inference budget and spend ledger.
+- Verification that the installed CLI is isolated and respects round limits.
+- A snapshot of the intended caller identity.
+- The matching verified CLI binary on `PATH`.
+
+The Sanctum setup also needs:
+
+- A reviewed routing-memory release.
+- Verified System One settings and matching runtime files.
+
+The shipping fixture is intentionally not configured for model dispatch. It cannot start a real Claude run.
 
 ```bash
 PYTHONPATH=src:. .venv/bin/python tools/run_agent_campaign.py /path/to/accepted-bundle/experiment.yaml --out build/my-native-run
@@ -51,7 +67,16 @@ PYTHONPATH=src:. .venv/bin/python tools/report_agent_run.py /path/to/bundle/expe
 
 Reporting invokes no inference, but it validates the experiment and installed-CLI pins. It writes `comparison-report.json` under the run. The score map is keyed by scheduled attempt ID; semantic entries link to saved reviews within that run.
 
-`tools/run_quality_evaluation.py` is currently a **local reference driver**, not a portable turnkey CLI: it pins a developer-local Claude 2.1.288 binary, reads cached subscription auth with a macOS Keychain fallback, imports calibration fixtures and expects the current quality-policy format. It invokes Sonnet for semantic judging. Porting it requires selecting/verifying a local binary and revising the driver in a new pinned evaluation; do not copy personal paths into a general bundle or alter an active driver's source mid-run. [Scoring](scoring.md) explains calibration and acceptance gates.
+### Not portable yet: semantic evaluation driver
+
+`tools/run_quality_evaluation.py` is a local reference driver, not a turnkey CLI for another machine. It invokes Sonnet to judge saved answers.
+
+- It pins a developer-local Claude 2.1.288 binary.
+- It reads cached subscription login, with a macOS Keychain fallback.
+- It imports calibration fixtures and expects the current policy format.
+- Reusing it requires selecting and verifying your own binary in a new pinned evaluation.
+
+Do not copy personal paths into a general bundle or change an active evaluator mid-run. [Scoring](scoring.md) explains calibration and acceptance checks.
 
 ## Recovery table
 

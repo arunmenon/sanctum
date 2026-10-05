@@ -4,7 +4,7 @@ Sanctum helps a coding agent find evidence across code, documents, procedures an
 
 **All lab evidence is synthetic.** The hubs are working local services. The experiments test a research implementation, not a production deployment.
 
-## For tomorrow’s walkthrough
+## Reading order
 
 Start with the [guided walkthrough](walkthrough.md). It follows one question through the system and explains the terms as they appear. Then open these pages in order:
 
@@ -32,10 +32,9 @@ The code, documentation and small [shipping example](../../examples/agent-bundle
 
 The larger PDLC corpus contains 120 artifacts. Its corpus files, reviewed memory release, private task bundle and raw run records are generated local inputs under ignored `build/` directories. A fresh checkout does not contain them. See [corpus and hubs](corpus-and-hubs.md) before trying to reproduce that campaign.
 
-## Current behavior and experiment history
+## Design and experiment records
 
-This pack describes implementation as of **2026-10-05**. The [HLD artifacts](../../design/intelligence-layer/README.md) describe design intent. The root README’s milestones preserve older experiments.
-
-The lab supports several System One modes. Earlier campaigns recorded Jev advice without applying it, or applied it with routing overrides. Later experiments let Jev choose all, some or none of the eligible hubs. These are different conditions; see [System One](system-one.md).
-
-For results, read the [unconstrained Jev comparison](../experiments/pdlc-jev-unconstrained-results.md) and the [four-variant follow-up](../experiments/pdlc-rubric-followup-results.md). The follow-up compares Sanctum configurations, not Sanctum against direct hub access. Its changes have not been promoted. Human acceptance is still pending, and grading disagreements remain under investigation. These records support exploratory findings, not a production recommendation.
+- **Design intent:** [HLD artifacts](../../design/intelligence-layer/README.md). This guide describes implementation as of 2026-10-05.
+- **Setup:** [experiment method](../experiments/method/README.md), separate from findings.
+- **Findings and open questions:** [results index](../experiments/README.md), with one entry per experiment.
+- **History:** the root README’s milestones and preserved plans describe earlier work, not current status.

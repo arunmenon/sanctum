@@ -1,3 +1,54 @@
+# Direct hubs versus shadow Sanctum: findings
+
+## Question
+
+Does Claude answer better through Sanctum when Jev’s uncalibrated skip advice is recorded but not applied? This is the original two-arm comparison, not the later unconstrained experiment.
+
+## What changed and what stayed constant
+
+- **Changed:** Claude’s tool surface: direct hub tools versus Sanctum retrieval.
+- **Held constant:** the synthetic corpus, public questions, private criteria, agent configuration and shared agent limits.
+- **Jev behavior:** real calls in the Sanctum arm, without the intended source-pruning effect.
+
+## Cohort and scoring
+
+**30 tasks × two setups × three repetitions = 180 attempts.** Task mix: 18 supported, six partial and six out of scope. All attempts finished. Four agent-output protocol failures remain zero-credit; a missing direct judgment was recovered without an agent rerun.
+
+The table uses the corrected v3 scoring policy and all 30 task pairs. Do not compare these absolute scores with the later 12-question follow-up.
+
+## Corrected results
+
+Differences are shadow Sanctum minus direct hubs, in percentage points. These are required-fact coverage differences, not completion rates.
+
+| Slice | Tasks | Difference | Descriptive 95% interval |
+|---|---:|---:|---|
+| Overall | 30 | -2.69 | -14.13 to +8.83 |
+| Supported | 18 | -6.73 | -19.94 to +6.91 |
+| Boundary | 6 | +9.26 | -25.00 to +38.89 |
+| Partial | 6 | -2.50 | -26.39 to +22.78 |
+
+All intervals include zero. This comparison does not establish a quality winner. The supported-task estimate favors direct access; it is not proof of a general advantage.
+
+## Limits
+
+- One synthetic scenario and a small task set.
+- Same-model semantic judging and post-run scoring-policy repairs.
+- Independent task-gold acceptance and human answer acceptance pending.
+- This tests shadow Sanctum, not Jev-driven candidate selection.
+
+## Decision and evidence
+
+Keep this comparison as the historical baseline. Use the [unconstrained record](pdlc-jev-unconstrained-results.md) for the later Jev-selection comparison.
+
+Local source: `build/rubric-gap-audit/mechanical-v3-03/original/report.json`. The source is ignored in Git; public summaries do not publish raw answers or credentials. See the [scorer audit](pdlc-scorer-v3-audit.md) for the recorded judgment recovery.
+
+## Original scoring — superseded
+
+The original 2026-10-04 report below is retained for audit history. Its missing-grade status and completion figures are superseded by the v3 correction and recorded recovery above.
+
+<details>
+<summary>Open the original report</summary>
+
 # Pilot-0 exploratory quality results
 
 Recorded 2026-10-04 from the saved Sonnet 5.5 subscription campaign. All 180 native agent runs completed: 30 tasks × two arms × three repetitions. The quality driver finished processing the schedule in `build/agent-runs/sonnet55-full-development-01/quality-evaluation-07`.
@@ -34,3 +85,7 @@ The study has one synthetic connected scenario, 30 tasks, same-model Sonnet judg
 Next: examine task-level failure patterns and conduct the pending independent gold/human checks before changing routing or making adoption claims. Do not silently repair the failed judge record or rerun selected agent answers. Any later adjudication requires a separately recorded decision and preserved original evidence.
 
 Sources: local `comparison-report.json`, `execution-summary.json`, `quality-evaluation-07/{scores,judge-failures,complete}.json`; [scoring contract](../lab/scoring.md), [review dispositions](quality-scoring-review-dispositions.md).
+
+</details>
+
+[Back to results index](README.md)

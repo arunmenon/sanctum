@@ -6,7 +6,14 @@ For example, Claude might be asked: “What happens when fraud checking times ou
 
 ## What is set up in this reference implementation?
 
-There are three stages: prepare information, run a question, and evaluate the answer. The preparation tools run before the experiment. The scorer runs afterward.
+There are three stages: prepare information, run a question, and evaluate the answer. Preparation runs before the experiment; scoring runs afterward.
+
+Terms used below:
+
+- **Gateway:** the intermediary that carries and records hub calls.
+- **Broker:** the intermediary that calls an external decision model and records its response.
+- **Arm:** one setup being compared, such as direct hubs or Sanctum.
+- **Runtime release:** a reviewed version of memory selected for a run.
 
 | Stage | Component | Its job |
 |---|---|---|
@@ -63,9 +70,19 @@ Claude chooses its searches and can ask follow-up questions within the run’s l
 
 ## Inside Sanctum
 
-Sanctum resolves the question’s intent and subjects, selects sources, searches them, and returns a compact set of passages with citation details. Its [routing memory](routing-memory.md) supplies reviewed names and search scopes. [System One](system-one.md), using Jev in the hosted experiments, supplies source-usefulness decisions. The configured mode determines how those decisions affect selection.
+Sanctum does four things:
 
-System One calls pass through a runner-owned broker. That broker holds provider credentials and records model calls. Claude does not call Jev directly. MemoryHub is a separate hub containing prior-session evidence; it is different from Sanctum’s routing memory.
+1. **Understand the question.** Intent analysis identifies the kind of information needed; routing memory helps resolve names and subjects.
+2. **Choose sources.** Routing policy and the configured System One mode determine which hubs to consult.
+3. **Search for evidence.** The gateway carries search and fetch calls to the selected hubs.
+4. **Pack the evidence.** Sanctum returns selected passages with version and citation details.
+
+Two distinctions matter:
+
+- Claude writes the answer; Jev supplies source-usefulness decisions through the broker.
+- Routing memory is the search map; MemoryHub is evidence from past sessions.
+
+Read [routing memory](routing-memory.md) and [System One](system-one.md) for the detailed behavior.
 
 ## Scoring happens outside the answer path
 

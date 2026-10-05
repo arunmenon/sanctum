@@ -38,16 +38,23 @@ All referenced paths stay within the bundle’s root. File hashes record exact i
 
 The criteria contain required facts, evidence or missing-evidence obligations, and any task-specific plan checklist. A diversity matrix records the task mix. See the complete [shipping example](../../examples/agent-bundles/shipping/experiment.yaml).
 
-| Configuration | Purpose |
-|---|---|
-| `mode`, `workspace` | Currently `evidence_only`, empty workspace |
-| `agent` | Adapter `claude_code`, exact model, effort, authentication and installed-CLI proofs |
-| `arms` | `direct_hubs` or `sanctum_only`; Sanctum requires a verified runtime file |
-| `limits` | Rounds, calls, cumulative/per-response evidence tokens, deadline and inference ceiling |
-| `execution` | Repetitions, random seed and fresh-session requirement |
-| `readiness` | Explicit dispatch, isolation and independent-freeze gates |
+### What you choose
 
-[bundle.py](../../src/sanctum_run/bundle.py) checks offline linkage, corpus hashes and task mix; its success alone does not enable inference. [agent_contract.py](../../src/sanctum_run/agent_contract.py) and [agent_runtime.py](../../src/sanctum_run/agent_runtime.py) enforce executable and Sanctum prerequisites.
+- **Workspace mode:** currently evidence-only with an empty workspace.
+- **Agent:** Claude Code, exact model, effort and authentication mode.
+- **Tool setup:** direct hubs or Sanctum-only.
+- **Limits:** rounds, calls, evidence tokens, deadline and inference allowance.
+- **Execution:** repetitions and random seed, with fresh sessions.
+
+### What the harness verifies
+
+- Paths stay inside the bundle; file hashes match.
+- Questions and private criteria link correctly and satisfy task-mix checks.
+- The installed CLI and its isolation/round controls match their verification records.
+- A Sanctum setup names a reviewed memory release and verified runtime configuration.
+- Dispatch is explicitly allowed and any required acceptance gates are satisfied.
+
+[bundle.py](../../src/sanctum_run/bundle.py) checks the offline inputs. Passing it alone does not enable model calls. [agent_contract.py](../../src/sanctum_run/agent_contract.py) and [agent_runtime.py](../../src/sanctum_run/agent_runtime.py) check execution prerequisites.
 
 ## Controller and evidence path
 
@@ -66,11 +73,13 @@ The direct arm exposes authorized hub tools. The Sanctum arm exposes only `sanct
 
 ### Sessions and authentication
 
-Every attempt starts fresh so earlier conversations cannot leak into later answers. The bundle chooses either API authentication or subscription authentication; they are separate modes.
+Every attempt starts fresh so earlier conversations cannot influence later answers.
 
-Subscription mode uses Claude Code’s cached first-party OAuth credential and does not fall back to an API key. Checks are tied to the exact installed CLI, model and authentication mode.
+- The bundle selects API authentication **or** subscription authentication.
+- Subscription mode uses Claude Code’s cached first-party OAuth credential; it does not fall back to an API key.
+- Verification records identify the exact installed CLI, model and authentication mode.
 
-The current process and isolation checks verify the evidence-only experiment. They do not provide a hostile-code sandbox for future tasks that edit and execute repositories.
+These controls cover the evidence-only experiment. They are not a hostile-code sandbox for future tasks that edit and execute repositories.
 
 ## Durable outputs
 

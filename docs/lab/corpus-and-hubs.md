@@ -34,7 +34,7 @@ SkillHub uses guidance collections and procedure paths. MemoryHub uses session c
 
 The hubs are working MCP services backed by local JSONL files and an SQLite FTS5 text-search index. They simulate knowledge sources rather than connect to live production repositories.
 
-## Artifact contract and hierarchy
+## What an artifact record contains
 
 Each hub has two input files under `hubs/<hub_id>/`:
 
@@ -76,12 +76,22 @@ flowchart TD
 | Verify retrieval | MCP verification receipt; lab operator | Every artifact can be fetched with the intended caller identity |
 | Accept/freeze evaluation | Experiment readiness and task-gold records; independent evaluator | Separate gold acceptance and pinned snapshots; loading alone is insufficient |
 
-Pilot authoring supports OpenAI and Gemini through [generate_pdlc_corpus.py](../../tools/generate_pdlc_corpus.py). It uses bounded jittered retries and a reservation ledger. Provider/model IDs and price records are explicit inputs to this historical preparation workflow, not a guarantee that they remain current.
+## Which script does what?
 
-The PDLC ingester intentionally writes only `build/pdlc-pilot` and requires local audited authoring inputs. It does not recreate the pilot from a fresh checkout automatically. Use the checked-in shipping fixture for onboarding, or supply a separately audited bundle for a new scenario.
+| Tool | Job |
+|---|---|
+| [generate_pdlc_corpus.py](../../tools/generate_pdlc_corpus.py) | Author drafts through OpenAI or Gemini, with bounded jittered retries and spend reservations |
+| [map_pdlc_hierarchy.py](../../tools/map_pdlc_hierarchy.py) | Assign homes and repository/service/domain/team cross-links |
+| [ingest_pdlc_corpus.py](../../tools/ingest_pdlc_corpus.py) | Convert audited drafts into hub records while preserving mappings |
+| [servers.py](../../src/sanctum_hubs/servers.py) | Serve source-specific MCP search and fetch tools |
+| [access.py](../../src/sanctum_hubs/access.py) | Enforce caller access-control lists (ACLs) |
+| [versions.py](../../src/sanctum_hubs/versions.py) | Control which artifact versions can be read |
 
-[servers.py](../../src/sanctum_hubs/servers.py) owns source-specific search/fetch tools. [access.py](../../src/sanctum_hubs/access.py) enforces ACLs; [versions.py](../../src/sanctum_hubs/versions.py) controls version reads. Lab mutations and failure injection remain runner/admin functions, not agent tools. Access-control lists (ACLs) determine which caller can read an artifact.
+Important limits:
 
-Next: [routing memory](routing-memory.md), [extending](extending.md), [runbook](runbook.md).
+- Model IDs and price records are explicit authoring inputs, not a claim that historical settings remain current.
+- The PDLC ingester writes only `build/pdlc-pilot` and requires local audited inputs.
+- A fresh checkout does not automatically recreate the PDLC corpus. Start with the checked-in shipping fixture or supply audited inputs.
+- Mutations and failure injection are runner/admin operations, not agent tools.
 
-[Back to start](README.md).
+Next: [routing memory](routing-memory.md), [extending](extending.md), [runbook](runbook.md). [Back to start](README.md).

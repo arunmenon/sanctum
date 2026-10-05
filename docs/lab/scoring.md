@@ -38,7 +38,7 @@ The answer format has `schema_version`, prose `answer`, `claims` with IDs/text/c
 | Boundary facts | Precise missing-evidence diagnosis, relevant observed investigation and configured source obligations; generic refusal is insufficient |
 | Whole-answer grounding | Inspect prose beyond the declared claim list for fabricated or uncited facts and contradictions |
 | Plans | Score each dimension 0 absent/wrong, 1 partial with named gap, 2 all task-specific mandatory items coherently met |
-| Completion | All required facts, supported citations, full required plan, uncertainties/caller obligations, no material unsupported claims or unresolved contradictions, observed retrieval and no declared unmet requirements |
+| Completion | All applicable items in the completion checklist below |
 
 ## What do plan scores 0, 1 and 2 mean?
 
@@ -72,28 +72,63 @@ A generic “I cannot answer” is not sufficient for a boundary task. The answe
 
 Semantic packets include the public task, private criteria, neutral evidence inventory and investigation context, without arm/tool/cost identifiers. Each review is bound to a packet hash; schemas require per-item labels and reasons. Mechanically valid citations are not automatically semantically supporting citations.
 
-## Failures and acceptance
+## Failures: preserve the original answer
 
-Only a strict outer JSON fence may be removed. Invalid JSON is a zero-credit protocol failure, retained in the denominator. Do not rewrite an agent answer, manufacture a citation or rerun a poor answer to improve the result.
+| Situation | What happens | What must not happen |
+|---|---|---|
+| Agent answer is invalid JSON or violates the protocol | Zero-credit failure remains in the totals | Rewrite the answer, manufacture citations, or selectively rerun the agent |
+| Judge reply has the wrong format | One policy-declared retry; preserve both replies | Fill in missing semantic labels |
+| Judge still fails after retry | Mark grading unknown; report the missing grade | Treat missing judgment as an agent-quality zero |
+| Calibration or grading disagrees | Investigate | Choose the more favorable grade |
 
-The quality driver permits one policy-declared format retry for malformed judge output, preserving the first response and error. It does not supply missing semantic labels. The latest follow-up also records a narrowly scoped format repair that removed plan annotations where the frozen checklist was empty; see its [recovery record](../experiments/pdlc-rubric-followup-results.md#scoring-recovery-and-verification). After an exhausted schema retry, the driver records an unknown review failure and continues other judgments. The report remains incomplete where grades are missing; no agent-quality zero is invented. Calibration disagreement is a gate to investigate, not permission to pick the nicer grade.
+Only a strict outer JSON fence may be removed from the agent response. A **judge packet** is the saved question, private criteria and delivered-evidence context supplied to the judge; its hash ties the review to exact inputs.
 
-A task is provisionally complete only when all its required facts and applicable plan items pass, citations support the claims, uncertainty and caller obligations are satisfied, and no material unsupported claims, unresolved contradictions or declared unmet requirements remain. The attempt must have completed with observed retrieval.
+## Completion: automated versus accepted
 
-Evidence delivery limits are reported separately. A limit flag alone does not prove that an otherwise complete answer failed.
+A task has two completion levels. Automated checks give the first; a matching human acceptance gives the second.
 
-`provisional_task_complete` means the automated checks passed. `task_complete` additionally requires the matching human acceptance. Human acceptance requires a pinned human-reviewer registry and a receipt bound to the answer, gold, attempt and review. Independent acceptance of task gold is another prerequisite. The current PDLC judge is Sonnet 5.5 low judging Sonnet answers: same-model bias and post-run scoring-policy repairs must be disclosed. Human spot checks and all boundary-gold acceptance are still pending; this is exploratory development scoring.
+| Level | Field | Requirement |
+|---|---|---|
+| Passed automated checks | `provisional_task_complete` | Every applicable item below passes |
+| Human accepted | `task_complete` | Automated completion plus recorded acceptance of that exact answer and review |
+
+**Automated checklist — all must hold:**
+
+- Every required fact is established with the required support.
+- Citations are valid and support their claims.
+- Every mandatory plan item is coherently met.
+- Uncertainty and caller obligations are satisfied.
+- No material unsupported claims or unresolved contradictions remain.
+- The run completed with observed retrieval.
+- The answer declares no unmet requirements.
+
+**Acceptance requirements:**
+
+- Human acceptance matches the answer, gold, attempt and semantic review.
+- The human reviewer is registered and differs from the semantic adjudicator.
+- Independent acceptance of task gold is a separate prerequisite.
+
+Evidence-delivery limits are reported separately. A limit flag alone does not prove that an otherwise complete answer failed.
+
+For dated judge configurations, grading repairs and acceptance status, see the [results index](../experiments/README.md). Keep these campaign-specific details out of the general scoring rules.
 
 ## How we check whether grading is wrong
 
 Compare three things: the source passage, Claude’s answer, and the judgment. If Claude omitted a required fact, that is an answer gap. If Claude stated the fact correctly with supporting evidence but received no credit, investigate grading before changing Jev or memory.
 
-The [follow-up results](../experiments/pdlc-rubric-followup-results.md) remain exploratory. Fact-versus-recommendation labeling disagreements are under investigation; do not treat every lost mark as a proven routing failure.
+Do not treat a lost mark as a proven routing failure until the evidence, answer and scoring decision have been checked.
 
 ## Comparison rules
 
-[report_agent_run.py](../../tools/report_agent_run.py) validates saved bindings and, with a quality policy, recomputes scores from saved reviews before aggregation. Report supported-fact coverage, citation support, unsupported claims, plan scores, provisional completion, reliability, cost and latency together. Keep supported, partial and out-of-scope strata separate so successful refusals cannot hide weak supported answers.
+[report_agent_run.py](../../tools/report_agent_run.py) verifies saved input bindings and recomputes scores from saved reviews before aggregation.
 
-Average repetitions within each task/arm, then compare paired task differences. The seeded bootstrap resamples tasks, not individual facts or repeated runs. Thirty tasks within one scenario support directional findings; they do not resolve a narrow noninferiority margin or establish production adoption. Missing or invalid comparisons are labeled rather than silently dropped.
+- Report fact coverage, citation support, unsupported claims, plans and provisional completion separately.
+- Keep supported, partial and out-of-scope tasks separate; successful refusals must not hide weak supported answers.
+- Average repetitions within each task/setup, then compare paired task differences.
+- Resample whole tasks for uncertainty intervals, not individual facts or repeated answers.
+- Label missing or invalid comparisons rather than silently dropping them.
+- Keep operational reliability, cost and latency alongside quality; they are different outcomes.
+
+Thirty tasks within one scenario support directional findings. They cannot resolve a narrow quality margin or establish production adoption. See [experiment method](../experiments/method/README.md) for campaign setup.
 
 [Back to start](README.md). Next: [runbook](runbook.md), [rubric fixtures](../../tests/fixtures/agent-score-cases.json), [quality review dispositions](../experiments/quality-scoring-review-dispositions.md).

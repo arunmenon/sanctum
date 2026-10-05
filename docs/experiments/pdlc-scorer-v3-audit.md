@@ -1,10 +1,27 @@
 # Mechanical scorer v3 audit and correction
 
-## Complete-cohort update
+This is a scoring-policy correction, not a new product experiment. The current comparison summaries are in the [results index](README.md).
+
+## Complete-cohort update — current
 
 The missing direct-hub judgment was recovered on 5 October with one recorded schema-repair judge call, preserving its original packet and failed response. This exception involved no agent rerun and supersedes the earlier incomplete-comparison status below. The merged recovery lives in `quality-recovery-01/` under the original run, and all 360 records were rescored separately in `build/rubric-gap-audit/mechanical-v3-03/`.
 
-Unconstrained versus direct access now covers all thirty tasks: overall +13.63 percentage points (descriptive task-cluster interval +7.33 to +20.39); supported +11.67, partial +13.70 and boundary +19.44 points. Historical-cohort confounding, same-model judging and pending independent/human acceptance still apply. The [gap diagnosis](pdlc-rubric-gap-diagnosis.md) separates family results and remaining failure causes.
+**30 tasks × three repetitions per setup**, with the original semantic judgments and recorded recovery under the v3 mechanical policy.
+
+| Unconstrained minus direct access | Difference |
+|---|---:|
+| Overall | +13.63 percentage points |
+| Supported | +11.67 points |
+| Partial | +13.70 points |
+| Boundary | +19.44 points |
+
+The overall descriptive interval is +7.33 to +20.39 points. Limits still apply:
+
+- Historical campaign timing and order differ.
+- The semantic judge uses the same model family.
+- Independent and human acceptance remain pending.
+
+The [gap diagnosis](pdlc-rubric-gap-diagnosis.md) separates task-family results and remaining failure causes.
 
 ## What changed
 
@@ -15,13 +32,15 @@ The 0/1/2 checklist scale is unchanged. Two mechanical criteria were corrected:
 
 Version: `mechanical-v3-boundary-support-completion`. Judge packets, semantic judgments, task gold, agent answers and runs were not changed. This is a scoring-policy repair, not a new product experiment. Blind-judge visibility of operational metadata is still a separate unresolved audit; no new judge calls were made.
 
-## Verification and rescoring
+## Initial verification and rescoring — before the recovery
 
 46 focused checks passed, including successful and unsuccessful content under a delivery limit, mixed boundary/factual premises, nonentailing and uncited premises, irrelevant/failed investigation, stale bindings and report preservation.
 
 359 available original score records were recomputed across the original direct/shadow campaign and the two subsequent Sanctum cohorts. The four original agent-output protocol failures remain zero; the original unscored direct-arm judgment remains unknown. Every recomputed score retained the original answer, attempt, gold, judge-packet and semantic-review hashes. Reports independently recomputed score derivations and found no binding issues. Original files and reports were preserved. No agent reruns or inference calls occurred. The failed first offline command encountered a protocol-failure score without a `fact_credit` field; the runner was corrected to handle that existing schema, and version `mechanical-v3-02` completed.
 
 ## Revised rubric results
+
+**Cohort: the original 30 tasks, with three attempts per task/setup.** This table compares the historical guarded and unconstrained cohorts using the same v3 mechanical policy. It does not describe the later 12-question follow-up.
 
 | Required-fact coverage | Calibrated / guarded | Unconstrained |
 | --- | ---: | ---: |
@@ -31,7 +50,7 @@ Version: `mechanical-v3-boundary-support-completion`. Judge packets, semantic ju
 
 The earlier apparent out-of-scope decline (26.85% to 15.74%) was driven by the mechanical claim-type rule; it is superseded by this consistently rescored comparison. This does not imply that every boundary answer is perfect. Supported-task coverage is unchanged. Checklist scores and original material-unsupported-claim incidence are unchanged because semantic judgments were reused.
 
-Overall unconstrained versus guarded: +13.06 percentage points, descriptive paired task-cluster bootstrap interval +5.07 to +21.41 points. Versus original shadow mode: +16.31 points, interval +6.85 to +26.26. These remain exploratory historical-cohort comparisons with pending human/independent-gold acceptance. Full comparison against direct access remains incomplete because its original one missing judgment remains unscored; do not silently exclude that task to claim a full winner.
+Overall unconstrained versus guarded: +13.06 percentage points, descriptive paired task-cluster bootstrap interval +5.07 to +21.41 points. Versus original shadow mode: +16.31 points, interval +6.85 to +26.26. These remain exploratory historical-cohort comparisons with pending human/independent-gold acceptance. At this earlier audit stage, the direct comparison was incomplete. That status is superseded by the complete-cohort recovery at the top of this page; the original missing judgment was recovered without an agent rerun.
 
 Provisional supported-task completion is 31/54 for unconstrained, 21/54 for guarded, 23/54 for original shadow and 23/54 for direct access. These are answer attempts across repetitions, not independent task counts, and none constitutes human acceptance. Across all unconstrained scopes, 33 answers are provisionally complete. Some accurately diagnosed boundary/partial responses still declare original caller requirements unmet, so coverage and full completion must remain separate measures.
 
@@ -44,3 +63,5 @@ Local outputs: `build/rubric-gap-audit/mechanical-v3-02/complete.json`, `changes
 ## Remaining work
 
 Trace missing supported facts and plan/uncertainty gaps using the corrected scores. Resolve true versus invented operational metadata claims through original receipts before changing judge visibility. Then choose System One and routing-memory changes from that evidence, retaining unconstrained Jev selection and verifying their effects on fresh development and held-out tasks. No call-count optimization is a current objective.
+
+[Back to results index](README.md)

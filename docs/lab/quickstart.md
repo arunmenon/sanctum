@@ -22,7 +22,13 @@ PYTHONPATH=src .venv/bin/python tools/lint_world.py --build build/docs-smoke/wor
 PYTHONPATH=src:. .venv/bin/python tools/score_m0.py
 ```
 
-Rendering produces `hubs/`, a private provenance directory and a manifest. With the checked-in base world and this seed, the manifest reports 3,009 distinct artifacts. Lint should exit zero with `0 finding(s)`. M0 scoring prints three synthetic stub cases; it checks the hand-authored fixture evaluator, **not** the newly rendered world or the PDLC agent campaign.
+**You should see:**
+
+- A `hubs/` directory, private provenance and a manifest containing 3,009 distinct artifacts.
+- Lint exit successfully with `0 finding(s)`.
+- M0 scoring print three synthetic stub cases.
+
+M0 checks the hand-authored fixture evaluator. It does not score the newly rendered world or the PDLC agent campaign.
 
 ## Exercise the agent harness
 
@@ -34,13 +40,29 @@ PYTHONPATH=src:. .venv/bin/python tools/plan_agent_run.py examples/agent-bundles
 PYTHONPATH=src:. TIKTOKEN_CACHE_DIR="$PWD/build/token-cache" .venv/bin/python tools/run_agent_attempt.py examples/agent-bundles/shipping/experiment.yaml --out build/docs-smoke/shipping-run --task-id shipping-eligibility --arm direct --fixture
 ```
 
-Validation reports one task and `ready_for_paid_dispatch: false`. Planning creates one frozen schedule item. The fixture should produce a terminal `completed` record with `fixture: true` and `task_complete: false`; it exercises the controller, MCP tool path and delivered-evidence records without running Claude or judging answer quality.
+**You should see:**
+
+- Validation: one task and `ready_for_paid_dispatch: false`.
+- Planning: one frozen schedule item.
+- Fixture result: `completed`, `fixture: true`, and `task_complete: false`.
+
+**`task_complete: false` is expected, not a failure.** This fixture checks orchestration, MCP calls and evidence delivery. It does not run Claude or assess answer quality.
 
 ```bash
 PYTHONPATH=src:. .venv/bin/pytest -q
 ```
 
 The suite verifies contracts, source isolation, failure handling, routing, memory and agent controls. Live-provider tests are skipped unless explicitly enabled; expected failures are documented in their tests. It does not independently accept private benchmark gold.
+
+## If the offline tutorial stops
+
+| Symptom | What to check |
+|---|---|
+| Python 3.12 is unavailable | Install Python 3.12, then create the virtual environment |
+| Import or dependency error | Confirm the install step completed and use `.venv/bin/python` from the repo root |
+| Tokenizer tries to download while offline | Bootstrap the cache with network access, then reuse the same `TIKTOKEN_CACHE_DIR` |
+| Attempt already dispatched | Choose a new output directory; do not delete or replay its existing receipt |
+| Fixture completes but task is not accepted | Expected: the fixture does not judge quality or provide human acceptance |
 
 Next: [architecture](architecture.md), [runbook](runbook.md).
 

@@ -13,17 +13,24 @@ flowchart TD
 
 This diagram explains the link meanings; it is not a dump of the current graph. An ABOUT link says a specific artifact discusses a subject. It does not say every file in its repository discusses that subject. Bindings include the artifact’s version and content hash, so they apply to the evidence that was actually reviewed.
 
-## Link types and implementation
+## Link types, with examples
 
-| Relation or record | Meaning | Runtime treatment |
+A **canonical subject** is the shared identity used across sources, such as Payment Authorization. A **selector** is a search scope, such as a repository or document space. Names can differ across hubs while referring to the same subject.
+
+The examples illustrate the meanings; they are not a claim that these exact strings occur in the current release.
+
+| Link | Plain meaning | Example |
 |---|---|---|
-| DENOTES | A scoped native name identifies a canonical entity | Accepted names support resolution |
-| SELECTS_FOR | A source place is a useful search scope for an entity | Accepted selectors guide retrieval |
-| MEMBER_OF | An explicit entity/domain membership | Trusted declarations guide context |
-| ABOUT | An artifact or passage discusses a subject | Accepted, version/hash-bound subjects affect evidence identity |
-| Procedures and authority assertions | Reviewed routing obligations and fact-kind authority | Scoped owner declarations and review required |
-| PARENT / related associations in harvest | Navigation/context structure | Do not assume every harvested edge is traversed at runtime |
-| RELATES_TO | Relationship retained for review | Stored, deliberately unused operationally |
+| DENOTES | This name identifies this subject | A service’s short name means Payment Authorization |
+| SELECTS_FOR | This place is worth searching for this subject | The payment-authorization repository |
+| ABOUT | This specific artifact discusses this subject | A handler file at a reviewed version |
+| MEMBER_OF | This subject belongs to a declared group | Payment Authorization belongs to Payments |
+
+Other records have narrower uses:
+
+- **Authority and procedures:** explicit, reviewed declarations about reliable fact sources and routing obligations.
+- **PARENT:** navigation/context links collected during harvest; do not assume every link is followed by the router.
+- **RELATES_TO:** retained for review, deliberately unused operationally.
 
 ### How proposals are grounded
 
@@ -31,7 +38,7 @@ The [harvest connector](../../src/sanctum_ref/harvest.py) lists artifacts in pag
 
 An LLM can propose links from those artifacts. Validators check source IDs, hashes and the exact passage supporting each proposal. Unsupported proposals are set aside for review. A plausible LLM sentence is not enough to establish a link or declare ownership.
 
-### How the graph is implemented
+### How it is stored — for implementers
 
 It is a local in-memory graph. [RelationStore](../../src/sanctum_ref/memory.py) stores entities in dictionaries keyed by ID. Its adjacency-style lists record which relationships leave a subject. Edge types such as `DENOTES` are relationship labels that the code validates.
 
@@ -53,23 +60,29 @@ flowchart TD
 
 The candidate is a draft. A runtime release contains the supported records accepted for use. Building a candidate does not change which release Sanctum uses. Source-owner policy must be declared explicitly; an LLM cannot create it from prose.
 
-### Responsibilities and checks
+### Who reviews what?
 
-| Step | Responsible role | Artifact / check |
+| Responsibility | Role | Output |
 |---|---|---|
-| Declare source policy | Source owner, or explicitly scoped synthetic lab curator | Owner registry, membership, authority and routing declarations |
-| Collect and propose | Harvest connector / LLM author | Stable inventory snapshot and grounded candidate assertions |
-| Decide assertion status | Delegated reviewer | Candidate snapshot hash, reviewer identity and source/edge/entity grants |
-| Assemble release | Release operator | `review_bundle` / `project_release`; unspecified proposals stay unreviewed |
-| Select runtime release | Experiment operator | Explicit memory release argument or `ACTIVE` pointer; runtime pins and scoped review bindings checked |
-| Accept an evaluation | Independent evaluator | Corpus/task acceptance separate from runtime memory selection |
+| Declare membership, authority and routing policy | Source owner or authorized synthetic-lab curator | Owner-policy records |
+| Propose grounded links | Connector and LLM author | Candidate graph with supporting evidence |
+| Accept or reject links | Reviewer authorized for those sources and link types | Review tied to the exact candidate version |
+| Build the usable memory version | Release operator | Reviewed release |
+| Choose memory for an experiment | Experiment operator | Bundle pointing to that release |
+| Accept task criteria and results | Independent evaluator | Separate evaluation acceptance |
+
+Reviewer permissions are sometimes called **grants**. They specify which sources, entities and link types the reviewer may accept. Release checks verify those permissions as well as the input hashes.
 
 ### What “active” means
 
-A graph is active for a run when that run selects its reviewed release. [agent_runtime.py](../../src/sanctum_run/agent_runtime.py) checks the release and matching review, reviewer permissions and owner-policy versions before starting Sanctum.
+A graph is active for a run when that run selects its reviewed release. Building a candidate does not activate it.
 
-The harvest pipeline does **not** change the global `ACTIVE` pointer. Experiments should select a specific release explicitly. Changing `ACTIVE` would affect later reference runs that do not name a release.
+- [agent_runtime.py](../../src/sanctum_run/agent_runtime.py) checks the release, review, reviewer permissions and owner-policy versions.
+- The harvest pipeline does **not** change the global `ACTIVE` pointer.
+- Experiments should choose a specific release. Changing `ACTIVE` affects later reference runs that do not name one.
+- Unreviewed assertions remain unreviewed; unknown subjects remain unknown.
+- Each record retains its visibility rules, source version and supporting evidence.
 
-The pilot's reviewed release is synthetic lab policy. Some assertions remain unreviewed; unknown subjects stay unknown. Owner declarations cannot be inferred from prose or invented to fill a graph gap. Each record retains who may see it and which source version supports it.
+The pilot’s owner policy is explicitly synthetic lab policy. It cannot be inferred from prose or invented to fill a gap.
 
 [Back to start](README.md). Next: [System One](system-one.md), [runbook](runbook.md), [HLD artifacts](../../design/intelligence-layer/README.md).

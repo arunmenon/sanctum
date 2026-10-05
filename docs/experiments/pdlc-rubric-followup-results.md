@@ -1,6 +1,21 @@
 # PDLC rubric follow-up: isolated descriptions and place memory
 
-All 48 Sonnet 5.5 subscription runs completed, and all 48 answers are scored. Twelve newly authored, technically reviewed development tasks ran once each through four variants, with randomized variant order, identical corpus, prompts, rubric and resource limits. Jev remained raw and unconstrained in every variant. This compares Sanctum variations, not a new direct-hub baseline.
+## Question
+
+Can Sanctum answer better by changing the information it uses to find evidence? This compares four Sanctum configurations, not a new direct-hub baseline.
+
+## What changed and what stayed constant
+
+- **Variants:** unchanged Sanctum, richer hub descriptions for Jev, reviewed place-memory mappings, and both changes together.
+- **Held constant:** corpus, public prompts, rubric, agent configuration and resource limits.
+- **Selection:** raw unconstrained Jev in every variant.
+- **Order:** randomized variant order.
+
+## Cohort and scoring
+
+**12 new questions × four configurations × one attempt = 48 runs.** Mix: six supported, three partial and three boundary questions. All 48 finished and were scored.
+
+These are different questions from the earlier 30-task campaigns. **Do not compare their absolute scores across pages.** The questions were technically reviewed but independent human/gold acceptance remains pending.
 
 ## Coverage and unsupported claims
 
@@ -11,22 +26,79 @@ All 48 Sonnet 5.5 subscription runs completed, and all 48 answers are scored. Tw
 | Reviewed place memory | 84.03% | 95.83% | 44.44% | 100.00% | 0 |
 | Both changes | 65.28% | 52.78% | 55.56% | 100.00% | 2 |
 
-Memory-only overall coverage improves by 10.42 percentage points; its descriptive paired task-cluster interval spans −2.78 to +23.61 points. Descriptions alone and combined each decline by 8.33 points, with intervals −26.39 to +9.72. These intervals include zero. Six supported, three partial and three boundary questions are too few to establish narrow margins or robust family effects.
+## What we learned
 
-The memory variation is a promising supported-task signal, with no material unsupported claims, but partial-evidence coverage regresses by 11.11 points. Do not promote it without diagnosing that regression. The description variation is not supported by these results: supported coverage falls by 25 points and unsupported claims appear. Combining it with memory does not recover that loss. The existing active configuration remains unchanged.
+| Change | Signal | Remaining concern |
+|---|---|---|
+| Memory only | Supported coverage rises from 77.78% to 95.83% | Partial-evidence coverage falls from 55.56% to 44.44% |
+| Richer descriptions | No supported-task improvement | Supported coverage falls to 52.78%; one answer has material unsupported claims |
+| Both changes | Memory does not recover the description decline | Two answers have material unsupported claims |
 
-Coverage does not mean completion. Provisional completion is 1/12 unchanged, 1/12 descriptions, 0/12 memory and 0/12 combined under the separate full checklist, uncertainty and unmet-requirement gates. Inspect those obligations before equating high fact coverage with completed PDLC work.
+### How uncertain is the overall difference?
+
+Differences below are percentage points versus unchanged Sanctum. These descriptive intervals resample whole tasks and all include zero.
+
+| Variation | Difference | Descriptive 95% interval |
+|---|---:|---|
+| Memory only | +10.42 | −2.78 to +23.61 |
+| Richer descriptions | −8.33 | −26.39 to +9.72 |
+| Both | −8.33 | −26.39 to +9.72 |
+
+Six supported and three questions per other slice are too few to establish reliable family effects or a narrow quality margin.
+
+### Coverage is not completion
+
+The full checklist also checks uncertainty and declared unmet requirements.
+
+| Configuration | Provisionally complete answers |
+|---|---:|
+| Unchanged | 1/12 |
+| Richer descriptions | 1/12 |
+| Memory only | 0/12 |
+| Both | 0/12 |
+
+These are automated completion results, not human-accepted task success.
+
+## Decision
+
+**Do not promote any variation yet.** Keep the existing active configuration.
+
+- Diagnose the partial-evidence regression in memory-only.
+- Diagnose the supported-evidence failures in description variants.
+- Check grading disagreements before treating every missing credit as a product failure.
+- Retain the negative results; make changes only where traces identify a specific mechanism.
 
 ## Scoring recovery and verification
 
-The initial workflow scored 47 answers and stopped at reporting because the evaluator imported `sys` only in its CLI entry point. Moving that import to module scope fixes embedded invocation. A new evaluation directory reused the saved judgments and fifteen exact-match calibration packets; no agent reruns or new fixture inference occurred.
+Saved records were preserved during recovery:
 
-The remaining judge response invented three planning dimensions for a behavior task whose frozen mandatory checklist is empty, even after its allowed format retry. A deterministic, recorded format repair removed only those nonapplicable annotations. Every fact, claim, citation, severity and contradiction label remained unchanged; the original response and failed retry remain preserved. No new judge call or rubric change was made. Final reporting recomputed all score derivations and validated evidence bindings.
+1. The first workflow scored 47 answers, then reporting failed because `sys` was imported only in the CLI entry point. Moving that import to module scope fixed embedded invocation.
+2. The replacement evaluation reused saved judgments and fifteen exact-match calibration packets. It did not rerun agents or invoke new fixture inference.
+3. One remaining judge reply added three plan dimensions to a behavior task whose frozen checklist was empty, even after its format retry.
+4. A recorded format repair removed only those inapplicable annotations. Fact, claim, citation, severity and contradiction labels remained unchanged.
+5. Final reporting recomputed scores and validated evidence bindings. No new judge call or rubric change was made for that repair.
 
-Local evidence: `build/agent-runs/sonnet55-rubric-followup-01/quality-evaluation-03/`, `quality-format-recovery-01/format-repair-receipt.json`, `followup-summary.json`, and `baseline-vs-{system-one,memory,combined}.json`. The general multi-arm report is operational; the three explicit paired reports establish complete comparisons. Its generic comparison-ready field is not the authority for this four-arm analysis.
+### Local evidence
+
+All paths below sit under `build/agent-runs/sonnet55-rubric-followup-01/` and are ignored in Git.
+
+| Record | Purpose |
+|---|---|
+| `quality-evaluation-03/` | Final saved judgments and scores |
+| `quality-format-recovery-01/format-repair-receipt.json` | Exact format repair and preserved originals |
+| `followup-summary.json` | Four-configuration summary |
+| `baseline-vs-{system-one,memory,combined}.json` | Three complete paired comparisons |
+
+The explicit paired reports establish comparisons. The general multi-arm report is operational; its generic comparison-ready field is not the authority for this four-arm analysis.
 
 ## Limits and next work
 
-This is one attempt per variant on twelve same-corpus tasks, with Codex technical acceptance, disclosed shared premises and a same-model semantic judge. Independent human/gold acceptance remains pending. These fresh questions do not establish independent generalization, and their absolute scores must not be compared directly with the previous thirty-task cohort.
+- One attempt per configuration on twelve same-corpus tasks.
+- Technical task acceptance by Codex, with shared premises disclosed.
+- Same-model semantic judge; independent gold and human acceptance pending.
+- Fresh questions do not establish independent generalization.
+- Follow-up fact-versus-recommendation grading disagreements remain under investigation.
 
-Next, trace the partial-evidence failures in memory-only and the supported failures in the description variants to selected sources, native filters, delivered evidence and answer/judge decisions. Preserve the negative results. Make further changes only where those traces establish a specific failure mechanism; keep Jev unconstrained and rubric quality as the objective.
+For each miss, inspect selected hubs, search filters, delivered evidence, Claude’s answer and the judge’s credit. Keep Jev unconstrained and answer quality as the objective.
+
+[Back to results index](README.md) · [Experiment method](method/README.md)

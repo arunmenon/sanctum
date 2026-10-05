@@ -1,5 +1,7 @@
 # Active Jev routing comparison
 
+> Historical plan and execution notes. Progress statements below describe the moment they were written. For current mode definitions, read [System One](../lab/system-one.md); for setup, read [experiment method](method/README.md); for completed findings, read the [results index](README.md).
+
 User authorized a new native Sonnet 5.5 subscription run on 2026-10-04. Preserve the previous shadow-mode Sanctum cohort as the historical comparison, not a no-Jev-cost baseline. Existing corpus, routing memory, agent model/effort, public questions, private gold and shared resource limits stay fixed. Changes are confined to a separately calibrated D2 policy and its pinned runtime binding.
 
 ## Sequence and gates

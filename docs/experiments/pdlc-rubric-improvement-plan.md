@@ -6,6 +6,18 @@ Improve required-fact coverage, supported design/planning quality, and precise h
 
 Use saved runs before dispatching more agents. Separate scoring problems from retrieval, memory and answer-generation failures. Preserve original results and evaluate any scorer repair on every comparison arm under a new version.
 
+## Next work: agreed sequence
+
+Address gaps in how Sanctum uses Jev and routing memory, rather than assuming richer descriptions or a larger graph are improvements. Keep the current active configuration until a change demonstrates better rubric outcomes.
+
+1. **Verify the grades.** Audit all thirteen follow-up fact assessments marked met by the semantic judge but denied mechanical credit, across all four variants. Check the actual answer, source support, claim classification and applicable rubric. Record retain or repair with evidence. If a general scoring rule changes, version it and rescore every affected historical cohort consistently; preserve old judgments and scores. Completion: every disputed assessment has a disposition, and corrected comparisons have validated bindings.
+2. **Explain the real failures.** Build a plain-language case for each remaining gap: which hubs Jev considered and selected, what queries and memory mappings were used, what evidence reached Claude, and what Claude omitted or overstated. Keep unknown fetch-versus-packing causes explicit. Completion: each gap has an evidence-backed cause or a named unresolved question; scoring disputes are separate from product failures.
+3. **Review Jev's role in Sanctum.** Examine what information reaches Jev, where its decisions enter the flow, and whether source selection represents the full PDLC request. Test grounded source context, resolved subjects or decomposition only where the cases justify them. Jev remains free to choose any of the four hubs or none, without forced-source or nonempty overrides. Completion: a specific proposed change names the failure it addresses and a diagnostic showing that it changes the intended decision.
+4. **Review routing memory's role.** Check whether the right subject is resolved, whether aliases and native place mappings reach search, and whether version and document-to-code distinctions are preserved. Use the existing HLD ontology and provenance-review pipeline; document any needed ontology extension before implementation. Completion: the proposed memory change has source-grounded assertions, validated projection and observable use in a failed case, without seeding evaluation answers.
+5. **Test isolated changes.** Declare expected rubric improvements before dispatch. Compare unchanged Sanctum, a justified Jev change, a justified memory change and their combination on the same new questions and limits. Include supported, partial, boundary and design work. Score facts, citations, checklist quality and unsupported claims separately. Use saved-answer rescoring for grading repairs; do not rerun agents merely to obtain different grades. Completion: a versioned report states what improved, remained weak or regressed, with limitations and a promote/reject/continue-investigation decision.
+
+Do not start another full campaign before the grading audit and failure diagnosis identify a concrete hypothesis. Extra backend calls remain secondary to answer quality. No new implementation or runtime activation is implied by this planning update.
+
 ## Current rubric position
 
 ### Execution update: 5 October 2026

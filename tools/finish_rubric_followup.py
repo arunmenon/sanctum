@@ -16,7 +16,7 @@ from sanctum_run.agent_schedule import compare_scope_strata
 from sanctum_run.agent_session import write_atomic
 
 
-def finish(bundle, run, calibration_cache):
+def finish(bundle, run, calibration_cache, *, resume_quality=None, quality_directory='quality-evaluation-01'):
     deadline = time.monotonic() + 7200
     terminal = run / 'campaign-result.json'
     while not terminal.exists():
@@ -26,11 +26,17 @@ def finish(bundle, run, calibration_cache):
     campaign = json.loads(terminal.read_text())
     if not campaign.get('all_terminal') or campaign.get('stop_reason'):
         raise ValueError('Campaign stopped; do not silently evaluate a selected subset')
-    out = run / 'quality-evaluation-01'
+    out = run / quality_directory
     out.mkdir(exist_ok=False)
     # Recheck the existing fixture judgments under this scorer, with exact packet
     # equality enforced by judge(); this avoids redundant calibration inference.
     shutil.copytree(calibration_cache / 'cases', out / 'cases')
+    if resume_quality:
+        # Keep original review_file paths and raw artifacts. The report validates
+        # their packet, answer, gold and derived-score bindings before comparison.
+        for name in ('scores.json', 'judge-failures.json'):
+            if (resume_quality / name).exists():
+                shutil.copyfile(resume_quality / name, out / name)
     write_atomic(out / 'calibration-reuse-receipt.json', {'source': str(calibration_cache),
         'method': 'exact packet equality plus fresh mechanical fixture regrading', 'new_fixture_model_calls': 0})
     policy = bundle.parent / 'private/evaluation-policy.json'
@@ -74,5 +80,9 @@ if __name__ == '__main__':
     p.add_argument('bundle', type=Path)
     p.add_argument('--run', type=Path, required=True)
     p.add_argument('--calibration-cache', type=Path, required=True)
+    p.add_argument('--resume-quality', type=Path)
+    p.add_argument('--quality-directory', default='quality-evaluation-01')
     a = p.parse_args()
-    finish(a.bundle.resolve(), a.run.resolve(), a.calibration_cache.resolve())
+    finish(a.bundle.resolve(), a.run.resolve(), a.calibration_cache.resolve(),
+           resume_quality=a.resume_quality.resolve() if a.resume_quality else None,
+           quality_directory=a.quality_directory)

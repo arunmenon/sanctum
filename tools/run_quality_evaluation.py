@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import random
 import subprocess
+import sys
 import tempfile
 import uuid
 
@@ -164,6 +165,5 @@ def evaluate(bundle,run,policy_path,out):
 
 
 if __name__=='__main__':
-    import sys
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('bundle',type=Path);p.add_argument('--run',type=Path,required=True);p.add_argument('--policy',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
     args=p.parse_args();evaluate(args.bundle.resolve(),args.run.resolve(),args.policy.resolve(),args.out.resolve())

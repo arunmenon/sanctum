@@ -36,4 +36,5 @@ Experiment findings remain exploratory. Human acceptance and grading-disagreemen
 - Checked all eleven guide pages plus the root README: 117 relative links and anchors resolved; code fences balanced.
 - `git diff --check` passed.
 - Existing tutorial command blocks retained; no model calls or runtime changes made by this pass.
-- Browser rendering verification is recorded after publication below.
+- Verified the published start page and its walkthrough link in Chrome, then inspected rendered architecture and subsystem diagrams. All nine Mermaid diagrams loaded. GitHub briefly showed a client-side renderer error on two pages; full reloads cleared it. The walkthrough is left open for the user.
+- Published the documentation rewrite in commit `b037b67` on `lab/pdlc-harness-docs-20261004`.

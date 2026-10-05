@@ -9,7 +9,7 @@ from sanctum_run.bundle import _file
 from sanctum_run.agent_score import _sha, judge_packet,score_answer
 
 
-def report(config_path, run, scores_path=None, policy_path=None):
+def report(config_path, run, scores_path=None, policy_path=None, *, output_path=None):
     policy=None
     if policy_path:
         from sanctum_run.quality_policy import load_policy,scoring_context
@@ -128,7 +128,7 @@ def report(config_path, run, scores_path=None, policy_path=None):
         score_binding_issues=score_issues,
         costs=costs, observations=observations,
         limitation='Fixture execution is operational evidence only. Semantic/human acceptance remains separately recorded.')
-    write_atomic(run/'comparison-report.json',result)
+    write_atomic(output_path or run/'comparison-report.json',result)
     return result
 
 

@@ -80,3 +80,15 @@ def test_changed_public_instructions_require_a_new_frozen_schedule(tmp_path):
         plan_schedule(config,run)
     with pytest.raises(ValueError,match='differs from frozen schedule'):
         report(config,run)
+
+
+def test_versioned_report_preserves_original(tmp_path):
+    config,_=setup(tmp_path)
+    run=tmp_path/'run'
+    plan_schedule(config,run)
+    original=run/'comparison-report.json'
+    original.write_text('{"original":true}\n')
+    new=tmp_path/'versioned-report.json'
+    report(config,run,output_path=new)
+    assert original.read_text()=='{"original":true}\n'
+    assert json.loads(new.read_text())['schema_version']==1

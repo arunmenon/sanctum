@@ -135,3 +135,32 @@ def test_judge_packet_preserves_injection_as_data_and_removes_arm_metadata():
     broken=copy.deepcopy(review);broken['full_prose_reviewed']=False
     with pytest.raises(ValueError,match='full-prose'):
         score_answer(answer,gold,attempt,rows,broken)
+
+
+@pytest.mark.parametrize('complete',[True,False])
+def test_delivery_omission_is_not_a_content_failure(complete):
+    answer,gold,attempt,rows,review=fixture(CASES[0])
+    attempt['delivered_evidence'][0]['budget_exhausted']=True
+    if not complete:review['facts'][0]['met']=False
+    review['packet_sha256']=judge_packet(answer,gold,attempt,rows)['packet_sha256']
+    result=score_answer(answer,gold,attempt,rows,review)
+    assert result['provisional_task_complete'] is complete
+    assert result['evidence_delivery_limited'] is True
+
+
+@pytest.mark.parametrize('entails',[True,False])
+def test_boundary_can_use_entailed_factual_premises(entails):
+    answer,gold,attempt,rows,review=fixture(next(c for c in CASES if c['name']=='justified_partial'))
+    review['facts'][1]['claim_ids']=['c1','c2']
+    review['claims'][0]['citation_support']=[entails]
+    review['packet_sha256']=judge_packet(answer,gold,attempt,rows)['packet_sha256']
+    result=score_answer(answer,gold,attempt,rows,review)
+    assert result['fact_credit']['live.deployment']==int(entails)
+
+
+def test_boundary_factual_premise_without_citation_is_not_credited():
+    answer,gold,attempt,rows,review=fixture(next(c for c in CASES if c['name']=='justified_partial'))
+    review['claims'][1]['claim_type']='factual'
+    review['packet_sha256']=judge_packet(answer,gold,attempt,rows)['packet_sha256']
+    result=score_answer(answer,gold,attempt,rows,review)
+    assert result['fact_credit']['live.deployment']==0

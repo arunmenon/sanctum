@@ -1,5 +1,7 @@
 # Unconstrained Jev development results
 
+**Scoring amendment:** The boundary and completion figures below describe the original mechanical scorer. The consistently rescored [v3 audit](pdlc-scorer-v3-audit.md) corrects those rules; its boundary coverage and comparisons supersede the original apparent decline. Agent runs and routing counts are unchanged.
+
 Observed 5 October 2026. All 90 Sonnet 5.5 subscription attempts completed and all 90 answers were scored, with zero judge or agent-output protocol failures. This is an exploratory historical-cohort comparison against the preceding calibrated/guarded Sanctum run, not a frozen production acceptance result.
 
 | Quality score difference, unconstrained minus guarded | Percentage points | Descriptive 95% interval | Tasks |

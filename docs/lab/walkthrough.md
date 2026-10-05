@@ -1,6 +1,25 @@
 # A guided walkthrough of the lab
 
-Use this page to introduce the lab to someone who has not worked on it. Follow one illustrative question: **“What happens when fraud checking times out, and what should we test?”** This is an explanation of the flow, not a claim about a particular scored answer.
+This lab is a **reference implementation of Sanctum**, a layer that helps coding agents find evidence across knowledge sources. It turns the design into working software so we can study how the components behave together. We use synthetic evidence to test whether Sanctum helps an agent produce better answers than searching the sources directly.
+
+## What has been implemented?
+
+- **Searchable hubs:** local services for code, documents, procedures and prior investigations.
+- **Sanctum retrieval:** a router that searches selected hubs and returns evidence with citation details.
+- **Routing memory:** a reviewed map of names, subjects and search locations.
+- **System One:** a decision layer, using Jev in the hosted experiments, that judges which hubs may help.
+- **Agent harness and scorer:** tools that run Claude Code, save its evidence and answers, and evaluate them against private criteria.
+
+The current experiments use local simulated hubs and an evidence-only Claude workflow. They do not demonstrate production connectors or coding inside checked-out repositories. The [architecture guide](architecture.md) explains the component boundaries.
+
+## What this walkthrough covers
+
+1. How information is organized in the hubs.
+2. How an agent receives a question and retrieves evidence.
+3. How routing memory and System One help Sanctum.
+4. How answers are saved, scored and interpreted.
+
+The sections below follow that flow. An example question appears once the evidence and agent setup have been introduced.
 
 ## 1. Start with the information
 
@@ -9,6 +28,8 @@ The lab has synthetic code, designs, procedures and prior investigations. They l
 A repository is a container for code artifacts. It is not a hub. A design document can link to a repository, a service and several domains without becoming part of CodeHub. Open [corpus and hubs](corpus-and-hubs.md) for the hierarchy.
 
 ## 2. Give Claude a question
+
+To illustrate the flow, consider: **“What happens when fraud checking times out, and what should we test?”** This example shows how a request moves through the components; it is not a claim about a particular evaluated answer.
 
 The harness starts a fresh Claude Code session in an empty workspace. In this experiment Claude reads evidence through MCP tools; it does not have a local repository to edit.
 

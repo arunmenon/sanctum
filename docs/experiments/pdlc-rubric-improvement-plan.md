@@ -1,0 +1,78 @@
+# PDLC rubric improvement plan
+
+## Objective
+
+Improve required-fact coverage, supported design/planning quality, and precise handling of missing or conflicting evidence. Extra backend calls are not a current optimization target. Keep Jev free to select all four hubs or none; do not reintroduce a rules shortlist, forced sources, calibration gate or nonempty fallback.
+
+Use saved runs before dispatching more agents. Separate scoring problems from retrieval, memory and answer-generation failures. Preserve original results and evaluate any scorer repair on every comparison arm under a new version.
+
+## Current rubric position
+
+Verified from the saved calibrated/guarded and unconstrained reports and score files on 5 October 2026. These are development results; independent gold and human acceptance remain pending.
+
+| Dimension | Calibrated / guarded | Unconstrained | Meaning |
+| --- | ---: | ---: | --- |
+| Supported required-fact coverage | 76.08% | 90.86% | 54 answers, 18 tasks per arm |
+| Partial-evidence fact coverage | 62.78% | 75.28% | 18 answers, 6 tasks per arm |
+| Out-of-scope rubric coverage | 26.85% | 15.74% | Boundary diagnosis credit, not percentage of factual answers |
+| Supported-answer citation support | 98.02% | 99.54% | Scorer-validated support for cited claims |
+| Supported answers with material unsupported claims | 7 / 54 | 2 / 54 | Incidence, not number of claims |
+| Proposed-change checklist score | 1.50 / 2 | 2.00 / 2 | Applicable supported planning tasks |
+| Scope/dependencies checklist score | 1.67 / 2 | 2.00 / 2 | Applicable supported planning tasks |
+| Validation checklist score | 1.78 / 2 | 2.00 / 2 | Applicable supported planning tasks |
+| Rollout/recovery checklist score | 1.89 / 2 | 1.89 / 2 | Applicable supported planning tasks |
+| Uncertainty checklist score | 1.33 / 2 | 1.67 / 2 | Applicable supported planning tasks |
+
+Checklist means apply only to tasks containing that dimension; they do not imply every task is a design task. Partial-evidence uncertainty stays at 1.00 / 2. Aggregate gains are not sufficient to establish task completion.
+
+## 1. Audit scorer validity before interpreting the gaps
+
+- [x] Inspect dimension reports, score derivations and representative saved semantic reviews.
+- [ ] Trace all semantic/mechanical fact-credit disagreements, retaining the exact rule that withheld credit. In the unconstrained run, the judge marked facts met but the mechanical score withheld credit on 35 out-of-scope, 12 partial and 5 supported fact assessments. These counts are assessments across repetitions, not unique tasks; some withholding may be correct.
+- [ ] Audit mixed factual/boundary claims. Example: `fraud-batch-client-behavior-v2` is out of scope because deployed state is unknown. The judge marked both boundary facts met, but referenced claims were labeled factual; the scorer requires every associated claim to be boundary-typed and therefore grants zero. Determine whether the label or the scoring rule is wrong; do not simply grant all disputed credit.
+- [ ] Audit the completion gate in `src/sanctum_run/agent_score.py`. All 90 unconstrained answers have provisional completion false. Forty-three meet the simpler check of full fact coverage, full checklist items/scores and no material unsupported claim; all 43 have an evidence-budget flag. The real completion gate additionally checks contradictions, citations, uncertainties, caller requirements and unmet requirements. Establish which conditions actually block each answer. Hitting a delivery limit must not automatically be treated as substantive task failure without an agreed rubric justification.
+- [ ] Audit judge visibility of retrieval metadata. Reviews flag budget/conflict/receipt statements as unsupported because the blinded packet omits those fields. Verify whether the statements are true in saved traces. If relevant, supply neutral metadata consistently without revealing the arm; retain penalties for invented metadata.
+- [ ] If policy changes are justified, version the scorer/packet, validate positive and negative cases, and regrade every cohort consistently. Keep old scores and publish the effect of the correction separately from product improvements. Do not modify task gold to fit answers.
+
+## 2. Build a failure ledger grounded in traces
+
+For every missing required fact, incomplete plan item and material unsupported claim, record the task/repetition, rubric item, gold evidence, source decision, query/alias/selector, fetched passages, delivered passages and judge rationale. Classify: source not selected; wrong query/subject; evidence fetched but omitted; relevant evidence delivered but answer missed it; missing corpus evidence correctly diagnosed; or scoring dispute. Gold evidence identifies an investigation target; absence of its exact artifact alone is not proof that alternate supporting evidence was unavailable.
+
+Start with distinct examples covering HLD, LLD, implementation/testing, rollout and partial/out-of-scope questions. For `payment-authorization-testing-v2`, one saved review credits timeout regression and retry arguments but withholds the client exception-conversion fact: the answer says the client source was not retrieved and does not establish conversion of a requests timeout to `FraudServiceTimeout`. Trace why the handler/client dependency did not yield delivered support before choosing a fix.
+
+Deliver a task-by-rubric matrix and a small case pack explaining success and failure in plain language. Do not prioritize calls or latency over rubric quality.
+
+## 3. Improve System One where evidence supports it
+
+Hypotheses to test on development examples, without changing the frozen historical run:
+
+- Improve hub descriptors and decision questions so usefulness covers the entire request: current behavior, dependencies, design constraints, tests and uncertainty, rather than keyword overlap alone.
+- Expose resolved subjects and grounded dependency/context descriptions to Jev when the failure ledger shows the query lacks that context. No gold facts or expected source labels go into runtime state.
+- Investigate decomposing multi-part PDLC requests into evidence needs and composing their source decisions. Jev still owns source selection; no must-consult override.
+- For boundary tasks, distinguish useful contextual evidence from evidence that establishes current deployment or an approved contract. Source usefulness is not proof of fact availability.
+
+Make the smallest change justified by actual misselection or query failures. Do not assume every missed fact is a classifier failure.
+
+## 4. Improve routing memory where evidence supports it
+
+- Audit canonical subjects, aliases, repo/module/service ownership and artifact-to-subject bindings for failed cases against the HLD ontology and source spans.
+- Check version/status distinctions: deployed versus draft, current versus historical, proposed versus implemented, and known versus unavailable. Unknown deployment facts remain unknown.
+- Verify cross-repo dependencies and document-to-code links are represented by the existing ontology where supported. If a missing relationship requires an ontology extension, document the evidence and HLD change before adding it.
+- Improve grounded retrieval vocabulary and dependency traversal when a resolved handler question needs its client, configuration, contract or test evidence. Memory supplies context to Jev and search; it does not force hubs in this experiment.
+- Reuse the existing harvest/propose/validate/review/release pipeline. Do not manually seed evaluation answers, convert speculative notes into authority, or invent artifacts to make out-of-scope questions answerable.
+
+## 5. Validate attribution and rubric outcomes
+
+After the scorer audit and failure ledger, declare the selected hypotheses and numeric targets before further paid runs. Keep the current unconstrained cohort as the historical baseline. Compare a System One-only change, a memory-only change, and their combination where both are justified. Each arm uses the same model, corpus, prompts, rubric and resource limits; record all routing decisions and saved answers.
+
+Use separate development facts for tuning, then fresh held-out tasks with explicit HLD/LLD, partial evidence and boundary cases. The reused thirty tasks can diagnose regressions but cannot establish generalization. Report coverage, citation support, checklist items and unsupported-claim incidence separately by scope and task family. Treat the joint arm as the package effect; attribute improvements only where the isolated comparisons support it.
+
+Completion: deliver an audited rubric report, evidence-backed failure ledger, selected changes and verification, and a versioned comparison showing which gaps improved, remained or regressed. Human acceptance remains an explicit status, not a reason to halt authorized analysis.
+
+## Evidence locations
+
+- `build/agent-runs/sonnet55-jev-unconstrained-02/comparison-report.json`
+- `build/agent-runs/sonnet55-jev-unconstrained-02/quality-evaluation-01/scores.json` and per-attempt semantic reviews
+- `build/agent-runs/sonnet55-jev-active-01/comparison-report.json`
+- [Unconstrained results](pdlc-jev-unconstrained-results.md)
+- [Implementation and experiment plan](pdlc-jev-active-plan.md)

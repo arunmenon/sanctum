@@ -52,7 +52,7 @@ New bundle: `build/agent-bundles/pdlc-sonnet-55-jev-unconstrained-02/experiment.
 - [x] Live MCP proof: all four hubs evaluated; CodeHub selected; three other hubs actually skipped (`build/pdlc-jev-unconstrained/activation-proof-02/proof.json`).
 - [x] Complete affected regression checks: 103 passed, 2 live-test skips.
 - [x] Dispatch the 90-attempt campaign with automatic scoring afterward; completion remains pending. Native worker and comparison worker are running.
-- [ ] Score all saved answers and publish the comparison, including actual applied skips, missing decisions and zero-source requests.
+- [x] Score all 90 saved answers without judge failures; comparison published in [unconstrained Jev results](pdlc-jev-unconstrained-results.md).
 
 The first live probe exposed unsupported receipt reason labels and returned infrastructure failures. Existing reason codes replaced those labels; its raw traces remain in `activation-proof-01`. The successful second probe is not a selective agent rerun: no Claude attempts were dispatched by either probe.
 

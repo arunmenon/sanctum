@@ -76,3 +76,11 @@ Completion: deliver an audited rubric report, evidence-backed failure ledger, se
 - `build/agent-runs/sonnet55-jev-active-01/comparison-report.json`
 - [Unconstrained results](pdlc-jev-unconstrained-results.md)
 - [Implementation and experiment plan](pdlc-jev-active-plan.md)
+
+## First scorer audit: completion gate
+
+The exact gate replay found 33 of 90 answers satisfy every implemented completion condition except `budget_exhausted`. That flag is set by the delivery layer whenever any evidence unit is omitted, even if all required facts and checklist items were satisfied. This is a confirmed scoring-policy problem to resolve: omission of an extra passage is not by itself proof that the requested work is incomplete. It is not a bug in the 0/1/2 checklist scale. No scores have been changed yet.
+
+Nonexclusive failed gate counts: missing fact credit 45, material unsupported claim 2, citation support 2, plan score 10, uncertainty 2, answer-declared unmet requirements 53, evidence budget 89. No execution, observed-backend, caller-requirement or contradiction failures occurred. Gates overlap, so do not add these counts. Exact per-attempt replay is saved at `build/rubric-gap-audit/completion-gates.json`.
+
+The 33-answer count checks all completion conditions and supersedes the earlier 43-answer simplified diagnostic for identifying answers blocked only by the budget flag. The primary fact-coverage scores are unaffected by this particular gate. Boundary typing and judge metadata visibility remain separate audits.

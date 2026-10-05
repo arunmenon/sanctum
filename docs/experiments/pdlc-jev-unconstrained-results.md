@@ -20,9 +20,10 @@ Scores are required-fact coverage. Repetitions are averaged within each task; in
 
 ## Corrected results: unconstrained versus guarded
 
+Overall coverage is **13.06 percentage points higher**; the descriptive 95% interval is +5.07 to +21.41 points.
+
 | Slice | Guarded coverage | Unconstrained coverage | Difference | Descriptive 95% interval |
 |---|---:|---:|---:|---|
-| Overall | — | — | +13.06 points | +5.07 to +21.41 |
 | Supported | 76.08% | 90.86% | +14.78 points | +4.01 to +26.67 |
 | Partial | 75.83% | 90.28% | +14.44 points | -2.78 to +32.22 |
 | Boundary | 90.74% | 97.22% | +6.48 points | -5.56 to +20.37 |

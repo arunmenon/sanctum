@@ -43,7 +43,9 @@ Applied the supplied two-pass Claude/Fable review on 5 October 2026. The [origin
 - `git diff --check` passed.
 - Offline shipping fixture validated, scheduled and completed with `fixture: true`, `task_complete: false`; no Claude or Jev calls.
 - Local fixture output: `build/docs-handover-20261005/shipping-run/` (ignored in Git).
-- Browser checks follow publication; their outcome is recorded below.
+- Inspected the published results index in Chrome: all five entries fit the desktop page and link to separate records.
+- Checked published scoring, runbook, unconstrained results and System One headings/rendering. Original unconstrained scoring is collapsed by default. Scoring and both System One diagrams loaded without renderer errors; inspected the new mode diagram and its rule list.
+- Main documentation changes published in commit `a9a8aab` on `lab/pdlc-harness-docs-20261004`.
 
 ## Remaining research limits
 

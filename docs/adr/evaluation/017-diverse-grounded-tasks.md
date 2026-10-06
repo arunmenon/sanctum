@@ -11,11 +11,14 @@ Repeated planning questions or false absence labels would make a benchmark uninf
 ## Decision
 
 - Author task evidence packets from audited corpus versions, then verify model-drafted questions and facts.
-- Declare six task families and separate supported, partial and out-of-scope axes.
-- Include explicit HLD/LLD demands and task-specific design criteria.
+- Cover six task families: understand behavior; trace dependencies/change impact; plan implementation; design testing; plan rollout/recovery; resolve uncertainty.
+- Track separately whether evidence fully supports, partially supports or cannot support the requested answer.
+- Include explicit high-level and low-level design (HLD/LLD) demands and task-specific design criteria.
 - Require independent acceptance before a frozen evaluation claim.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 Diversity must cover different evidence and reasoning demands, not just different wording.
 
@@ -30,5 +33,7 @@ Diversity must cover different evidence and reasoning demands, not just differen
 - [bundle.py](../../../src/sanctum_run/bundle.py)
 - [pdlc-task-review-astra-low.md](../../experiments/pdlc-task-review-astra-low.md)
 - [README.md](../../experiments/method/README.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

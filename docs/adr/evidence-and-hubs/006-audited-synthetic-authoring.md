@@ -16,11 +16,13 @@ Uniform perfect fixtures would hide ambiguity, stale knowledge and incomplete en
 
 ## Why this approach?
 
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
+
 Synthetic messiness should challenge retrieval while remaining traceable to an inspectable scenario.
 
 ## Tradeoffs and limits
 
-- Generation is inexpensive relative to establishing reliable evidence.
+- Generating drafts does not remove the work of checking their claims, versions and consistency.
 - Models can propose content; they cannot invent reviewed status or real production observations.
 - The historical public-repository importer idea is outside the synthetic pilot’s implemented preparation path.
 
@@ -29,5 +31,7 @@ Synthetic messiness should challenge retrieval while remaining traceable to an i
 - [generate_pdlc_corpus.py](../../../tools/generate_pdlc_corpus.py)
 - [pdlc-corpus-spec.md](../../experiments/pdlc-corpus-spec.md)
 - [pdlc-design-corpus-audit.md](../../experiments/pdlc-design-corpus-audit.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

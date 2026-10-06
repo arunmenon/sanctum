@@ -17,6 +17,8 @@ Direct filesystem access or prior conversation history could bypass the evidence
 
 ## Why this approach?
 
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
+
 This tests the evidence-routing contribution under controlled agent access.
 
 ## Tradeoffs and limits
@@ -30,5 +32,7 @@ This tests the evidence-routing contribution under controlled agent access.
 - [agent_mcp.py](../../../src/sanctum_run/agent_mcp.py)
 - [test_agent_session.py](../../../tests/test_agent_session.py)
 - [agent-harness.md](../../lab/agent-harness.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

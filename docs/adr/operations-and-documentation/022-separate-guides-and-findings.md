@@ -17,6 +17,8 @@ A monolithic write-up and mixed status/results pages made the lab difficult to h
 
 ## Why this approach?
 
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
+
 Readers can understand the system before its contracts and find new findings without rewriting architecture pages.
 
 ## Tradeoffs and limits
@@ -30,5 +32,7 @@ Readers can understand the system before its contracts and find new findings wit
 - [README.md](../../experiments/README.md)
 - [README.md](../../experiments/method/README.md)
 - [lab-docs-handover-dispositions-20261005.md](../../reviews/lab-docs-handover-dispositions-20261005.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

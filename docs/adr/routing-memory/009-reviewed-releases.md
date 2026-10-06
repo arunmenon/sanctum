@@ -6,15 +6,17 @@
 
 ## Context
 
-A harvested candidate may include weak assertions and cannot safely stand in for accepted routing knowledge.
+A harvested candidate is a collection of proposed links. Some may be weak or unsupported, so it cannot automatically become the map Sanctum uses to route requests.
 
 ## Decision
 
 - Record reviewer scope and explicit owner-policy declarations.
-- Project supported accepted records into a runtime release; unspecified proposals remain unreviewed.
-- Pin release and review/policy inputs in the experiment; harvest does not switch ACTIVE.
+- Build the runtime memory file from links with supporting evidence and an authorized review; unspecified proposals remain unreviewed.
+- Select exact release and review/policy inputs for the experiment. Harvesting does not change ACTIVE, the pointer to the default memory release.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 Review, release assembly and runtime selection are separate actions with separate evidence.
 
@@ -28,5 +30,7 @@ Review, release assembly and runtime selection are separate actions with separat
 - [harvest.py](../../../src/sanctum_ref/harvest.py)
 - [agent_runtime.py](../../../src/sanctum_run/agent_runtime.py)
 - [routing-memory.md](../../lab/routing-memory.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

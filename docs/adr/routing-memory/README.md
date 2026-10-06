@@ -1,6 +1,6 @@
 # Routing memory
 
-Turn evidence into a reviewed map of subjects and useful search locations.
+Routing memory helps Sanctum connect a name or subject to places worth searching. It is not MemoryHub’s collection of prior sessions. These records follow the map from storage, through proposed links, to a reviewed runtime release.
 
 | Record | Decision | Status |
 |---|---|---|

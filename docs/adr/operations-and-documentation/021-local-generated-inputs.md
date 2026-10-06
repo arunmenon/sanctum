@@ -17,6 +17,8 @@ Code distribution, credentials, synthetic authoring outputs and experiment recei
 
 ## Why this approach?
 
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
+
 An engineer can exercise the harness without obtaining the full local campaign or model credentials.
 
 ## Tradeoffs and limits
@@ -30,5 +32,7 @@ An engineer can exercise the harness without obtaining the full local campaign o
 - [README.md](../../../examples/agent-bundles/shipping/README.md)
 - [quickstart.md](../../lab/quickstart.md)
 - [runbook.md](../../lab/runbook.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

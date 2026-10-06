@@ -6,7 +6,7 @@
 
 ## Context
 
-A harness hard-coded to the PDLC repositories could not assess unrelated scenarios.
+A scenario bundle is the experiment kit: source versions, questions, private grading criteria and run settings. A harness hard-coded to the product-development repositories could not assess unrelated scenarios.
 
 ## Decision
 
@@ -15,6 +15,8 @@ A harness hard-coded to the PDLC repositories could not assess unrelated scenari
 - Keep agent adapters separate from scenario data; Claude Code is the current native adapter.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 The same scheduling and scoring contracts can operate on another evidence corpus.
 
@@ -29,5 +31,7 @@ The same scheduling and scoring contracts can operate on another evidence corpus
 - [agent_contract.py](../../../src/sanctum_run/agent_contract.py)
 - [experiment.yaml](../../../examples/agent-bundles/shipping/experiment.yaml)
 - [extending.md](../../lab/extending.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

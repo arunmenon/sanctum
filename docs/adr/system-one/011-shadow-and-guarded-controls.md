@@ -16,17 +16,25 @@ Earlier campaigns protected retrieval candidates until the matching decision pro
 
 ## Why this approach?
 
-These were earlier experimental controls; the later unconstrained test asks a different question.
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
+
+These controls preserve access to evidence when usefulness estimates are not calibrated or a skip would break a source requirement. A required-source protection keeps a hub that must be consulted; a nonempty protection prevents skipping every hub.
 
 ## Tradeoffs and limits
 
-- The guarded run’s three proposed skips were all overridden, so active decisions did not demonstrate pruning.
+- Guards can prevent hub skips even when Jev advice is active. The linked guarded result records one campaign example; it is not a universal skip rate.
 - These modes still exist; they are not the selection policy of the unconstrained campaigns.
+
+## Related decisions
+
+[ADR-012](012-unconstrained-selection.md) experiments with selection without these controls. It is an experimental override, not a global replacement; both modes remain implemented.
 
 ## Evidence
 
 - [pipeline.py](../../../src/sanctum_ref/pipeline.py)
 - [http_systemone.py](../../../src/sanctum_ref/providers/http_systemone.py)
 - [pdlc-jev-guarded-results.md](../../experiments/pdlc-jev-guarded-results.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

@@ -6,7 +6,7 @@
 
 ## Context
 
-The lab needs to investigate retrieval and agent answer quality before making deployment claims.
+Sanctum helps an agent find evidence across knowledge sources. This lab investigates whether that retrieval improves answers, before making deployment claims.
 
 ## Decision
 
@@ -15,6 +15,8 @@ The lab needs to investigate retrieval and agent answer quality before making de
 - Treat production connectors, other agent adapters and local coding workflows as separate work.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 This keeps experiments concrete while exposing the limits of their conclusions.
 
@@ -28,5 +30,7 @@ This keeps experiments concrete while exposing the limits of their conclusions.
 - [decisions.md](../../decisions.md)
 - [extending.md](../../lab/extending.md)
 - [walkthrough.md](../../lab/walkthrough.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

@@ -6,7 +6,7 @@
 
 ## Context
 
-Routing knowledge should be collected consistently from hubs rather than maintained as unrelated manual fragments.
+Routing knowledge should be collected consistently from hubs rather than maintained as unrelated manual fragments. For example, a passage naming the payment-authorization service can support a proposed link saying that the artifact is about that service. The proposal must retain the exact passage that supports it.
 
 ## Decision
 
@@ -15,6 +15,8 @@ Routing knowledge should be collected consistently from hubs rather than maintai
 - Require exact supporting spans for proposals and set unsupported proposals aside.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 Provenance lets a reviewer distinguish a supported relationship from plausible model output.
 
@@ -28,5 +30,7 @@ Provenance lets a reviewer distinguish a supported relationship from plausible m
 - [harvest.py](../../../src/sanctum_ref/harvest.py)
 - [harvest_pdlc_memory.py](../../../tools/harvest_pdlc_memory.py)
 - [test_memory_harvest.py](../../../tests/test_memory_harvest.py)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

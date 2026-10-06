@@ -6,7 +6,7 @@
 
 ## Context
 
-Retries after a partial dispatch could duplicate model work or conceal an unfavorable outcome.
+An interrupted run can leave a request sent to a model but no saved answer. Starting it again immediately could duplicate work or conceal an unfavorable outcome. The harness therefore records when each attempt starts and when its final outcome is saved.
 
 ## Decision
 
@@ -15,6 +15,8 @@ Retries after a partial dispatch could duplicate model work or conceal an unfavo
 - Resume never-started attempts; reconcile unresolved dispatches before replay.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 Durable records support recovery without selectively rerunning poor answers.
 
@@ -28,5 +30,7 @@ Durable records support recovery without selectively rerunning poor answers.
 - [agent_schedule.py](../../../src/sanctum_run/agent_schedule.py)
 - [agent_runner.py](../../../src/sanctum_run/agent_runner.py)
 - [runbook.md](../../lab/runbook.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

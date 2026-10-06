@@ -1,6 +1,6 @@
 # System One
 
-Separate model invocation from the policy that applies source-selection advice.
+System One is Sanctum’s decision-model layer; Jev supplies hub-selection advice in these experiments. Start with the broker, then compare the earlier controls with the unconstrained experimental policy.
 
 | Record | Decision | Status |
 |---|---|---|

@@ -1,6 +1,6 @@
 # Operations and documentation
 
-Make local inputs, reproduction limits and documentation navigation explicit.
+These records explain what another engineer receives from Git and how to navigate it. They also make clear which local campaign inputs a fresh clone does not contain.
 
 | Record | Decision | Status |
 |---|---|---|

@@ -6,7 +6,7 @@
 
 ## Context
 
-The reference needs real search/fetch behavior without requiring enterprise connectors.
+A hub serves searchable artifacts, such as code files or design documents. The reference needs working search and fetch tools without enterprise connectors. Agents call these tools through MCP (Model Context Protocol).
 
 ## Decision
 
@@ -15,6 +15,8 @@ The reference needs real search/fetch behavior without requiring enterprise conn
 - Preserve source access checks and supported version reads.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 This exercises tool protocols, retrieval and access behavior in a controlled corpus.
 
@@ -29,5 +31,7 @@ This exercises tool protocols, retrieval and access behavior in a controlled cor
 - [index.py](../../../src/sanctum_hubs/index.py)
 - [servers.py](../../../src/sanctum_hubs/servers.py)
 - [corpus-and-hubs.md](../../lab/corpus-and-hubs.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

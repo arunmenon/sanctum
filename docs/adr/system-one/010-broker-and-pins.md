@@ -6,15 +6,17 @@
 
 ## Context
 
-Sanctum needs model decisions without receiving provider credentials or hiding nested inference usage.
+System One supplies model decisions inside Sanctum retrieval; Jev is the provider used in these experiments. Sanctum needs these decisions without receiving provider credentials or making internal model calls invisible to the experiment’s usage records.
 
 ## Decision
 
 - Keep credentials and request/response accounting in the runner-owned broker.
-- Validate provider contracts and pin model, prompt, descriptors and applicable calibration inputs.
+- Validate the provider’s request/response format and select exact versions of the model, prompt, hub descriptions and any applicable calibration inputs.
 - Verify the resolved provider/model rather than treating a configuration alias as execution proof.
 
 ## Why this approach?
+
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
 
 The broker makes external decisions and their cost distinguishable from agent tool calls.
 
@@ -29,5 +31,7 @@ The broker makes external decisions and their cost distinguishable from agent to
 - [protocol.py](../../../src/sanctum_systemone/protocol.py)
 - [test_system_one_broker.py](../../../tests/test_system_one_broker.py)
 - [system-one.md](../../lab/system-one.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

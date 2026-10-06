@@ -1,6 +1,6 @@
 # Evaluation
 
-Create diverse grounded questions and separate valid evidence, answer meaning and acceptance.
+These records explain how questions and private grading criteria are built, how answers earn credit, and how results are compared. Automated scores remain distinct from independent task acceptance and human answer acceptance.
 
 | Record | Decision | Status |
 |---|---|---|

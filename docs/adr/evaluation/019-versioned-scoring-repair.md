@@ -16,6 +16,8 @@ Two mechanical rules withheld legitimate completion or boundary credit in the ea
 
 ## Why this approach?
 
+*Retrospective explanation based on the linked implementation and records; not a new approval.*
+
 A grading correction should not masquerade as a new product improvement or require selective agent reruns.
 
 ## Tradeoffs and limits
@@ -29,5 +31,7 @@ A grading correction should not masquerade as a new product improvement or requi
 - [rescore_saved_quality.py](../../../tools/rescore_saved_quality.py)
 - [pdlc-scorer-v3-audit.md](../../experiments/pdlc-scorer-v3-audit.md)
 - [pdlc-rubric-followup-results.md](../../experiments/pdlc-rubric-followup-results.md)
+
+*Documentation reviewed and clarified on 2026-10-06; runtime choices unchanged.*
 
 [Catalog](../README.md) · [Recording conventions](../README.md#how-to-read-these-records)

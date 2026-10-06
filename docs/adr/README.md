@@ -2,16 +2,39 @@
 
 An architecture decision record (ADR) explains **why the lab is built or tested a particular way**. Use this catalog for decisions; use the [lab guide](../lab/README.md) for a walkthrough and the [results index](../experiments/README.md) for findings.
 
-The catalog contains 22 decisions grouped into seven buckets. It was recorded retrospectively on 6 October 2026 from source baseline `848da1f` and its linked design, implementation and experiment records. The [catalog plan](catalog-plan.md) explains the grouping and scope.
+The catalog contains 23 decisions grouped into seven buckets. It was recorded retrospectively on 6 October 2026 from source baseline `848da1f` and its linked design, implementation and experiment records. The [catalog plan](catalog-plan.md) explains the grouping and scope.
+
+## What is this lab?
+
+Sanctum retrieves evidence for an answering agent. In this lab, Claude answers engineering questions using either hub tools directly or Sanctum’s retrieval tool. Jev helps Sanctum choose hubs; a separate scorer checks saved answers against private criteria.
+
+- **Knowledge hubs** serve code, documents, procedures and prior-session evidence.
+- **Routing memory** maps names and subjects to useful search locations. It is different from **MemoryHub**, which holds session records as evidence.
+- **System One** is the decision-model layer; **Jev** is the provider used in these experiments.
+- **The harness** starts agent sessions, records their evidence and saves answers for scoring.
+
+For the full question-to-answer flow, start with the [architecture guide](../lab/architecture.md).
+
+## Terms used in the records
+
+| Term | Plain meaning |
+|---|---|
+| PDLC | Product development life cycle: understanding, designing, changing, testing and releasing software |
+| MCP | Model Context Protocol: the tool interface agents use to call Sanctum and the hubs |
+| Private gold | Expected facts and grading criteria hidden from the answering agent |
+| Arm | One experiment setup, such as direct hub access or Sanctum retrieval |
+| Pin | Select an exact version or configuration so a run can be reproduced |
+| Ontology | The defined kinds of things and relationships in routing memory |
+| HLD / LLD | High-level design / low-level design |
 
 ## Buckets
 
 | Bucket | What it covers | Records |
 |---|---|---|
 | [Scope and contracts](scope-and-contracts/README.md) | Define the research scope, keep private answers outside runtime, and maintain explicit interfaces. | ADR-001–003 |
-| [Evidence and hubs](evidence-and-hubs/README.md) | Represent searchable evidence while preserving its origin, version and business relationships. | ADR-004–006 |
+| [Evidence and hubs](evidence-and-hubs/README.md) | Represent searchable evidence while preserving its origin, version and business relationships. | ADR-004–006, 023 |
 | [Routing memory](routing-memory/README.md) | Turn evidence into a reviewed map of subjects and useful search locations. | ADR-007–009 |
-| [System One](system-one/README.md) | Separate model invocation from the policy that applies source-selection advice. | ADR-010–012 |
+| [System One: model decisions](system-one/README.md) | Separate model invocation from the policy that applies source-selection advice. | ADR-010–012 |
 | [Agent harness](agent-harness/README.md) | Run fresh, recorded agent attempts using reusable scenario inputs. | ADR-013–016 |
 | [Evaluation](evaluation/README.md) | Create diverse grounded questions and separate valid evidence, answer meaning and acceptance. | ADR-017–020 |
 | [Operations and documentation](operations-and-documentation/README.md) | Make local inputs, reproduction limits and documentation navigation explicit. | ADR-021–022 |
@@ -46,4 +69,5 @@ This catalog does not grant new approvals, change runtime configuration or repla
 2. Use the next unused global ADR ID and the same short sections. Give it evidence links and an accurate status.
 3. State which earlier choice it changes. Preserve the earlier record and link both directions if a decision is superseded.
 4. Update the bucket index and this catalog. Keep measured results in their experiment record.
-5. Record any missing approval or evidence rather than turning an assumption into an accepted decision.
+5. Correct wording, facts or links in place with a dated correction note. A changed architectural choice needs a new ADR; preserve the old choice and link both records.
+6. Record any missing approval or evidence rather than turning an assumption into an accepted decision.

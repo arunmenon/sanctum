@@ -46,7 +46,7 @@ Use short paragraphs and bullets. Record the documentation date separately from 
 - [x] The lab entry point and owner-decision register link to the catalog.
 - [x] Publish on the existing lab branch; no runtime or evaluation changes.
 
-## Verification record
+## Verification record: initial publication
 
 - 22 unique ADR IDs and filenames agree; all required record sections and status labels are present.
 - Seven bucket indexes link to their records; each record links back to the catalog.
@@ -55,3 +55,12 @@ Use short paragraphs and bullets. Record the documentation date separately from 
 - No code, runtime configuration, judgments or experiment inputs changed; no model calls made.
 
 - Catalog published in commit `ed5df10` on `lab/pdlc-harness-docs-20261004`.
+
+## One-pass Astra review and corrections
+
+Astra reviewed the original seven buckets and 22 records at medium effort on 6 October 2026. Verdict: ready with corrections. The seven buckets remain; ADR-023 adds the missing evidence-assembly policy, bringing the catalog to 23 records. Readability, selection-policy details, scoring explanations and amendment rules were corrected without changing runtime behavior.
+
+- [Approved prompt](../reviews/lab-adr-catalog-review-prompt-20261006.md)
+- [Findings and dispositions](../reviews/lab-adr-catalog-review-20261006.md)
+
+Post-correction verification: 34 Markdown files, 206 relative links/anchors, 23 unique ADR IDs and required sections passed; `git diff --check` passed. This was a documentation-only correction, with no runtime or evaluation reruns.

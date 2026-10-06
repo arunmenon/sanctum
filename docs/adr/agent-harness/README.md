@@ -1,6 +1,6 @@
 # Agent harness
 
-Run fresh, recorded agent attempts using reusable scenario inputs.
+The harness launches Claude, connects the selected tools and saves what happened. These records explain how the same controller can run different experiment kits while keeping attempts comparable and recoverable.
 
 | Record | Decision | Status |
 |---|---|---|

@@ -44,7 +44,7 @@ Use short paragraphs and bullets. Record the documentation date separately from 
 - [x] Experimental Jev selection and unpromoted follow-up variations remain explicit.
 - [x] Every relative link and Markdown fence validates.
 - [x] The lab entry point and owner-decision register link to the catalog.
-- [ ] Publish on the existing lab branch; no runtime or evaluation changes.
+- [x] Publish on the existing lab branch; no runtime or evaluation changes.
 
 ## Verification record
 
@@ -53,3 +53,5 @@ Use short paragraphs and bullets. Record the documentation date separately from 
 - Thirty-three Markdown files and 207 relative links checked, including the two entry points.
 - Repaired one pre-existing broken provider-design link in the owner register.
 - No code, runtime configuration, judgments or experiment inputs changed; no model calls made.
+
+- Catalog published in commit `ed5df10` on `lab/pdlc-harness-docs-20261004`.

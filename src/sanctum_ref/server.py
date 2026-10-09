@@ -80,7 +80,8 @@ class ProxyPort:
 
 def build_server(arm: ArmConfig, registry_dir: Path, proxy: ClientSession,
                  memory_seed: Optional[Path] = None, provider=None, memory_release: Optional[str] = None,
-                 round3: str = "none", round3_provider=None, d4_max_units: int = 20) -> Server:
+                 round3: str = "none", round3_provider=None, d4_max_units: int = 20,
+                 round3_policy: str = "calibrated") -> Server:
     server: Server = Server("sanctum-ref")
     memory = MemoryState(memory_seed, memory_release)            # one per process: release cache, change cursor
     schema = RetrieveRequest.model_json_schema()
@@ -99,10 +100,12 @@ def build_server(arm: ArmConfig, registry_dir: Path, proxy: ClientSession,
         request = RetrieveRequest.model_validate(arguments)
         try:
             retriever = Retriever(arm, load_registry(registry_dir), memory=memory, provider=provider,
-                                  round3=round3, round3_provider=round3_provider, d4_max_units=d4_max_units)
+                                  round3=round3, round3_provider=round3_provider, d4_max_units=d4_max_units,
+                                  round3_policy=round3_policy)
         except RegistryUnavailable as error:
             retriever = Retriever(arm, None, str(error), memory=memory, provider=provider,
-                                  round3=round3, round3_provider=round3_provider, d4_max_units=d4_max_units)
+                                  round3=round3, round3_provider=round3_provider, d4_max_units=d4_max_units,
+                                  round3_policy=round3_policy)
         port = ProxyPort(proxy, request.request_id, extra.get(META_CALLER_TOKEN))
         response, receipt = await retriever.retrieve(request, port)
         return {"response": response.model_dump(mode="json"), "receipt": receipt.model_dump(mode="json")}
@@ -126,9 +129,10 @@ async def proxy_session(read_descriptor: int, write_descriptor: int):
 
 async def serve(arm: ArmConfig, registry_dir: Path, proxy_read_fd: int, proxy_write_fd: int,
                 memory_seed: Optional[Path] = None, provider=None, memory_release: Optional[str] = None,
-                round3: str = "none", round3_provider=None, d4_max_units: int = 20) -> None:
+                round3: str = "none", round3_provider=None, d4_max_units: int = 20,
+                 round3_policy: str = "calibrated") -> None:
     async with proxy_session(proxy_read_fd, proxy_write_fd) as proxy:
         server = build_server(arm, registry_dir, proxy, memory_seed, provider, memory_release, round3,
-                              round3_provider, d4_max_units)
+                              round3_provider, d4_max_units, round3_policy)
         async with stdio_server() as (read_stream, write_stream):
             await server.run(read_stream, write_stream, server.create_initialization_options())

@@ -54,6 +54,17 @@ flowchart TD
 
 Experiment setup and budgets are in the [method guide](../experiments/method/README.md). Outcomes are in the [results index](../experiments/README.md).
 
+## Passage relevance and conflict assessment
+
+The Claude runner can now enable two additional reference decisions, independently or together:
+
+- **D4 relevance:** Jev scores retrieved passages. Scores affect ordering and can add qualifying passages into spare budget; rule-packed evidence remains.
+- **D6 conflicts:** Jev assesses candidate passage pairs. Positive decisions add possible conflicts; existing rule flags remain.
+
+The [entire-flow experiment](../experiments/pdlc-jev-entire-flow-plan.md) uses explicit raw application, rather than silently falling back to shadow mode without calibration. These capabilities were not enabled in the earlier Claude campaign results. Their quality effect remains under evaluation.
+
+Runtime `round3` settings declare `mode` (`d4`, `d6`, `both` or `none`), `policy` (`raw` or `calibrated`) and optional per-decision `templates`. Earlier bundles omit this field and remain unchanged. Raw mode accepts only non-diagnostic positive `noul` templates.
+
 ## Provider configuration and verification
 
 Runtime bundles record the provider, descriptors, prompts, calibration files where applicable, resolved model and verification proof. A pinned model means a specific verified identifier, not a name that can silently resolve to a different model later.

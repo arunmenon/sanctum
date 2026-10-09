@@ -120,9 +120,13 @@ class MemoryState:
 class Retriever:
     def __init__(self, arm: ArmConfig, registry: Optional[Registry],
                  registry_error: Optional[str] = None, memory: Optional[MemoryState] = None,
-                 provider=None, round3: str = "none", round3_provider=None, d4_max_units: int = 20):
+                 provider=None, round3: str = "none", round3_provider=None, d4_max_units: int = 20,
+                 round3_policy: str = "calibrated"):
         self.arm = arm
         self.provider = provider
+        if round3 not in {"none", "d4", "d6", "both"} or round3_policy not in {"calibrated", "raw"}:
+            raise ValueError("unsupported Round 3 configuration")
+        self.round3_policy = round3_policy
         self.round3 = round3                      # none | d6 | d4 (design page §14)
         self.round3_provider = round3_provider
         self.d4_max_units = d4_max_units
@@ -226,13 +230,13 @@ class Retriever:
                            dedup_exact=self.arm.exact_dedup,
                            domain_terms={stem(term) for terms in self.registry.domains.values() for term in terms})
         promoted: list = []
-        if self.round3 == "d6" and self.round3_provider is not None and (prepared.flagged or prepared.pair_candidates):
+        if self.round3 in {"d6", "both"} and self.round3_provider is not None and (prepared.flagged or prepared.pair_candidates):
             promoted, round3_decisions, round3_failed = await self._judge_conflicts(request, prepared, port)
             decisions = decisions + round3_decisions
             if round3_failed:
                 degraded = sorted(set(degraded) | {"decision_layer_unavailable"})
         d4_scores, d4_use = None, None
-        if self.round3 == "d4" and self.round3_provider is not None and (prepared.ranked or prepared.excluded):
+        if self.round3 in {"d4", "both"} and self.round3_provider is not None and (prepared.ranked or prepared.excluded):
             d4_scores, d4_use, round3_decisions, round3_failed = await self._judge_relevance(request, prepared, port)
             decisions = decisions + round3_decisions
             if round3_failed:
@@ -312,13 +316,14 @@ class Retriever:
         meta = {qid: {"rule_flagged": qid in flagged_ids} for qid in items}
         try:
             judgements, results, calibration = await decide_items(
-                self.round3_provider, "d6", items, request.query, port, self.arm.deadline_ms, meta)
+                self.round3_provider, "d6", items, request.query, port, self.arm.deadline_ms, meta,
+                raw_selection=self.round3_policy == "raw")
         except Exception:                     # a provider failure is never a conflict decision
             return [], [unavailable(self.round3_provider.name, time.monotonic())], True
         promoted = []
         for a, b, relation in prepared.pair_candidates:
             judgement = judgements.get(f"d6:{a.unit.evidence_id}|{b.unit.evidence_id}")
-            if calibration is not None and judgement and judgement.p is not None and judgement.p >= calibration.use:
+            if judgement and judgement.p is not None and (calibration is not None or self.round3_policy == "raw") and judgement.p >= (0.5 if self.round3_policy == "raw" else calibration.use):
                 promoted.append((a, b, relation))
         failed = all(r.status.value != "answered" for r in results)
         return promoted, results, failed
@@ -335,14 +340,15 @@ class Retriever:
                                                    "end": item.unit.span.end}] for item in units}
         try:
             judgements, results, calibration = await decide_items(
-                self.round3_provider, "d4", items, request.query, port, self.arm.deadline_ms)
+                self.round3_provider, "d4", items, request.query, port, self.arm.deadline_ms,
+                raw_selection=self.round3_policy == "raw")
         except Exception:
             return None, None, [unavailable(self.round3_provider.name, time.monotonic())], True
         failed = all(r.status.value != "answered" for r in results)
-        if calibration is None:
+        if calibration is None and self.round3_policy != "raw":
             return None, None, results, failed            # shadow: rules order and rules packing
         scores = {qid.split(":", 1)[1]: j.p for qid, j in judgements.items() if j.p is not None}
-        return (scores or None), calibration.use, results, failed
+        return (scores or None), (0.5 if self.round3_policy == "raw" else calibration.use), results, failed
 
     async def _judge_usefulness(self, request: RetrieveRequest, plans: list[SourcePlan], port: HubPort):
         """Round 2, D2 (HLD §6.3): one question per optional called source. A confident "not

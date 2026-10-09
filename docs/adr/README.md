@@ -2,7 +2,7 @@
 
 An architecture decision record (ADR) explains **why the lab is built or tested a particular way**. Use this catalog for decisions; use the [lab guide](../lab/README.md) for a walkthrough and the [results index](../experiments/README.md) for findings.
 
-The catalog contains 23 decisions grouped into seven buckets. It was recorded retrospectively on 6 October 2026 from source baseline `848da1f` and its linked design, implementation and experiment records. The [catalog plan](catalog-plan.md) explains the grouping and scope.
+The catalog contains 25 decisions grouped into seven buckets. The initial retrospective records use source baseline `848da1f` and its linked design, implementation and experiment records. ADR-024 and ADR-025 record the subsequent 9 October Jev integration experiments. The [catalog plan](catalog-plan.md) explains the grouping and scope.
 
 ## What is this lab?
 
@@ -34,7 +34,7 @@ For the full question-to-answer flow, start with the [architecture guide](../lab
 | [Scope and contracts](scope-and-contracts/README.md) | Define the research scope, keep private answers outside runtime, and maintain explicit interfaces. | ADR-001–003 |
 | [Evidence and hubs](evidence-and-hubs/README.md) | Represent searchable evidence while preserving its origin, version and business relationships. | ADR-004–006, 023 |
 | [Routing memory](routing-memory/README.md) | Turn evidence into a reviewed map of subjects and useful search locations. | ADR-007–009 |
-| [System One: model decisions](system-one/README.md) | Separate model invocation from the policy that applies source-selection advice. | ADR-010–012 |
+| [System One: model decisions](system-one/README.md) | Separate model invocation from the policy that applies source-selection advice. | ADR-010–012, 024–025 |
 | [Agent harness](agent-harness/README.md) | Run fresh, recorded agent attempts using reusable scenario inputs. | ADR-013–016 |
 | [Evaluation](evaluation/README.md) | Create diverse grounded questions and separate valid evidence, answer meaning and acceptance. | ADR-017–020 |
 | [Operations and documentation](operations-and-documentation/README.md) | Make local inputs, reproduction limits and documentation navigation explicit. | ADR-021–022 |

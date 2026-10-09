@@ -50,6 +50,23 @@ def validate_runtime(root: Path, runtime: dict, *, fixture=False):
     arm = yaml.safe_load(matrix.read_text())['arms'][runtime['config_id']]
     if arm.get('memory_store') not in ('relations', 'tables') or arm.get('decision_provider') != 'named':
         raise ValueError('runtime must enable memory and named System One')
+    round3 = runtime.get('round3', {})
+    if not isinstance(round3, dict) or set(round3) - {'mode', 'policy', 'templates'}:
+        raise ValueError('invalid Round 3 configuration')
+    if round3.get('mode', 'none') not in {'none', 'd4', 'd6', 'both'} or round3.get('policy', 'calibrated') not in {'raw', 'calibrated'}:
+        raise ValueError('unsupported Round 3 mode or policy')
+    round3_templates = round3.get('templates', {})
+    if not isinstance(round3_templates, dict) or set(round3_templates) - {'d4', 'd6'} or any(not isinstance(v, str) or not v for v in round3_templates.values()):
+        raise ValueError('invalid Round 3 templates')
+    if round3.get('mode', 'none') != 'none':
+        template_config = yaml.safe_load(templates.read_text())
+        for decision in (('d4', 'd6') if round3['mode'] == 'both' else (round3['mode'],)):
+            template_id = round3_templates.get(decision) or template_config['defaults'][decision]
+            template = template_config['templates'].get(template_id)
+            if not template or template.get('decision') != decision:
+                raise ValueError('Round 3 template does not match decision')
+            if round3.get('policy') == 'raw' and (template.get('diagnostic', False) or template.get('type') != 'noul'):
+                raise ValueError('raw Round 3 requires non-diagnostic noul templates')
     release_file = pinned('memory_release')
     release = yaml.safe_load(release_file.read_text())
     if (release.get('release_id') != release_file.parent.name
@@ -132,6 +149,12 @@ async def open_agent_runtime(root: Path, runtime: dict, gateway, corpus: Path, o
         '--memory-release', checked['release'].parent.name, '--decision-provider', provider['provider'],
         '--system-one-providers', str(checked['providers']), '--system-one-templates', str(checked['templates']),
         '--calibration-dir', str(checked['calibration'])]
+    round3 = runtime.get('round3', {})
+    if round3.get('mode', 'none') != 'none':
+        arguments += ['--round3', round3['mode'], '--round3-provider', provider['provider'],
+                      '--round3-policy', round3.get('policy', 'calibrated')]
+        for decision, template in round3.get('templates', {}).items():
+            arguments += [f'--{decision}-template', template]
     sut = ProcessSUT(arguments)
     sut.extra_timeout_seconds = checked['profile'].deadline_ms / 1000
     try:

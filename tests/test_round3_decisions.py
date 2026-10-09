@@ -197,3 +197,47 @@ def test_reorder_that_costs_more_never_removes_a_rules_packed_unit(monkeypatch):
     d4 = finish(prepared, budget, "cl100k_base", d4_scores=reversed_scores, d4_use=0.99)
     assert {u.evidence_id for u in rules.evidence} <= {u.evidence_id for u in d4.evidence}
     assert d4.used_tokens <= budget
+
+
+@pytest.mark.parametrize('decision', ['d4', 'd6'])
+def test_raw_round3_applies_without_calibration_and_records_policy(tmp_path, decision):
+    from sanctum_contracts import RetrieveRequest
+    adapter = SystemOneHttpAdapter(SPEC, tmp_path, transport=ScriptedTransport(0.95))
+    retriever = Retriever(load_arm(ROOT/'configs/matrix.yaml', 'C4'), None,
+                          round3='both', round3_provider=adapter, round3_policy='raw')
+    request = RetrieveRequest(request_id='raw-round3', query='payment auth retry limit',
+                              mode='scoped', budget_tokens=4000, deadline_ms=3000)
+    prepared = _prepared()
+    if decision == 'd6':
+        promoted, results, failed = anyio.run(retriever._judge_conflicts, request, prepared, None)
+        assert promoted == prepared.pair_candidates
+        assert _pairs(finish(prepared, 4000, 'cl100k_base', promoted)) > _pairs(_rules_only())
+    else:
+        scores, use, results, failed = anyio.run(retriever._judge_relevance, request, prepared, None)
+        assert scores and set(scores.values()) == {0.95} and use == 0.5
+    assert not failed
+    assert all(r.value['shadow'] is False and r.value['application_policy'] == 'raw'
+               and r.value['use_threshold'] == 0.5 and r.calibration is None for r in results)
+
+
+def test_raw_relevance_changes_delivered_order_and_preserves_unavailable(tmp_path):
+    from sanctum_contracts import RetrieveRequest
+    class ReverseTransport(ScriptedTransport):
+        async def send(self, port, payload, deadline_ms):
+            self.payloads.append(payload)
+            ids=list(payload['questions'])
+            return CallOutcome(provider=SPEC.name, model=self.model, descriptor_release='none',
+                answers={qid:{'type':'noul','noul':i/len(ids)} for i,qid in enumerate(ids)})
+    request=RetrieveRequest(request_id='raw-order',query='payment auth retry limit',mode='scoped',
+                            budget_tokens=4000,deadline_ms=3000)
+    prepared=_prepared()
+    adapter=SystemOneHttpAdapter(SPEC,tmp_path,transport=ReverseTransport())
+    retriever=Retriever(load_arm(ROOT/'configs/matrix.yaml','C4'),None,round3='both',round3_provider=adapter,round3_policy='raw')
+    scores,use,_,failed=anyio.run(retriever._judge_relevance,request,prepared,None)
+    rules=finish(prepared,4000,'cl100k_base')
+    changed=finish(prepared,4000,'cl100k_base',d4_scores=scores,d4_use=use)
+    assert [e.evidence_id for e in changed.evidence] != [e.evidence_id for e in rules.evidence]
+    assert not failed
+    retriever.round3_provider=SystemOneHttpAdapter(SPEC,tmp_path,transport=ScriptedTransport(reason='timeout'))
+    promoted,results,failed=anyio.run(retriever._judge_conflicts,request,prepared,None)
+    assert not promoted and failed and all(r.status.value=='unavailable' for r in results)

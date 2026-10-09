@@ -41,8 +41,11 @@ def main(argv=None) -> int:
     parser.add_argument("--decision-params", type=Path, default=ROOT / "configs" / "d2_standin.yaml")
     parser.add_argument("--d2-template", default=None, help="template id for D2 (configs/system_one_templates.yaml)")
     parser.add_argument("--round3-template", default=None, help="template id for the Round 3 decision")
-    parser.add_argument("--round3", default="none", choices=["none", "d6", "d4"],
+    parser.add_argument("--round3", default="none", choices=["none", "d6", "d4", "both"],
                         help="Round 3 System One decision (design page §14); the config id gains +D6 / +D4")
+    parser.add_argument("--round3-policy", default="calibrated", choices=["calibrated", "raw"])
+    parser.add_argument("--d4-template", default=None)
+    parser.add_argument("--d6-template", default=None)
     parser.add_argument("--round3-provider", default=None, help="provider name for the Round 3 decision")
     parser.add_argument("--proxy-read-fd", type=int, required=True)
     parser.add_argument("--proxy-write-fd", type=int, required=True)
@@ -67,18 +70,28 @@ def main(argv=None) -> int:
         if not arguments.round3_provider:
             print("sanctum_ref: --round3 needs --round3-provider", file=sys.stderr)
             return 2
+        selected = ("d4", "d6") if arguments.round3 == "both" else (arguments.round3,)
+        templates = {key: value for key, value in {"d4": arguments.d4_template, "d6": arguments.d6_template}.items() if value}
+        if arguments.round3_template:
+            if arguments.round3 == "both":
+                parser.error("use --d4-template and --d6-template for both decisions")
+            templates[arguments.round3] = arguments.round3_template
         round3_provider = build_provider(arguments.round3_provider, arguments.decision_params,
                                          arguments.system_one_providers, arguments.calibration_dir,
-                                         template_ids={arguments.round3: arguments.round3_template}
-                                         if arguments.round3_template else None,
+                                         template_ids=templates or None,
                                          templates_path=arguments.system_one_templates)
         if not hasattr(round3_provider, "_transport"):
             print("sanctum_ref: Round 3 needs a System One HTTP provider", file=sys.stderr)
             return 2
+        if arguments.round3_policy == "raw":
+            for decision in selected:
+                template = round3_provider.template(decision)
+                if template.diagnostic or template.type != "noul":
+                    parser.error("raw Round 3 requires non-diagnostic noul templates")
         arm = dataclasses.replace(arm, config_id=f"{arm.config_id}+{arguments.round3.upper()}")
     anyio.run(serve, arm, arguments.registry, arguments.proxy_read_fd, arguments.proxy_write_fd,
               arguments.memory_seed if arm.uses_memory else None, provider, arguments.memory_release,
-              arguments.round3, round3_provider, round3_limits(arguments.system_one_providers)["d4_max_units"])
+              arguments.round3, round3_provider, round3_limits(arguments.system_one_providers)["d4_max_units"], arguments.round3_policy)
     return 0
 
 

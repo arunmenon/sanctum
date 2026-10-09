@@ -235,13 +235,15 @@ class ItemJudgement:
 
 async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: dict[str, list[dict[str, Any]]],
                        query: str, port: Any, deadline_ms: int,
-                       item_meta: Optional[dict[str, dict[str, Any]]] = None) -> tuple[dict[str, ItemJudgement], list[DecisionResult], Optional[Calibration]]:
+                       item_meta: Optional[dict[str, dict[str, Any]]] = None, *, raw_selection: bool = False) -> tuple[dict[str, ItemJudgement], list[DecisionResult], Optional[Calibration]]:
     """A Round 3 round (design page §14): the resolved template's question(s) per item; items carry
     provenance refs only and the broker reads the text. Returns judgements, receipt DecisionResults
     and the calibration used. Diagnostic templates and templates without a matching calibration
     are shadow-only: recorded, never applied."""
     started = time.monotonic()
     template = adapter.template(round_name)
+    if raw_selection and (template.diagnostic or template.type != "noul"):
+        raise ValueError("raw Round 3 requires a non-diagnostic noul template")
     questions: dict[str, dict[str, Any]] = {}
     item_payload: dict[str, dict[str, Any]] = {}
     for qid, refs in items.items():
@@ -258,8 +260,9 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
     judgements: dict[str, ItemJudgement] = {}
     results: list[DecisionResult] = []
     calibration = None if outcome.unavailable_reason or template.diagnostic else adapter._calibration(outcome.model, round_name)
-    shadow = (template.diagnostic or calibration is None
-              or not calibration.matches(adapter.name, outcome.model, outcome.descriptor_release, template.id))
+    shadow = (not raw_selection and (template.diagnostic or calibration is None
+              or not calibration.matches(adapter.name, outcome.model, outcome.descriptor_release, template.id)))
+    use_threshold = 0.5 if raw_selection else (calibration.use if calibration is not None else None)
     for qid, refs in items.items():
         own = [question_id for question_id in questions if question_id == qid or question_id.startswith(qid + "#")]
         answers = {} if outcome.unavailable_reason else {q: outcome.answers[q] for q in own if q in outcome.answers}
@@ -270,10 +273,11 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
             continue
         single = answers.get(qid)
         p_raw = single["noul"] if single is not None and single.get("type") == "noul" else None
-        p = None if shadow or p_raw is None else calibration.apply(p_raw)
+        p = None if shadow or p_raw is None else (p_raw if raw_selection else calibration.apply(p_raw))
         judgements[qid] = ItemJudgement(qid, None if template.diagnostic else p_raw, p, shadow)
         value = {"item": qid, "shadow": shadow, "refs": refs, "request_hash": digest, "usage": outcome.usage,
                  "calls": outcome.calls, "template": template.id, "diagnostic": template.diagnostic,
+                 "application_policy": "raw" if raw_selection else "calibrated", "use_threshold": use_threshold,
                  "answers": answers, **((item_meta or {}).get(qid) or {})}
         if p_raw is not None:
             value["p_raw"] = round(p_raw, 4)
@@ -289,8 +293,8 @@ async def decide_items(adapter: "SystemOneHttpAdapter", round_name: str, items: 
         results.append(DecisionResult(
             status="answered", value=value, target=f"{round_name}: template {template.id}",
             distribution=None if p_raw is None else {"true": round(p_raw, 4), "false": round(1 - p_raw, 4)},
-            calibration=None if shadow else {"method": "platt_on_logit", "binding": f"{adapter.name}@{outcome.model}.{round_name}"},
-            disposition="use" if (p is not None and p >= calibration.use) else "preserve_candidate",
+            calibration=None if shadow or raw_selection else {"method": "platt_on_logit", "binding": f"{adapter.name}@{outcome.model}.{round_name}"},
+            disposition="use" if (p is not None and use_threshold is not None and p >= use_threshold) else "preserve_candidate",
             provider=adapter.name, model_version=outcome.model, policy_version=POLICY_VERSION,
             latency_ms=outcome.latency_ms, cost=0))
-    return judgements, results, (None if shadow else calibration)
+    return judgements, results, (None if shadow or raw_selection else calibration)

@@ -121,3 +121,15 @@ Nonexclusive failed gate counts: missing fact credit 45, material unsupported cl
 The 33-answer count checks all completion conditions and supersedes the earlier 43-answer simplified diagnostic for identifying answers blocked only by the budget flag. The primary fact-coverage scores are unaffected by this particular gate. Boundary typing and judge metadata visibility remain separate audits.
 
 The [mechanical v3 audit](pdlc-scorer-v3-audit.md) supersedes the original boundary coverage figures and completion interpretation above. Supported coverage remains 76.08% versus 90.86%; corrected partial coverage is 75.83% versus 90.28%, and corrected boundary coverage is 90.74% versus 97.22%. Original results remain preserved.
+
+## Requested expansion: Jev throughout the Claude retrieval path — 9 October 2026
+
+The owner requested that the Claude experiment runner exercise Jev beyond D2 hub selection, including D4 passage relevance and D6 conflict assessment. Inspection found three integration gaps: the agent runner passes no Round 3 arguments; the reference CLI/pipeline currently chooses D4 or D6, not both; and Round 3 advice without matching calibration remains shadow-only. Merely wiring calls would therefore repeat the earlier mistake of calling the model without applying its advice.
+
+Reuse the existing broker, templates, evidence-reference validation, pipeline and scorer. Add independently selectable D4/D6 settings and a combined path, with pinned per-decision inputs and explicit active-versus-shadow policy. Preserve existing bundles and defaults. Verify that a D4 judgment changes ordering/delivery and a D6 judgment changes conflict reporting on controlled fixtures; unavailable responses must remain distinguishable from negative judgments. Record each decision's input, response and actual effect in the saved attempt.
+
+The initial transcript wording was ambiguous about selection policy. The owner clarified: keep current hub selection and use Jev in passage relevance and conflict assessment as well. Also make the Round 3 application policy explicit rather than silently running shadow mode. Do not infer that enabling more decision points removes source-access checks or evidence provenance.
+
+Once policy is resolved, implement and run affected pipeline/runtime/broker checks, then verify one real Claude attempt with applicable evidence exercises D2, D4 and D6. Compare D2-only, D2+D4, D2+D6 and D2+D4+D6 on the same tasks and limits, reporting rubric outcomes separately from call counts. Use supported, partial, boundary and design tasks; conflict cases must actually produce pairs to judge. Existing experiments remain immutable. Add dedicated ADR coverage for the new relevance/conflict policy before presenting it as implemented. No new model calls or implementation changes have been made by this planning entry.
+
+Implementation and the active development campaign are tracked in [the entire-flow plan](pdlc-jev-entire-flow-plan.md). The earlier planning entry describes the pre-implementation inspection; current verified status is in that checklist.

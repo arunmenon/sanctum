@@ -94,8 +94,13 @@ def test_real_runtime_binds_review_snapshot_and_registered_source_owners(tmp_pat
         validate_runtime(tmp_path,runtime)
 
 
-def test_sanctum_agent_mcp_runs_memory_and_broker_out_of_process(tmp_path, scenario_world, monkeypatch):
+@pytest.mark.parametrize("round3", [False, True])
+def test_sanctum_agent_mcp_runs_memory_and_broker_out_of_process(tmp_path, scenario_world, monkeypatch, round3):
     runtime, records = runtime_fixture(tmp_path, scenario_world)
+    if round3:
+        runtime["round3"] = {"mode": "both", "policy": "raw"}
+        runtime["system_one_broker"]["max_calls_per_attempt"] = 32
+        runtime["system_one_broker"]["max_input_tokens_per_attempt"] = 500000
     with SystemOneTestServer() as server:
         monkeypatch.setenv('SANCTUM_SYSTEMONE_TEST_URL', server.base_url)
         async def exercise():
@@ -115,6 +120,11 @@ def test_sanctum_agent_mcp_runs_memory_and_broker_out_of_process(tmp_path, scena
                     assert any(a['kind'] == 'subject_binding'
                                for a in trace['router_receipt']['activations'])
                     assert trace['backend_trace']['model_calls']
+                    if round3:
+                        rounds = {c['round'] for c in trace['backend_trace']['model_calls']}
+                        assert {'d2', 'd4', 'd6'} <= rounds
+                        applied = [d for d in trace['router_receipt']['decisions'] if (d.get('value') or {}).get('application_policy') == 'raw']
+                        assert applied and all(d['value']['shadow'] is False for d in applied)
                     assert any(u.get('artifact_id') for u in result['evidence'])
                     assert adapter.inventory == ['sanctum_retrieve']
                     await adapter.close()
@@ -179,3 +189,16 @@ def test_unconstrained_offers_four_hubs_even_for_release_query(tmp_path, scenari
                     assert called == {d['source'] for d in decisions if d['call']}
                     await adapter.close()
         anyio.run(exercise)
+
+
+def test_round3_runtime_rejects_invalid_policy_and_template(tmp_path, scenario_world):
+    runtime,_=runtime_fixture(tmp_path,scenario_world)
+    runtime['round3']={'mode':'both','policy':'raw','templates':{'d4':'d4-noul-v1','d6':'d6-noul-v1'}}
+    validate_runtime(tmp_path,runtime,fixture=True)
+    runtime['round3']['policy']='typo'
+    with pytest.raises(ValueError,match='Round 3'):
+        validate_runtime(tmp_path,runtime,fixture=True)
+    runtime['round3']['policy']='raw'
+    runtime['round3']['templates']['d4']='d6-noul-v1'
+    with pytest.raises(ValueError,match='template does not match'):
+        validate_runtime(tmp_path,runtime,fixture=True)

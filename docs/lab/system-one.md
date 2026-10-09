@@ -1,6 +1,6 @@
 # System One: what Jev decides
 
-System One is Sanctum’s decision layer. In the hosted experiments, Jev judges which hubs are likely to help answer a retrieval question. It selects evidence sources; Claude still writes the answer.
+System One is Sanctum’s decision layer. Earlier hosted experiments used Jev to choose hubs. The new entire-flow experiment also enables passage relevance and conflict assessment. Claude still writes the answer.
 
 A **hub description** is the text Jev reads about a source’s contents. Changing that text changes the information available to Jev, even when the hub’s actual documents stay the same.
 
@@ -17,6 +17,8 @@ flowchart TD
 ```
 
 The broker holds provider credentials and saves model-call records. Sanctum calls through the gateway; Claude has no Jev tool or provider key.
+
+The diagram above shows hub selection; the additional relevance and conflict steps are described below.
 
 ## Which Jev advice actually affects routing?
 
@@ -61,7 +63,7 @@ The Claude runner can now enable two additional reference decisions, independent
 - **D4 relevance:** Jev scores retrieved passages. Scores affect ordering and can add qualifying passages into spare budget; rule-packed evidence remains.
 - **D6 conflicts:** Jev assesses candidate passage pairs. Positive decisions add possible conflicts; existing rule flags remain.
 
-The [entire-flow experiment](../experiments/pdlc-jev-entire-flow-plan.md) uses explicit raw application, rather than silently falling back to shadow mode without calibration. These capabilities were not enabled in the earlier Claude campaign results. Their quality effect remains under evaluation.
+The [entire-flow experiment](../experiments/pdlc-jev-entire-flow-plan.md) uses explicit raw application, rather than silently falling back to shadow mode without calibration. These capabilities were not enabled in the earlier Claude campaign results. Its [48 scored runs](../experiments/pdlc-jev-entire-flow-results.md) show mixed quality: adding both hurt partial-evidence coverage, while conflict-only scored highest without promoting any conflict pairs. No new default was promoted.
 
 Runtime `round3` settings declare `mode` (`d4`, `d6`, `both` or `none`), `policy` (`raw` or `calibrated`) and optional per-decision `templates`. Earlier bundles omit this field and remain unchanged. Raw mode accepts only non-diagnostic positive `noul` templates.
 

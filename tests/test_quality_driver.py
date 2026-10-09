@@ -4,11 +4,13 @@ import sys
 from pathlib import Path
 
 import yaml
+import pytest
 
 from tools import run_quality_evaluation as driver
 
 
-def test_exhausted_judge_retry_preserves_unknown_and_finishes_other_attempt(monkeypatch, tmp_path):
+@pytest.mark.parametrize('saved_retry', [False, True])
+def test_exhausted_judge_retry_preserves_unknown_and_finishes_other_attempt(monkeypatch, tmp_path, saved_retry):
     bundle = tmp_path / 'bundle'
     bundle.mkdir()
     (bundle / 'corpus').mkdir()
@@ -32,6 +34,12 @@ def test_exhausted_judge_retry_preserves_unknown_and_finishes_other_attempt(monk
     out = run / 'quality'
     out.mkdir()
     (out / 'calibration.json').write_text('{"passed":true}')
+    if saved_retry:
+        prior=out/'judgments'/'good'
+        (prior/'schema-retry-01').mkdir(parents=True)
+        (prior/'review.json').write_text('{}')
+        (prior/'schema-retry-receipt.json').write_text('{"max_retries":1}')
+        (prior/'schema-retry-01'/'review.json').write_text('{"valid":true}')
     monkeypatch.setattr(driver, 'CLI', cli)
     monkeypatch.setattr(driver, 'sys', sys, raising=False)
     monkeypatch.setattr(driver, 'load_policy', lambda p: {'judge': {'invalid_schema_retries': 1}})
@@ -46,6 +54,8 @@ def test_exhausted_judge_retry_preserves_unknown_and_finishes_other_attempt(monk
         return {}
     def score(answer, *args, **kwargs):
         if answer == 'bad':
+            raise ValueError('semantic labels missing')
+        if saved_retry and not args[3].get('valid'):
             raise ValueError('semantic labels missing')
         return {'adjudication_kind': 'semantic', 'supported_required_fact_coverage': 1}
     reports = []
@@ -63,3 +73,6 @@ def test_exhausted_judge_retry_preserves_unknown_and_finishes_other_attempt(monk
     assert complete['scored'] == 1 and complete['judge_failures'] == 1
     assert complete['all_attempts_scored'] is False
     assert len(reports) == 1
+    if saved_retry:
+        assert not [c for c in calls if c[0]=='good']
+        assert scores['good']['review_file'].endswith('schema-retry-01/review.json')

@@ -23,6 +23,7 @@ Start here to find what the lab has tested. **Coverage means required facts esta
 | Unconstrained Jev | What happens when Jev chooses among all eligible hubs? Same 30 tasks, 90 new attempts | Corrected coverage +13.06 points vs guarded; +13.63 vs direct. These are historical comparisons | [Unconstrained findings](pdlc-jev-unconstrained-results.md) |
 | Scorer correction | Which grades change when two mechanical rules are repaired? 360 existing records | Apparent boundary regression was a grading artifact; no agent reruns | [Scorer v3 audit](pdlc-scorer-v3-audit.md) |
 | Memory and descriptions | Which change helps Sanctum? 12 new tasks, four configurations, 48 attempts | Memory helped supported questions but hurt partial evidence; richer descriptions hurt supported coverage; nothing promoted | [Four-variant follow-up](pdlc-rubric-followup-results.md) |
+| Jev at three decisions | Does adding passage relevance and conflict assessment help? Same 12 development questions, 48 fresh attempts | Mixed coverage; combined setup hurt partials. Conflict-only scored highest but promoted no conflicts; nothing promoted | [Entire-flow findings](pdlc-jev-entire-flow-results.md) |
 
 “Points” means percentage points. Each record identifies its scoring version and comparison. Original scores remain available as superseded history.
 

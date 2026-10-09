@@ -64,3 +64,7 @@ Astra reviewed the original seven buckets and 22 records at medium effort on 6 O
 - [Findings and dispositions](../reviews/lab-adr-catalog-review-20261006.md)
 
 Post-correction verification: 34 Markdown files, 206 relative links/anchors, 23 unique ADR IDs and required sections passed; `git diff --check` passed. This was a documentation-only correction, with no runtime or evaluation reruns.
+
+## Subsequent integration records — 9 October 2026
+
+ADR-024 and ADR-025 document active passage relevance and conflict assessment in the Claude runner. The catalog now has 25 records in the original seven buckets. These new records were not included in the earlier Astra review; their implementation checks and development campaign are tracked in [the entire-flow plan](../experiments/pdlc-jev-entire-flow-plan.md).

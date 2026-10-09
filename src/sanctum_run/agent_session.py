@@ -189,7 +189,49 @@ async def stop_process_group(process,grace=1.0):
     return False
 
 
-def nested_usage_cost(calls, model_prices):
+def verified_batch_usage(call, receipts):
+    """Accept batching only when trusted HTTP receipts account for every request.
+
+    Retries, failed exchanges, duplicate questions and missing usage remain unknown.
+    This changes accounting only, never a recorded model judgment.
+    """
+    matches=[]
+    for receipt in receipts:
+        outcome=receipt.get('outcome') or {}
+        if (receipt.get('round')!=call.get('round') or
+                receipt.get('provider')!=call.get('provider') or
+                receipt.get('profile')!=call.get('profile') or
+                outcome.get('unavailable_reason') is not None or
+                any(outcome.get(k)!=call.get(k) for k in ('model','calls','usage'))):
+            continue
+        exchanges=receipt.get('exchanges') or []
+        if len(exchanges)!=call['calls']:
+            continue
+        totals={'input_tokens':0,'output_tokens':0}
+        questions=[]
+        valid=True
+        for exchange in exchanges:
+            response=exchange.get('response')
+            request=exchange.get('request')
+            if (exchange.get('status')!=200 or exchange.get('error') or
+                    not isinstance(response,dict) or not isinstance(request,dict) or
+                    response.get('model')!=call.get('model') or
+                    not isinstance(request.get('questions'),dict)):
+                valid=False;break
+            questions.extend(request['questions'])
+            usage=response.get('usage') or {}
+            for key in totals:
+                if type(usage.get(key)) is not int or usage[key]<0:
+                    valid=False;break
+                totals[key]+=usage[key]
+        if (valid and len(set(questions))==len(questions) and
+                sorted(questions)==sorted(call.get('questions') or []) and
+                totals==call.get('usage')):
+            matches.append(receipt)
+    return len(matches)==1
+
+
+def nested_usage_cost(calls, model_prices, receipts=()):
     """List-price estimate only; retries/missing usage stay unknown."""
     total=0.0
     for call in calls:
@@ -200,7 +242,10 @@ def nested_usage_cost(calls, model_prices):
             continue
         rates=(model_prices or {}).get(call.get('model'), {})
         usage=call.get('usage') or {}
-        if call.get('outcome')!='ok' or call.get('calls')!=1:
+        if call.get('outcome')!='ok':
+            return None
+        if call.get('calls')!=1 and not (type(call.get('calls')) is int and
+                call['calls']>1 and verified_batch_usage(call,receipts)):
             return None
         for key in ('input_tokens','output_tokens'):
             if type(usage.get(key)) is not int or usage[key]<0:
@@ -332,7 +377,8 @@ async def run_session(adapter,*,attempt_id,ledger:AttemptLedger,out:Path,prompt:
             result['agent_cost_basis']='subscription SDK estimate, not incremental invoice' if authentication_mode=='subscription' else 'API SDK estimate'
             result['nested_model_calls']=nested
             if nested:
-                nested_cost=nested_usage_cost(nested,model_prices)
+                receipts=[json.loads(path.read_text()) for path in sorted((out/'system_one').glob('*.json'))]
+                nested_cost=nested_usage_cost(nested,model_prices,receipts)
                 result['nested_cost_usd']=nested_cost
                 result['cost_usd']=None if nested_cost is None or result['agent_cost_usd'] is None else result['agent_cost_usd']+nested_cost
                 result['combined_cost_basis']='agent SDK plus nested rate-card estimate; not an invoice'

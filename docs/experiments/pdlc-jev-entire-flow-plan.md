@@ -31,9 +31,9 @@ Each setup retains eight agent rounds, 8,000 cumulative evidence tokens, 4,000 p
 - [x] Refresh installed Claude isolation and round-limit checks against a local API double; both passed. This does not prove hosted inference.
 - [x] Prepare and freeze the 48-attempt development schedule.
 - [x] Verify hosted D4/D6 calls in real Claude traces: first combined attempt `5bd33631e8f5a3cdad032827f889c435` recorded D2, D4 and D6; D4/D6 records show raw policy, threshold 0.5 and shadow false. Controlled fixtures separately prove ordering and conflict-promotion effects.
-- [ ] Complete all scheduled attempts, retaining failures and unavailable decisions.
-- [ ] Score saved answers with the existing rubric and versioned policy; report three paired comparisons against the D2-only baseline.
-- [ ] Publish observed decision effects, rubric results, failures and limitations. No configuration promotion is implied.
+- [x] Complete all 48 scheduled attempts: all succeeded. Reconcile one successful multi-batch accounting record from saved receipts; no attempt replay.
+- [x] Score all 48 saved answers with the existing rubric and versioned policy; report three complete paired comparisons against the D2-only baseline. Recover nine already-recorded valid format retries without new judgments.
+- [x] Publish [decision effects, rubric results, recovery and limitations](pdlc-jev-entire-flow-results.md). No configuration promotion: combined partial coverage regressed, and conflict-only gains cannot be attributed to extra conflict findings because there were no promotions.
 
 ## Evidence and reproduction
 

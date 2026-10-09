@@ -143,12 +143,18 @@ def evaluate(bundle,run,policy_path,out):
                 try:
                     score=score_answer(answer,g,attempt,rows,review,context=context)
                 except ValueError as schema_error:
-                    if policy['judge'].get('invalid_schema_retries',0)!=1 or (judgment/'schema-retry-receipt.json').exists():raise
+                    if policy['judge'].get('invalid_schema_retries',0)!=1:raise
                     initial=review
+                    prior_retry=(judgment/'schema-retry-receipt.json').exists()
                     judgment=judgment/'schema-retry-01'
                     feedback={'validation_error':str(schema_error),'previous_review':initial}
-                    write_atomic(judgment.parent/'schema-retry-receipt.json',{'reason':str(schema_error),'max_retries':1,'agent_rerun':False})
-                    review=judge(packet,judgment,policy,format_feedback=feedback)
+                    if prior_retry:
+                        # Resume the one already-recorded retry; never issue a second.
+                        if not (judgment/'review.json').exists():raise schema_error
+                        review=json.loads((judgment/'review.json').read_text())
+                    else:
+                        write_atomic(judgment.parent/'schema-retry-receipt.json',{'reason':str(schema_error),'max_retries':1,'agent_rerun':False})
+                        review=judge(packet,judgment,policy,format_feedback=feedback)
                     score=score_answer(answer,g,attempt,rows,review,context=context)
             except (ValueError,subprocess.TimeoutExpired) as error:
                 failures[ident]={'reason':str(error),'quality_score':None,'agent_rerun':False,'review_directory':str(judgment.relative_to(run))}

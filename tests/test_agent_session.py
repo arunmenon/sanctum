@@ -171,3 +171,26 @@ def test_nested_predispatch_budget_refusal_has_zero_provider_cost():
     assert nested_usage_cost([refused],{}) == 0
     assert nested_usage_cost([{**refused,'calls':1}],{}) is None
     assert nested_usage_cost([{**refused,'elapsed_ms':1}],{}) is None
+
+
+def test_nested_batches_need_complete_disjoint_success_receipts():
+    from copy import deepcopy
+    from sanctum_run.agent_session import nested_usage_cost
+    prices={'jev':{'input_usd_per_million':1,'output_usd_per_million':0}}
+    usage={'input_tokens':200,'output_tokens':20}
+    call=dict(model='jev',provider='typesafe-jev',profile='strict',round='d6',
+              questions=['a','b'],outcome='ok',calls=2,usage=usage)
+    receipt=dict(provider='typesafe-jev',profile='strict',round='d6',
+        outcome=dict(model='jev',calls=2,usage=usage,unavailable_reason=None),
+        exchanges=[dict(status=200,request={'questions':{q:{}}},
+            response=dict(model='jev',usage={'input_tokens':100,'output_tokens':10})) for q in ('a','b')])
+    assert nested_usage_cost([call],prices,[receipt])==pytest.approx(.0002)
+    assert nested_usage_cost([call],prices,[receipt,receipt]) is None
+    for mutation in ('failed','missing','duplicate','wrong_total','wrong_model'):
+        bad=deepcopy(receipt)
+        if mutation=='failed':bad['exchanges'][0]['status']=503
+        if mutation=='missing':del bad['exchanges'][0]['response']['usage']['output_tokens']
+        if mutation=='duplicate':bad['exchanges'][1]['request']['questions']={'a':{}}
+        if mutation=='wrong_total':bad['exchanges'][0]['response']['usage']['input_tokens']=101
+        if mutation=='wrong_model':bad['exchanges'][0]['response']['model']='other'
+        assert nested_usage_cost([call],prices,[bad]) is None
